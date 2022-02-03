@@ -1,0 +1,18 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../controllers/micro_app_event_controller.dart';
+
+typedef PageBuilder = Widget Function(BuildContext context, dynamic arguments);
+typedef MethodCallHandler = Future<dynamic> Function(MethodCall);
+typedef MicroAppEventOnEvent = void Function(MicroAppEvent<dynamic>);
+typedef MicroAppEventOnDone = void Function();
+typedef MicroAppEventOnError = Function;
+typedef MicroAppEventSubscription
+    = StreamSubscription<MicroAppEvent<dynamic>> Function(MicroAppEventOnEvent?,
+        {bool? cancelOnError,
+        MicroAppEventOnDone? onDone,
+        MicroAppEventOnError? onError});
+typedef MicroAppEmitter = void Function(MicroAppEvent<dynamic> event);
