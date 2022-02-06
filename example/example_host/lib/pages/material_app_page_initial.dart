@@ -5,8 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class MaterialAppPageInitial extends StatelessWidget {
+class MaterialAppPageInitial extends StatefulWidget {
   const MaterialAppPageInitial({Key? key}) : super(key: key);
+
+  @override
+  State<MaterialAppPageInitial> createState() => _MaterialAppPageInitialState();
+}
+
+class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +36,11 @@ class MaterialAppPageInitial extends StatelessWidget {
               ElevatedButton(
                 child: const Text('Emit "my_event"'),
                 onPressed: () {
-                  MicroAppEventController().emit(const MicroAppEvent(
-                      name: 'my_event',
-                      payload: {'data': 'lorem ipsum'},
-                      channels: ['abc']));
+                  MicroAppEventController().emit(
+                      MicroAppEvent<Map<String, dynamic>>(
+                          name: 'my_event',
+                          payload: const {'data': 'lorem ipsum'},
+                          channels: const ['abc']));
                 },
               ),
               ElevatedButton(
@@ -117,6 +125,24 @@ class MaterialAppPageInitial extends StatelessWidget {
                       builder: (context) => const ExamplePage()));
                 },
               ),
+              MicroAppWidgetBuilder(
+                  initialData: MicroAppEvent(name: 'my_event', payload: 0),
+                  channels: const ['widget_channel'],
+                  builder: (context, eventSnapshot) {
+                    if (eventSnapshot.hasError) return const Text('Error');
+                    return ElevatedButton(
+                      child: Text(
+                        'emit event in [widget_channel] count = ${eventSnapshot.data?.payload}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        MicroAppEventController().emit(MicroAppEvent<int>(
+                            name: 'my_event',
+                            payload: ++count,
+                            channels: const ['widget_channel']));
+                      },
+                    );
+                  }),
             ],
           ),
         ),

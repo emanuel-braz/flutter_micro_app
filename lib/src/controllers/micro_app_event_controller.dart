@@ -1,79 +1,26 @@
 // ignore_for_file: cancel_subscriptions
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
 
-/// Event channels
-abstract class EventChannelsEquatable extends Equatable {
-  final List<String> channels;
-  const EventChannelsEquatable(this.channels);
-}
-
-/// [MicroAppEvent]
-class MicroAppEvent<T> extends EventChannelsEquatable {
-  final String name;
-  final T? payload;
-  const MicroAppEvent(
-      {required this.name, this.payload, List<String> channels = const []})
-      : super(channels);
-
-  @override
-  String toString() {
-    return jsonEncode(toMap());
-  }
-
-  /// [MicroAppEvent.fromJson(json)]
-  static MicroAppEvent? fromJson(String json) {
-    try {
-      final map = jsonDecode(json);
-      final name = map['name'];
-      final payload = map['payload'];
-      final channels = map['channels'];
-      return MicroAppEvent(name: name, payload: payload, channels: channels);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// [toMap]
-  Map<String, dynamic> toMap() =>
-      {'name': name, 'payload': payload, 'channel': channels};
-
-  /// [MicroAppEvent.copyWith]
-  MicroAppEvent<T> copyWith({
-    String? name,
-    T? payload,
-    List<String>? channels,
-  }) {
-    return MicroAppEvent<T>(
-        name: name ?? this.name,
-        payload: payload ?? this.payload,
-        channels: channels ?? this.channels);
-  }
-
-  @override
-  List<Object?> get props => [name, payload, channels];
-}
-
 /// [MicroAppEventHandler]
-class MicroAppEventHandler extends EventChannelsEquatable {
+class MicroAppEventHandler<T> extends EventChannelsEquatable {
   final String? id;
   final MicroAppEventOnEvent onEvent;
   final MicroAppEventOnDone? onDone;
   final MicroAppEventOnError? onError;
   final bool? cancelOnError;
 
-  const MicroAppEventHandler(this.onEvent,
-      {this.onDone,
-      this.onError,
-      this.cancelOnError,
-      List<String> channels = const [],
-      this.id})
-      : super(channels);
+  const MicroAppEventHandler(
+    this.onEvent, {
+    this.onDone,
+    this.onError,
+    this.cancelOnError,
+    List<String> channels = const [],
+    this.id,
+  }) : super(channels);
 
   @override
   List<Object?> get props =>
@@ -131,12 +78,13 @@ class MicroAppEventController {
   }
 
   /// register handler
-  StreamSubscription<MicroAppEvent>? registerHandler(
+  StreamSubscription<MicroAppEvent>? registerHandler<T>(
       MicroAppEventHandler? handler) {
     if (handler == null) return null;
     final subscription =
         _handlerRegisterHelper.registerHandler(stream, handler);
     _handlers.putIfAbsent(handler, () => subscription);
+    return subscription;
   }
 
   /// pauseAllHandlers
@@ -172,11 +120,16 @@ class HandlerRegisterHelper {
   /// registerHandler
   StreamSubscription<MicroAppEvent> registerHandler(
       Stream<MicroAppEvent> stream, MicroAppEventHandler handler) {
-    return stream.where((event) => shouldHandleEvents(handler, event)).listen(
-        handler.onEvent,
-        onDone: handler.onDone,
-        onError: handler.onError,
-        cancelOnError: handler.cancelOnError);
+    return stream
+        // TODO: implementar distinct
+        // .distinct((previous, event) => event.distinct)
+        .where((event) => handlerHasSameEventTypeOrDynamic(handler, event))
+        .where((event) => containsSomeChannelsOrHandlerHasNoChannels(
+            handler.channels, event.channels))
+        .listen(handler.onEvent,
+            onDone: handler.onDone,
+            onError: handler.onError,
+            cancelOnError: handler.cancelOnError);
   }
 
   /// pauseAllSubscriptions
@@ -221,46 +174,72 @@ class HandlerRegisterHelper {
   /// findHandlerEntries
   List<MapEntry<MicroAppEventHandler, StreamSubscription<MicroAppEvent>>>
       findHandlerEntries(
-          Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> handlers,
-          {String? id,
-          List<String>? channels}) {
+    Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> handlers, {
+    String? id,
+    List<String>? channels,
+  }) {
     final entries =
         <MapEntry<MicroAppEventHandler, StreamSubscription<MicroAppEvent>>>[];
 
     channels = channels ?? [];
-    for (var handler in handlers.entries) {
-      bool hasChannel = isChannelsIntersection(handler.key.channels, channels);
-      if ((handler.key.id == id && id != null) || hasChannel) {
-        entries.add(handler);
+    for (var handlerEntry in handlers.entries) {
+      if (id != null) {
+        if (handlerEntry.key.id != id) {
+          continue;
+        } else {
+          entries.add(handlerEntry);
+          continue;
+        }
+      }
+
+      bool hasChannel =
+          containsSomeChannels(handlerEntry.key.channels, channels);
+
+      if (hasChannel) {
+        entries.add(handlerEntry);
       }
     }
 
     return entries;
   }
 
-  /// isChannelsIntersection
-  bool isChannelsIntersection(
-      List<String> handlerChannels, List<String>? channels) {
-    if (channels == null || channels.isEmpty || handlerChannels.isEmpty) {
-      return false;
+  bool handlerHasSameEventTypeOrDynamic(
+      MicroAppEventHandler handler, MicroAppEvent event) {
+    final handlerGenericType = handler.runtimeType.toString();
+
+    if (handlerGenericType == r'MicroAppEventHandler<Object?>' ||
+        handlerGenericType == r'MicroAppEventHandler<dynamic>') {
+      return true;
     }
 
-    var firstListSet = handlerChannels.toSet();
-    var secondListSet = channels.toSet();
-    Set<String> intersection = firstListSet.intersection(secondListSet);
+    var handlerType = handler.runtimeType
+        .toString()
+        .replaceFirst(r'MicroAppEventHandler<', '')
+        .replaceFirst(r'>', '');
+    final eventType = event.runtimeType
+        .toString()
+        .replaceFirst(r'MicroAppEvent<', '')
+        .replaceFirst(r'>', '');
 
-    return intersection.isNotEmpty;
+    return eventType == handlerType;
   }
 
   /// shouldHandleEvents
-  bool shouldHandleEvents(MicroAppEventHandler handler, MicroAppEvent event) {
+  bool containsSomeChannelsOrHandlerHasNoChannels(
+      List<String> handlerChannels, List<String> eventChannels) {
     // If there is no handler channels, so handle all events
-    if (handler.channels.isEmpty) return true;
+    if (handlerChannels.isEmpty) return true;
+    return containsSomeChannels(handlerChannels, eventChannels);
+  }
+
+  bool containsSomeChannels(
+      List<String> handlerChannels, List<String> eventChannels) {
+    if (handlerChannels.isEmpty && eventChannels.isEmpty) return true;
 
     bool handlerChannelsContainsEventChannels = false;
-    for (var handlerChannel in handler.channels) {
+    for (var handlerChannel in handlerChannels) {
       handlerChannelsContainsEventChannels =
-          event.channels.contains(handlerChannel);
+          eventChannels.contains(handlerChannel);
       if (handlerChannelsContainsEventChannels) break;
     }
     return handlerChannelsContainsEventChannels;

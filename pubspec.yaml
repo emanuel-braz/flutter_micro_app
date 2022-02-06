@@ -1,6 +1,6 @@
 name: flutter_micro_app
 description: A package to speed up the creation of micro frontends structure in Flutter applications
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/emanuel-braz/flutter_micro_app
 
 environment:
