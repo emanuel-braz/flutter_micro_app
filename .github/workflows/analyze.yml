@@ -1,0 +1,26 @@
+name: Flutter Analyze
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop, master, release/* ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v2
+    - uses: subosito/flutter-action@v1
+      with:
+        flutter-version: '2.8.1'
+        channel: 'stable'
+    - name: Install dependencies
+      run: flutter pub get
+    - name: Run Flutter analyze
+      run: flutter analyze
+    - name: Run Flutter tests
+      run: flutter test
