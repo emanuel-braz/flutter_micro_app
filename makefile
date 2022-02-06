@@ -6,4 +6,4 @@ analyze:
 	&& dart pub global run pana .
 
 publish:
-	@dart pub publish
+	@git checkout master && dart pub publish
