@@ -1,11 +1,12 @@
 
 ### A package to speed up the creation of micro frontend(or independent features) structure in Flutter applications (beta version)
+[![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 <br>
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
 
-### Navigation between pages
+### ⛵️ Navigation between pages
 #### Use [NavigatorInstance] to navigate between pages
 ```dart
 NavigatorInstance.pop();
@@ -15,7 +16,7 @@ NavigatorInstance.pushReplacementNamed();
 NavigatorInstance ...
 ```
 
-### Open native (Android/iOS) pages, in this way
+### 📲 Open native (Android/iOS) pages, in this way
 #### It needs native implementation, you can see an example inside android folder
 
 ```dart
@@ -40,7 +41,7 @@ NavigatorInstance.eventController.nativeLoggerStream.listen((event) {});
 NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
 ```
 ---
-### Define micro app configurations and contracts
+### ⚙️ Define micro app configurations and contracts
 
 #### Configure the preferences (optional)
 ```dart
@@ -52,16 +53,16 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
   );
 ```
 
-### Register all routes
+### 🗺 Register all routes
 > This is just a suggestion of routing strategy (Optional)
 It's important that all routes are availble out of the projects, avoiding dependencies between micro apps.
 Create all routes inside a new package, and import it in any project as a dependency. This will make possible to open routes from anywhere in a easy and transparent way.  
   
-Create the routing package: `flutter create template=package micro_routes` 
+Create the routing package: `flutter create --template=package micro_routes` 
 
 ```dart 
 // Export all routes
-class Application1Routes extends MicroAppRoutes {
+class Application1Routes implements MicroAppRoutes {
   @override
   MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('application1');
   String get page1 => baseRoute.path('page1');
@@ -78,7 +79,7 @@ NavigatorInstance.pushNamed(Application1Routes().page1);
 
 
 
-### Expose all pages throuth a contract `MicroApp` (Inside external projects or features folder)
+### 🌐 🤝 Expose all pages throuth a contract `MicroApp` (Inside external projects or features folder)
 ```dart
 import 'package:micro_routes/exports.dart';
 
@@ -96,7 +97,7 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 }
 ```
 
-### Initialize the host, registering all micro apps
+### 🚀 Initialize the host, registering all micro apps
 - MicroHost is also a MicroApp, so you can register pages here too.
 - MyApp needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
 - The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages.
@@ -138,20 +139,48 @@ class MyApp extends MicroHostStatelessWidget {
 ```
 
 ---
-### Handling micro apps events
+### 🤲 Handling micro apps events
 
-#### Dispatching events
+#### 🗣 Dispatches events to all handlers that listen to channels 'user_auth' and 'chatbot'
 ```dart
-// dispatching in channel "user_auth", only
 MicroAppEventController()
-    .emit(const MicroAppEvent(
+    .emit(const MicroAppEvent<Map<String, dynamic>>(
         name: 'my_event',
         payload: {'data': 'lorem ipsum'},
-        channels: ['user_auth'])
+        channels: ['user_auth', 'chatbot'])
     );
 ```
 
-#### Listen to events (MicroApp)s
+#### 🗣 Dispatches events directly to handler with id = '0001' (only)
+```dart
+MicroAppEventController()
+    .emit(const MicroAppEvent(
+        name: 'my_event',
+        payload: {},
+        id: '0001')
+    );
+```
+
+#### 🗣 Dispatches events to handlers that listen to String event type
+```dart
+MicroAppEventController()
+    .emit<String>(const MicroAppEvent(
+        name: 'my_event',
+        payload: 'some string here')
+    );
+```
+
+#### 🗣 Dispatches events to handlers that listen to String event type, and channels 'user_auth' and 'wellcome'
+```dart
+MicroAppEventController()
+    .emit<String>(const MicroAppEvent<String>(
+        name: 'my_event',
+        payload: 'some string here'),
+        channels: ['user_auth', 'wellcome']
+    );
+```
+
+#### 🦻 Listen to events (MicroApp)s
 ```dart
 // It listen to all events
 @override
@@ -172,7 +201,16 @@ MicroAppEventController()
         // User auth feature, asked to show a popup :)
         myController.showDialog(event.payload);
       }, channels: ['chatbot', 'user_auth']);
+
+// It listen to events with type String (only)
+@override
+  MicroAppEventHandler<String>? get microAppEventHandler =>
+      MicroAppEventHandler((event) {
+        // Use .cast() to automatically cast the payload data to String? type
+        logger.d(event.cast()); 
+      });
 ```
+
 #### Managing events
 ```dart
 MicroAppEventController().unregisterHandler(id: '123');
@@ -182,7 +220,7 @@ MicroAppEventController().resumeAllHandlers();
 MicroAppEventController().unregisterAllHandlers();
 ```
 
-### Initiating an event subscription anywhere in the application (inside a StatefulWidget, for example)
+### 🦻🌐 Initiating an event subscription anywhere in the application (inside a StatefulWidget, for example)
 #### Using subscription
 ```dart
 final subscription = MicroAppEventController().stream.listen((MicroAppEvent event) {
@@ -207,9 +245,35 @@ void dispose() {
     super.dispose();
 }
 ```
+
+### 🏭 Using the pre-built widget `MicroAppWidgetBuilder` to display data on the screen
+It can be used to show visual info on the screen.
+In this example, it shows a button and the label changes when user clicks on the button
+> When user dispatched an event in the same channel that the widget is listening to, the widget redraw the updated info on the screen
+```dart
+MicroAppWidgetBuilder(
+  initialData: MicroAppEvent(name: 'my_event', payload: 0),
+  channels: const ['widget_channel'],
+  builder: (context, eventSnapshot) {
+    if (eventSnapshot.hasError) return const Text('Error');
+    return ElevatedButton(
+      child: Text('Widget count = ${eventSnapshot.data?.payload}'
+      ),
+      onPressed: () {
+        MicroAppEventController().emit(MicroAppEvent<int>(
+            name: 'my_event',
+            payload: ++count,
+            channels: const ['widget_channel']));
+      },
+    );
+  }
+)
+```
+
+
 ---
 
-### Overriding onGenerateRoute method
+### 📝 Overriding onGenerateRoute method
 
 If it fails to get a page route, ask for native(Android/iOS) to open the page
 ```dart
@@ -242,7 +306,7 @@ If it fails to get a page route, show a default error page
   }
      
 ```
-### The following table shows how Dart values are received on the platform side and vice versa
+### 📎 The following table shows how Dart values are received on the platform side and vice versa
 
 |Dart	                    |   Kotlin         |    Swift                                   |   Java
 |---|---|---|---|
@@ -261,3 +325,6 @@ If it fails to get a page route, show a default error page
 |Map	                    |   HashMap        |    Dictionary                              |   java.util.HashMap
   
 <br>  
+
+## 👨‍💻👨‍💻  Contributing
+#### Contributions of any kind are welcome!

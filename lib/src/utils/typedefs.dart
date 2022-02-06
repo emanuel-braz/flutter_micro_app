@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../controllers/micro_app_event_controller.dart';
+import '../entities/events/micro_app_event.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, dynamic arguments);
 typedef MethodCallHandler = Future<dynamic> Function(MethodCall);
-typedef MicroAppEventOnEvent = void Function(MicroAppEvent<dynamic>);
+typedef MicroAppEventOnEvent = void Function(MicroAppEvent);
 typedef MicroAppEventOnDone = void Function();
 typedef MicroAppEventOnError = Function;
 typedef MicroAppEventSubscription
@@ -16,3 +16,5 @@ typedef MicroAppEventSubscription
         MicroAppEventOnDone? onDone,
         MicroAppEventOnError? onError});
 typedef MicroAppEmitter = void Function(MicroAppEvent<dynamic> event);
+typedef MicroAppBuilder = Widget Function(
+    BuildContext context, AsyncSnapshot<MicroAppEvent> microAppEventSnapshot);
