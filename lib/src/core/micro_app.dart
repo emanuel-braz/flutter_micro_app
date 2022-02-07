@@ -1,4 +1,4 @@
-import '../controllers/micro_app_event_controller.dart';
+import '../entities/events/micro_app_event_handler.dart';
 import '../entities/router/base_route.dart';
 import '../utils/typedefs.dart';
 import 'micro_page.dart';

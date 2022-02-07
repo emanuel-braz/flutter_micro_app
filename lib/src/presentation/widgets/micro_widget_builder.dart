@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../flutter_micro_app.dart';
+import '../../controllers/app_event/micro_app_event_helper.dart';
 import '../../utils/extensions/list_extension.dart';
 
 class MicroAppWidgetBuilder<T> extends StatefulWidget {
@@ -22,7 +23,7 @@ class MicroAppWidgetBuilder<T> extends StatefulWidget {
 
 class _MicroAppWidgetBuilderState<T> extends State<MicroAppWidgetBuilder> {
   Stream<MicroAppEvent>? stream;
-  final helper = HandlerRegisterHelper();
+  final helper = MicroAppEventHelper();
 
   @override
   void initState() {
