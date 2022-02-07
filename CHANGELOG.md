@@ -1,6 +1,7 @@
-## 0.1.0
-[2022-01-30]
-* initial release.
+## 0.3.0
+[2022-02-06]
+### Added
+- add distinct property to handlers
 
 ## 0.2.0
 [2022-02-05]
@@ -11,7 +12,8 @@
 - bug fixes
 - refactoring
 
-## 0.3.0
-[2022-02-06]
-### Added
-- add distinct property to handlers
+## 0.1.0
+[2022-01-30]
+* initial release.
+
+
