@@ -1,6 +1,9 @@
 
 ### A package to speed up the creation of micro frontend(or independent features) structure in Flutter applications (beta version)
-[![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+[![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
+![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)
+![license](https://img.shields.io/github/license/emanuel-braz/flutter_micro_app)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 <br>
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
