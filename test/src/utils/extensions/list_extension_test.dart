@@ -1,6 +1,10 @@
 import 'package:flutter_micro_app/src/utils/extensions/list_extension.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/*
+  Test descriptions are in Portuguese language
+*/
+
 void main() {
   group('[list1.equals(list2)]', () {
     test(

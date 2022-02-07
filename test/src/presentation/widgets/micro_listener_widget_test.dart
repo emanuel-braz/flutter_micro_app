@@ -2,6 +2,10 @@ import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 
+/*
+  Test descriptions are in Portuguese language
+*/
+
 void main() {
   group('[MicroAppWidgetBuilder:tipagem]', () {
     testWidgets('Deve encontrar o widget com tipagem dynamic, sem erros',
