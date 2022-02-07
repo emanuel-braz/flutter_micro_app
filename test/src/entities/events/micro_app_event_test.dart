@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'package:flutter_micro_app/src/entities/events/micro_app_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/*
+  Test descriptions are in Portuguese language
+*/
+
 void main() {
   group('[MicroAppEvent.fromJson]', () {
     test('Deve converter um json(String) válido em um MicroAppEvent<String>',

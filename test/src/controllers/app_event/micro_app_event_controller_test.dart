@@ -12,7 +12,6 @@ class SpecializedClass {
 
 void main() {
   late MicroAppEventController controller;
-  late HandlerRegisterHelper registerHelper;
 
   // fixtures
   final eventTypeString =
@@ -37,149 +36,41 @@ void main() {
 
   setUp(() {
     controller = MicroAppEventController.$testOnlyPurpose();
-    registerHelper = HandlerRegisterHelper();
   });
 
-  test(
-      'Quando um evento de List<List<String>> for emitido, deve disparar o handler, apenas quando handler possuir a mesma tipagem',
-      () async {
-    // arrange
-    List<List<String>>? payloadListListString;
-    final subscription = controller
-        .registerHandler(MicroAppEventHandler<List<List<String>>>((event) {}));
+  group('MicroAppEventController: typing', () {
+    test(
+        'Quando um evento de List<List<String>> for emitido, deve disparar o handler, apenas quando handler possuir a mesma tipagem',
+        () async {
+      // arrange
+      List<List<String>>? payloadListListString;
+      final subscription = controller.registerHandler(
+          MicroAppEventHandler<List<List<String>>>((event) {}));
 
-    controller.emit(eventTypeDynamic);
-    controller.emit(eventTypeString);
-    controller.emit(eventTypeInt);
-    controller.emit(eventTypeSpecialized);
-    controller.emit(eventTypeListListString);
-    controller.emit(eventTypeInt);
+      // act
+      controller.emit(eventTypeDynamic);
+      controller.emit(eventTypeString);
+      controller.emit(eventTypeInt);
+      controller.emit(eventTypeSpecialized);
+      controller.emit(eventTypeListListString);
+      controller.emit(eventTypeInt);
 
-    // assert
-    subscription!.onData((event) {
-      payloadListListString = event.cast();
-      expect(event.payload.runtimeType.toString(), 'List<List<String>>');
-      expect(
-          payloadListListString.runtimeType.toString(), 'List<List<String>>');
-      expect(eventTypeListListString.cast()?.length, equals(2));
+      // assert
+      subscription!.onData((event) {
+        payloadListListString = event.cast();
+        expect(event.payload.runtimeType.toString(), 'List<List<String>>');
+        expect(
+            payloadListListString.runtimeType.toString(), 'List<List<String>>');
+        expect(eventTypeListListString.cast()?.length, equals(2));
+      });
+
+      await Future.delayed(Duration.zero);
+      // Handler was called
+      expect(payloadListListString, equals(eventTypeListListString.cast()));
     });
-
-    await Future.delayed(Duration.zero);
-    // Handler was called
-    expect(payloadListListString, equals(eventTypeListListString.cast()));
   });
 
-  group('[HandlerRegisterHelper]', () {
-    test(
-        'Quando um evento sem channels for emitido, deve disparar o handler, se handler nao tiver channels definidos',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {});
-      final event = MicroAppEvent(name: 'my_event');
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(true));
-    });
-
-    test(
-        'Quando um evento com channels for emitido, deve disparar o handler, se handler nao tiver channels definidos',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {});
-      final event =
-          MicroAppEvent(name: 'my_event', channels: const ['channel1']);
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(true));
-    });
-
-    test(
-        'Quando um evento com channels for emitido, deve disparar o handler, se o handler tiver um channel que exista também no evento',
-        () {
-      // arrange
-      const commonChannel = 'channel2';
-      final handler =
-          MicroAppEventHandler((event) {}, channels: const [commonChannel]);
-      final event = MicroAppEvent(
-          name: 'my_event',
-          channels: const ['channel1', commonChannel, 'channel3']);
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(true));
-    });
-
-    test(
-        'Quando um evento com channels for emitido, Não deve disparar o handler, se handler tiver algum channel, mas que Não seja nenhum dos channels existentes no evento',
-        () {
-      // arrange
-      final handler =
-          MicroAppEventHandler((event) {}, channels: const ['channel1']);
-      final event = MicroAppEvent(
-          name: 'my_event', channels: const ['channel2', 'channel3']);
-
-      // act
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(false));
-    });
-
-    test(
-        'Quando o controller emitir um evento com mútiplos channels, deve disparar o handler, se o handler tiver um channel que exista também no evento',
-        () {
-      // arrange
-      final handler =
-          MicroAppEventHandler((event) {}, channels: const ['channel1']);
-      final event = MicroAppEvent(
-          name: 'my_event',
-          channels: const ['channel1', 'channel2', 'channel3']);
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(true));
-    });
-
-    test(
-        'Quando o controller emitir um evento com um único channel, deve disparar o handler, se o handler tiver múltiplos channels, e pelo menos um, exista também no evento',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {},
-          channels: const ['channel1', 'channel2', 'channel3']);
-      final event =
-          MicroAppEvent(name: 'my_event', channels: const ['channel3']);
-      controller.registerHandler(handler);
-
-      // act
-      final result = registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-          handler.channels, event.channels);
-
-      // assert
-      expect(result, equals(true));
-    });
-
+  group('[MicroAppEventController.unregisterHandler]', () {
     test(
         'Deve desregistrar os dois handlers com o "channel1" e deve permanecer o handler com "channel3" e "channel12", quando desregistrar pelo "channel1"',
         () async {
@@ -198,6 +89,7 @@ void main() {
       controller.registerHandler(handler3);
       controller.registerHandler(handler4);
 
+      // act
       await controller.unregisterHandler(channels: ['channel1']);
 
       // assert
@@ -213,114 +105,6 @@ void main() {
       expect(hasHandler2, equals(false));
       expect(hasHandler3, equals(true));
       expect(hasHandler4, equals(true));
-    });
-
-    test(
-        'O handler deve ser encontrado nos registros, caso o channel informado coincidir',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {},
-          channels: const ['channel1', 'channel2', 'channel3']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channel2']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(true));
-    });
-
-    test(
-        'O handler deve ser encontrado nos registros, em caso de um ou mais channels coincidirem',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {},
-          channels: const ['channel1', 'channel2']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channel2', 'channel1']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(true));
-    });
-
-    test(
-        'O handler deve ser encontrado nos registros, em caso de um channel coincidir',
-        () {
-      // arrange
-      final handler =
-          MicroAppEventHandler((event) {}, channels: const ['channel1']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channel2', 'channel1']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(true));
-    });
-
-    test(
-        'O handler Não deve ser encontrado nos registros, caso a lista de channels informada esteja vazia e o handler tenha ao menos um channel',
-        () {
-      // arrange
-      final handler =
-          MicroAppEventHandler((event) {}, channels: const ['channel1']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(handler.channels, []);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(false));
-    });
-
-    test(
-        'O handler será encontrado nos registros, caso a lista de channels dele esteja vazia, mesmo que seja informado um ou mais channels na busca',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {}, channels: const []);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channel1']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(true));
-    });
-
-    test(
-        'O handler será encontrado nos registros, caso a lista de channels dele esteja vazia, e seja informado uma lista vazia de channels na busca',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {}, channels: const []);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(handler.channels, []);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(true));
-    });
-
-    test(
-        'O handler Não será encontrado nos registros, caso a lista de channels informada na coincida com a lista de channels do handler',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {},
-          channels: const ['channel1', 'channel2', 'channel3', 'channel4']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channelA', 'channelB', 'channelC']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(false));
-    });
-
-    test(
-        'O handler Não será encontrado nos registros, caso a lista de channels informada tenha um unico channel que não na coincida com qualquer channel na lista de channels do handler',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {},
-          channels: const ['channel1', 'channel2', 'channel3', 'channel4']);
-
-      final handlerSholdBeFoundInHandlersMap = registerHelper
-          .containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, ['channelA']);
-
-      expect(handlerSholdBeFoundInHandlersMap, equals(false));
     });
   });
 
@@ -673,171 +457,7 @@ void main() {
     });
   });
 
-  group('[HandlerRegisterHelper.handlerHasSameEventType]', () {
-    test('Quando informar handler e evento do tipo String, deve retornar true',
-        () {
-      // arrange
-      final handler =
-          MicroAppEventHandler<String>((event) {}, channels: const ['1', '2']);
-      final event =
-          MicroAppEvent<String>(name: 'my_event', channels: const ['1', '2']);
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(true));
-    });
-
-    test(
-        'Quando informar handler de tipo int e evento do tipo String, deve retornar false',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler<int>((event) {});
-      final event = MicroAppEvent<String>(name: 'my_event');
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(false));
-    });
-
-    test(
-        'Quando informar handler de tipo String e evento do tipo int, deve retornar false',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler<String>((event) {});
-      final event = MicroAppEvent<int>(name: 'my_event');
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(false));
-    });
-
-    test(
-        'Quando informar handler de tipo dynamic e evento do tipo List<String>, deve retornar false',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {});
-      final event = MicroAppEvent<List<String>>(name: 'my_event');
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(true));
-    });
-
-    test(
-        'Quando informar handler sem tipo e evento com tipo String, deve retornar true',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler((event) {});
-      final event = MicroAppEvent<String>(name: 'my_event');
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(true));
-    });
-
-    test(
-        'Quando informar handler com tipo String e evento sem tipo, deve retornar false',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler<String>((event) {});
-      final event = MicroAppEvent(name: 'my_event');
-
-      // act
-      bool isTypeEquals =
-          registerHelper.handlerHasSameEventTypeOrDynamic(handler, event);
-
-      // assert
-      expect(isTypeEquals, equals(false));
-    });
-  });
-
-  group('[HandlerRegisterHelper.isChannelsIntersection]', () {
-    test(
-        'asdasdasdsad asd Deve retornar true quando o handler asdasdsanão tiver channels registrados e evento também não',
-        () {
-      // arrange
-      final c1 = [
-        'asd',
-        'qwsqweqw',
-        'idbfsd',
-        'ajnd asd',
-        '12sasdads',
-        'dnwe3iuwe',
-        'endiue',
-        ' 23wdfsdcsdsdsdfsdf'
-      ];
-      final c2 = [
-        '7h87ah8dh',
-        'qwsqweqw',
-        'adjkabskdjbkas',
-        'asdsasd asd',
-        'asdasdqwqweqweqw',
-        'vmmcnv',
-        '99bjjfgbj9fg',
-        ' -'
-      ];
-      final handler = MicroAppEventHandler<String>((event) {}, channels: c1);
-      final event = MicroAppEvent<String>(name: 'my_event', channels: c2);
-
-      // act
-      bool hasSomeChannels =
-          registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, event.channels);
-
-      // assert
-      expect(hasSomeChannels, equals(true));
-    });
-
-    test(
-        'Deve retornar true quando o handler não tiver channels registrados e evento também não',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler<String>((event) {});
-      final event = MicroAppEvent<String>(name: 'my_event');
-
-      // act
-      bool hasSomeChannels =
-          registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, event.channels);
-
-      // assert
-      expect(hasSomeChannels, equals(true));
-    });
-
-    test(
-        'Deve retornar true quando o handler não tiver channels registrados, mas o evento tenha',
-        () {
-      // arrange
-      final handler = MicroAppEventHandler<String>((event) {});
-      final event = MicroAppEvent<String>(
-          name: 'my_event', channels: const ['some_channel']);
-
-      // act
-      bool hasSomeChannels =
-          registerHelper.containsSomeChannelsOrHandlerHasNoChannels(
-              handler.channels, event.channels);
-
-      // assert
-      expect(hasSomeChannels, equals(true));
-    });
-  });
-
-  group('[MicroAppEventHandler]', () {
+  group('[MicroAppEventController.registerHandler]', () {
     test(
         'Quando o handler não possuir uma tipagem especifica, ele deve ser disparado por qualquer evento',
         () {
@@ -916,6 +536,118 @@ void main() {
 
       // Handler was called
       expect(count, equals(0));
+    });
+  });
+
+  group('[MicroAppEventHandler.distinct]', () {
+    test(
+        'Deve: disparar o handler duas vezes'
+        'Quando: dois eventos forem emitidos'
+        'Desde que: os eventos sejam diferentes e distinct seja igual a true por default',
+        () async {
+      // arrange
+      final evento1 = MicroAppEvent(name: 'distinct', payload: 1);
+      final evento2 = MicroAppEvent(name: 'distinct', payload: 2);
+      int count = 0;
+      controller.registerHandler(MicroAppEventHandler<int>((event) {
+        ++count;
+      }));
+
+      // act
+      controller.emit(evento1);
+      controller.emit(evento2);
+
+      // assert
+      await Future.delayed(Duration.zero);
+      expect(count, equals(2));
+    });
+
+    test(
+        'Deve: disparar o handler duas vezes'
+        'Quando: dois eventos forem emitidos'
+        'Desde que: os eventos sejam diferentes e distinct seja igual a true',
+        () async {
+      // arrange
+      final evento1 = MicroAppEvent(name: 'distinct', payload: 1);
+      final evento2 = MicroAppEvent(name: 'distinct', payload: 2);
+      int count = 0;
+      controller.registerHandler(MicroAppEventHandler<int>((event) {
+        ++count;
+      }, distinct: true));
+
+      // act
+      controller.emit(evento1);
+      controller.emit(evento2);
+
+      // assert
+      await Future.delayed(Duration.zero);
+      expect(count, equals(2));
+    });
+
+    test(
+        'Não deve: disparar o handler duas vezes'
+        'Quando: dois eventos forem emitidos'
+        'Desde que: os eventos sejam iguais e distinct seja igual a true',
+        () async {
+      // arrange
+      final evento1 = MicroAppEvent(name: 'distinct', payload: 1);
+      final evento2 = MicroAppEvent(name: 'distinct', payload: 1);
+      int count = 0;
+      controller.registerHandler(MicroAppEventHandler<int>((event) {
+        ++count;
+      }, distinct: true));
+
+      // act
+      controller.emit(evento1);
+      controller.emit(evento2);
+
+      // assert
+      await Future.delayed(Duration.zero);
+      expect(count, equals(1));
+    });
+
+    test(
+        'Deve: disparar o handler duas vezes'
+        'Quando: dois eventos forem emitidos'
+        'Desde que: os eventos sejam iguais e distinct seja igual a false',
+        () async {
+      // arrange
+      final evento1 = MicroAppEvent(name: 'distinct', payload: 1);
+      final evento2 = MicroAppEvent(name: 'distinct', payload: 1);
+      int count = 0;
+      controller.registerHandler(MicroAppEventHandler<int>((event) {
+        ++count;
+      }, distinct: false));
+
+      // act
+      controller.emit(evento1);
+      controller.emit(evento2);
+
+      // assert
+      await Future.delayed(Duration.zero);
+      expect(count, equals(2));
+    });
+
+    test(
+        'Deve: disparar o handler duas vezes'
+        'Quando: dois eventos forem emitidos'
+        'Desde que: os eventos sejam diferentes e distinct seja igual a false',
+        () async {
+      // arrange
+      final evento1 = MicroAppEvent(name: 'distinct', payload: 1);
+      final evento2 = MicroAppEvent(name: 'distinct', payload: 2);
+      int count = 0;
+      controller.registerHandler(MicroAppEventHandler<int>((event) {
+        ++count;
+      }, distinct: false));
+
+      // act
+      controller.emit(evento1);
+      controller.emit(evento2);
+
+      // assert
+      await Future.delayed(Duration.zero);
+      expect(count, equals(2));
     });
   });
 }

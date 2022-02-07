@@ -209,6 +209,13 @@ MicroAppEventController()
         // Use .cast() to automatically cast the payload data to String? type
         logger.d(event.cast()); 
       });
+
+// It will be fired for every event, even if the value is the same (distinct = false)
+@override
+  MicroAppEventHandler<String>? get microAppEventHandler =>
+      MicroAppEventHandler((event) {
+        logger.d(event.cast()); 
+      }, distinct: false);
 ```
 
 #### Managing events

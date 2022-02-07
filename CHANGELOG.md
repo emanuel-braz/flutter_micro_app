@@ -10,3 +10,8 @@
 - new widget builder (MicroAppWidgetBuilder)
 - bug fixes
 - refactoring
+
+## 0.3.0
+[2022-02-06]
+### Added
+- add distinct property to handlers

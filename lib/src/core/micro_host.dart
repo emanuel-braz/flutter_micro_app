@@ -1,7 +1,7 @@
 import 'package:dart_log/dart_log.dart';
 import 'package:flutter/material.dart';
 
-import '../controllers/micro_app_event_controller.dart';
+import '../controllers/app_event/micro_app_event_controller.dart';
 import '../controllers/navigator_controller.dart';
 import '../utils/typedefs.dart';
 import 'micro_app.dart';

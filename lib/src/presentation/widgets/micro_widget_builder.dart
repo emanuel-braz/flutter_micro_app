@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../flutter_micro_app.dart';
+import '../../controllers/app_event/micro_app_event_helper.dart';
+import '../../utils/extensions/list_extension.dart';
 
 class MicroAppWidgetBuilder<T> extends StatefulWidget {
   const MicroAppWidgetBuilder({
@@ -21,7 +23,7 @@ class MicroAppWidgetBuilder<T> extends StatefulWidget {
 
 class _MicroAppWidgetBuilderState<T> extends State<MicroAppWidgetBuilder> {
   Stream<MicroAppEvent>? stream;
-  final helper = HandlerRegisterHelper();
+  final helper = MicroAppEventHelper();
 
   @override
   void initState() {
@@ -32,8 +34,7 @@ class _MicroAppWidgetBuilderState<T> extends State<MicroAppWidgetBuilder> {
   @override
   void didUpdateWidget(MicroAppWidgetBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // TODO: fazer uma comparacao correta de duas listas
-    final channelsChanged = oldWidget.channels.length != widget.channels.length;
+    final channelsChanged = !oldWidget.channels.equals(widget.channels);
     if (channelsChanged) {
       _updateStream();
     }
