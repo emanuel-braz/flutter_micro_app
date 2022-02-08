@@ -2,32 +2,35 @@ import 'package:dart_log/dart_log.dart';
 import 'package:flutter/material.dart';
 
 import '../controllers/app_event/micro_app_event_controller.dart';
-import '../controllers/navigator_controller.dart';
+import '../controllers/navigators/navigator_controller.dart';
 import '../utils/typedefs.dart';
 import 'micro_app.dart';
 
 /// [MicroHost] contract
 abstract class MicroHost with MicroApp {
   static bool _microAppsRegistered = false;
-  static Map<String, PageBuilder> allRoutes = {};
 
   List<MicroApp> get microApps;
 
   @override
-  Map<String, PageBuilder> get routes => allRoutes;
+  Map<String, PageBuilder> get pageBuilders => NavigatorInstance.pageBuilders;
 
   @override
-  bool get hasRoutes => routes.isNotEmpty;
+  bool get hasRoutes => pageBuilders.isNotEmpty;
 
   void registerRoutes() {
     if (_microAppsRegistered) return;
 
-    allRoutes = {for (var page in pages) page.name: page.builder};
+    NavigatorInstance.pageBuilders = {
+      for (var page in pages) page.name: page.builder
+    };
 
     _registerEventHandler(this);
 
     for (MicroApp microapp in microApps) {
-      if (microapp.hasRoutes) allRoutes.addAll(microapp.routes);
+      if (microapp.hasRoutes) {
+        NavigatorInstance.pageBuilders.addAll(microapp.pageBuilders);
+      }
       _registerEventHandler(microapp);
     }
     _microAppsRegistered = true;
@@ -41,7 +44,7 @@ abstract class MicroHost with MicroApp {
   Route<dynamic>? onGenerateRoute(RouteSettings settings,
       {bool? routeNativeOnError}) {
     MaterialPageRoute<dynamic>? pageRoute = NavigatorInstance.getPageRoute(
-        settings, routes,
+        settings,
         routeNativeOnError: routeNativeOnError);
     if (pageRoute == null) {
       logger.e('Error: [onGenerateRoute] PageRoute is null',

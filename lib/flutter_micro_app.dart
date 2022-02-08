@@ -1,7 +1,7 @@
 library flutter_micro_app;
 
 export 'src/controllers/app_event/micro_app_event_controller.dart';
-export 'src/controllers/navigator_controller.dart';
+export 'src/controllers/navigators/navigator_controller.dart';
 export 'src/core/micro_app.dart';
 export 'src/core/micro_host.dart';
 export 'src/core/micro_page.dart';

@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
+import 'package:example/pages/example_page_fragment.dart';
 import 'package:example_external/example_external.dart';
 import 'package:flutter/material.dart';
 import 'package:example/pages/example_page.dart';
@@ -52,6 +53,9 @@ class MicroApplication1 extends MicroApp with Application1Routes {
         MicroAppPage(
             name: pageExampleMaterialApp,
             builder: (context, arguments) => const MaterialAppPage()),
+        MicroAppPage(
+            name: pageExampleFragment,
+            builder: (context, arguments) => const ExamplePageFragment()),
       ];
 
   // Event handler (listen all micro apps events)
@@ -153,6 +157,18 @@ class BaseHomePage extends StatelessWidget {
                     Application2Routes().baseRoute.name);
               },
             ),
+            const SizedBox(
+              height: 8,
+            ),
+            SizedBox(
+                height: 50,
+                child: NavigatorInstance.getFragment(
+                    Application1Routes().pageExampleFragment, context,
+                    orElse: Container(
+                      height: 200,
+                      width: 200,
+                      color: Colors.red,
+                    )))
           ],
         ));
   }
