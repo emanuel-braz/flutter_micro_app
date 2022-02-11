@@ -30,6 +30,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   /// [NavigatorState]
   NavigatorState get nav => navigatorKey.currentState as NavigatorState;
 
+  /// [getFragment]
   Widget getFragment(String name, BuildContext context,
           {Object? arguments, String? type, Widget? orElse}) =>
       getPageBuilder(name)?.call(context, arguments) ??

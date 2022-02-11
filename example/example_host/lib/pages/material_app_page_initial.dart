@@ -28,10 +28,13 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
       ),
       body: Container(
         color: Colors.green,
-        alignment: Alignment.center,
+        height: double.infinity,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
                 child: const Text('Emit "my_event"'),
@@ -94,9 +97,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                       'Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
                 },
               ),
-              const SizedBox(
-                height: 8,
-              ),
               ElevatedButton(
                 child: const Text('Try open a page that only exists in Native'),
                 onPressed: () {
@@ -106,17 +106,11 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                       arguments: 'some_arguments');
                 },
               ),
-              const SizedBox(
-                height: 8,
-              ),
               ElevatedButton(
                 child: const Text('Open SubPage (NavigatorInstance.pushNamed)'),
                 onPressed: () {
                   NavigatorInstance.pushNamed(Application1Routes().pageExample);
                 },
-              ),
-              const SizedBox(
-                height: 8,
               ),
               ElevatedButton(
                 child: const Text('Open SubPage (Navigator.of(context).push)'),

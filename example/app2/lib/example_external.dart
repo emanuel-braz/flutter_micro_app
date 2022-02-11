@@ -1,3 +1,5 @@
+import 'package:example_external/pages/colors_float_page.dart';
+
 import './pages/page2.dart';
 import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,8 @@ class MicroApplication2 extends MicroApp with Application2Routes {
             builder: (context, arguments) => const Application2Initial()),
         MicroAppPage(
             name: page2, builder: (context, arguments) => const Page2()),
+        MicroAppPage(
+            name: pageColors, builder: (_, __) => const ColorsFloatPage()),
       ];
 
   @override

@@ -13,4 +13,5 @@ export 'src/entities/router/base_route.dart';
 export 'src/presentation/widgets/micro_widget_builder.dart';
 export 'src/utils/constants/constants.dart';
 export 'src/utils/constants/path_separator.dart';
+export 'src/presentation/overlay/micro_overlay_controller.dart';
 export 'src/utils/typedefs.dart';

@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
+import 'package:example_external/pages/colors_float_page.dart';
 import 'package:example/pages/example_page_fragment.dart';
 import 'package:example_external/example_external.dart';
 import 'package:flutter/material.dart';
@@ -130,15 +131,35 @@ class MyApp extends MicroHostStatelessWidget {
 }
 
 // This widget is registered as initial route in [MyApp] pages list
-class BaseHomePage extends StatelessWidget {
+class BaseHomePage extends StatefulWidget {
   const BaseHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<BaseHomePage> createState() => _BaseHomePageState();
+}
+
+class _BaseHomePageState extends State<BaseHomePage> {
+  final controller = MicroAppOverlayController(
+    isDraggable: true,
+    position: const Offset(50, 100),
+    size: const Size(300, 500),
+    route: Application2Routes().pageColors,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
+        padding: const EdgeInsets.all(16),
         color: Colors.amber,
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton(
               child: const Text('Open Example MaterialApp'),
@@ -155,6 +176,20 @@ class BaseHomePage extends StatelessWidget {
               onPressed: () {
                 NavigatorInstance.pushNamed(
                     Application2Routes().baseRoute.name);
+              },
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            ElevatedButton(
+              child: const Text('Open a float page'),
+              onPressed: () {
+                // controller.open();
+                controller.open(
+                    builder: (child, controller) => ColorsFloatFrame(
+                          child: child,
+                          controller: controller,
+                        ));
               },
             ),
             const SizedBox(
