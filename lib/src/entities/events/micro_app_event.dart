@@ -83,7 +83,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
         distinct: distinct);
   }
 
-  String get type => payload.runtimeType.toString();
+  Type get type => payload.runtimeType;
 
   /// Completes with success
   void resultSuccess([FutureOr<dynamic>? value]) => _completer.complete(value);

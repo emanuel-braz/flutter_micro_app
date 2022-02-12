@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../controllers/overlay/micro_overlay_controller.dart';
 import '../entities/events/micro_app_event.dart';
-import '../presentation/overlay/micro_overlay_controller.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, dynamic arguments);
 typedef MethodCallHandler = Future<dynamic> Function(MethodCall);

@@ -39,10 +39,8 @@ class _MicroAppOverlayState extends State<MicroAppOverlay> {
           child: GestureDetector(
               onPanUpdate: (tapInfo) {
                 if (widget.controller.isDraggable) {
-                  setState(() {
-                    controller.x += tapInfo.delta.dx;
-                    controller.y += tapInfo.delta.dy;
-                  });
+                  controller.x += tapInfo.delta.dx;
+                  controller.y += tapInfo.delta.dy;
                 }
               },
               child: Material(child: child)),

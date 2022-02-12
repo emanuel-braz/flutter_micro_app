@@ -130,7 +130,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                     if (eventSnapshot.hasError) return const Text('Error');
                     return ElevatedButton(
                       child: Text(
-                        'emit event in [widget_channel] count = ${eventSnapshot.data?.payload}',
+                        'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       onPressed: () {
