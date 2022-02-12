@@ -1,16 +1,35 @@
+## 0.4.0
+[2022-02-12]
+#### Added
+``` diff
++ add HandlerRegisterMixin to deal with BuildContext, and example
++ add example how to use overlay(float page)
++ add example how to emit and receive event, in order to change colors on other micro app component
++ add example how to complete an event, asynchronously
+```
+
+#### Break
+```diff
+- break changing:  MicroApp.routes becomes MicroApp.pageBuilders
+```
+  
 ## 0.3.0
 [2022-02-06]
-### Added
-- add distinct property to handlers
+#### Added
+```diff
++ add distinct property to handlers
+```
 
 ## 0.2.0
 [2022-02-05]
-### Added
-- improved channel filter performance
-- event filtering by type
-- new widget builder (MicroAppWidgetBuilder)
-- bug fixes
-- refactoring
+#### Added
+```diff
++ improved channel filter performance
++ event filtering by type
++ new widget builder (MicroAppWidgetBuilder)
++ bug fixes
++ refactoring
+```
 
 ## 0.1.0
 [2022-01-30]
