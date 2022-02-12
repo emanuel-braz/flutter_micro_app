@@ -30,22 +30,36 @@ class MicroAppOverlayController extends ChangeNotifier {
     notifyListeners();
   }
 
-  late Size _size;
-  Size get size => _size;
+  Size get size => Size(_width, _height);
   set size(Size size) {
-    _size = size;
+    _width = size.width;
+    _height = size.height;
+    notifyListeners();
+  }
+
+  double _width = 0;
+  double get width => _width;
+  set width(double value) {
+    _width = value;
+    notifyListeners();
+  }
+
+  double _height = 0;
+  double get height => _height;
+  set height(double value) {
+    _height = value;
     notifyListeners();
   }
 
   MicroAppOverlayController(
       {required this.route,
       Offset? position,
-      Size size = const Size(10, 10),
+      Size size = const Size(double.infinity, double.infinity),
       bool isDraggable = false}) {
     x = position?.dx ?? 0;
     y = position?.dy ?? 0;
     _isDraggable = isDraggable;
-    _size = size;
+    this.size = size;
   }
 
   void open({MicroAppFloatPageBuilder? builder}) {

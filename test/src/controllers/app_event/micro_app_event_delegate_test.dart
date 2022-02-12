@@ -1,5 +1,5 @@
 import 'package:flutter_micro_app/src/controllers/app_event/micro_app_event_controller.dart';
-import 'package:flutter_micro_app/src/controllers/app_event/micro_app_event_helper.dart';
+import 'package:flutter_micro_app/src/controllers/app_event/micro_app_event_delegate.dart';
 import 'package:flutter_micro_app/src/entities/events/micro_app_event.dart';
 import 'package:flutter_micro_app/src/entities/events/micro_app_event_handler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,12 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 */
 
 void main() {
-  late MicroAppEventHelper microAppEventHelper;
+  late MicroAppEventDelegate microAppEventHelper;
   late MicroAppEventController controller;
 
   setUp(() {
     controller = MicroAppEventController.$testOnlyPurpose();
-    microAppEventHelper = MicroAppEventHelper();
+    microAppEventHelper = MicroAppEventDelegate();
   });
 
   test(
@@ -242,7 +242,7 @@ void main() {
 
   // ---
 
-  group('[HandlerRegisterHelper.handlerHasSameEventType]', () {
+  group('[MicroAppEventDelegate.handlerHasSameEventType]', () {
     test('Quando informar handler e evento do tipo String, deve retornar true',
         () {
       // arrange
@@ -335,7 +335,7 @@ void main() {
     });
   });
 
-  group('[HandlerRegisterHelper.isChannelsIntersection]', () {
+  group('[MicroAppEventDelegate.isChannelsIntersection]', () {
     test(
         'asdasdasdsad asd Deve retornar true quando o handler asdasdsanão tiver channels registrados e evento também não',
         () {
@@ -403,6 +403,69 @@ void main() {
 
       // assert
       expect(hasSomeChannels, equals(true));
+    });
+  });
+
+  group('[MicroAppEventDelegate.unregisterHandler]', () {
+    test(
+        'Deve registrar 2 handlers, e remover o handler2'
+        'Quando remover apenas o handler2 com o comando unregisterHandler',
+        () async {
+      final handler1 = MicroAppEventHandler<String>((event) {});
+      final handler2 = MicroAppEventHandler<String>((event) {});
+
+      controller.registerHandler(handler1);
+      controller.registerHandler(handler2);
+
+      final handler = await controller.unregisterHandler(handler: handler2);
+
+      expect(controller.handlers.length, 1);
+      expect(handler, equals(handler2));
+      expect(identical(controller.handlers.keys.first, handler1), equals(true));
+    });
+
+    test(
+        'Deve registrar 2 handlers, e remover o handler1'
+        'Quando tentar remover apenas o handler1 com o comando unregisterHandler',
+        () async {
+      final handler1 = MicroAppEventHandler<String>((event) {});
+      final handler2 = MicroAppEventHandler<String>((event) {});
+
+      controller.registerHandler(handler1);
+      controller.registerHandler(handler2);
+
+      final handler = await controller.unregisterHandler(handler: handler1);
+      // controller
+      //     .emit(MicroAppEvent(name: 'name', channels: const ['channel1']));
+      // await Future.delayed(Duration.zero);
+
+      expect(controller.handlers.length, 1);
+      expect(handler, equals(handler1));
+      expect(identical(controller.handlers.keys.first, handler2), equals(true));
+    });
+
+    test(
+        'Não deve interceptar qualquer evento pelo handler'
+        'Quando este handler for desregistrado', () async {
+      int count = 0;
+      final handler = MicroAppEventHandler<String>((event) {
+        count++;
+      });
+
+      expect(controller.handlers.length, equals(0));
+
+      controller.registerHandler(handler);
+
+      expect(controller.handlers.length, equals(1));
+
+      await controller.unregisterHandler(handler: handler);
+
+      expect(controller.handlers.length, equals(0));
+
+      controller.emit(MicroAppEvent<String>(name: 'name', payload: 'data'));
+
+      await Future.delayed(Duration.zero);
+      expect(count, equals(0));
     });
   });
 }

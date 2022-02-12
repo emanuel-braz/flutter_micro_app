@@ -23,22 +23,22 @@ void main() {
       expect(eventFromJson?.channels.length, 2);
       expect(eventFromJson?.name, 'nome');
       expect(eventFromJson?.payload, 'abc');
-      expect(eventFromJson?.type, 'String');
+      expect(eventFromJson?.type, equals(String));
     });
 
     test(
-        'Deve converter um json válido, com lista de channels vazia, em um MicroAppEvent<String>',
+        'Deve converter um json válido, com lista de channels vazia, em um MicroAppEvent<int>',
         () {
       // arrange
       final eventFromJson = MicroAppEvent.fromJson(
-          jsonEncode({'name': 'nome', 'payload': 'abc', 'channels': []}));
+          jsonEncode({'name': 'nome', 'payload': 123, 'channels': []}));
 
       // assert
       expect(eventFromJson, isA<MicroAppEvent>());
       expect(eventFromJson?.channels.length, 0);
       expect(eventFromJson?.name, 'nome');
-      expect(eventFromJson?.payload, 'abc');
-      expect(eventFromJson?.type, 'String');
+      expect(eventFromJson?.payload, 123);
+      expect(eventFromJson?.type, equals(int));
     });
 
     test(
@@ -55,7 +55,7 @@ void main() {
       expect(eventFromJson?.channels.length, 0);
       expect(eventFromJson?.name, 'nome');
       expect(eventFromJson?.payload, 'abc');
-      expect(eventFromJson?.type, 'String');
+      expect(eventFromJson?.type, equals(String));
     });
 
     test('Não deve converter um json inválido, ', () {

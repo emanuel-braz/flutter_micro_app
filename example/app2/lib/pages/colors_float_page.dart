@@ -13,12 +13,59 @@ class _ColorsFloatStatePlage extends State<ColorsFloatPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        alignment: Alignment.center,
-        child: Container(
-          height: 50,
-          width: 50,
-          color: Colors.red,
-        ));
+      padding: const EdgeInsets.all(4),
+      child: Column(
+        children: [
+          const Text(
+            'Send commands to other microapp',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                child: const Text('Background'),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.blue)),
+                onPressed: () {
+                  MicroAppEventController().emit(MicroAppEvent(
+                      name: 'change_background_color',
+                      payload: Colors.blue,
+                      channels: const ['colors']));
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Buttons'),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.pink)),
+                onPressed: () {
+                  MicroAppEventController().emit(MicroAppEvent(
+                      name: 'change_buttons_color',
+                      payload: Colors.pink,
+                      channels: const ['colors']));
+                },
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    MicroAppEventController().emit(MicroAppEvent(
+        name: 'change_background_color',
+        payload: Colors.amber,
+        channels: const ['colors']));
+    MicroAppEventController().emit(MicroAppEvent(
+        name: 'change_buttons_color',
+        payload: Colors.green,
+        channels: const ['colors']));
   }
 }
 
@@ -45,8 +92,6 @@ class _ColorsFloatFrameState extends State<ColorsFloatFrame> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
-      height: widget.controller.size.height,
-      width: widget.controller.size.width,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -67,6 +112,18 @@ class _ColorsFloatFrameState extends State<ColorsFloatFrame> {
                     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
                   },
                   icon: const Icon(Icons.crop_square)),
+              const Spacer(),
+              Text(
+                widget.controller.isDraggable
+                    ? 'This is a draggable window'
+                    : 'This is not a draggable window',
+                style: TextStyle(
+                    color: widget.controller.isDraggable
+                        ? Colors.green
+                        : Colors.red,
+                    fontWeight: FontWeight.bold),
+              ),
+              const Icon(Icons.drag_indicator)
             ],
           ),
           Expanded(
