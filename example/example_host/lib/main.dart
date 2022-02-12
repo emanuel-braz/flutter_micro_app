@@ -89,6 +89,8 @@ class MicroApplication1 extends MicroApp with Application1Routes {
         }
         logger.d(
             ['(MicroAppExample) event received:', event.name, event.payload]);
+
+        event.resultSuccess('success!!!');
       }, channels: const ['abc', 'chatbot', 'colors']);
 }
 

@@ -11,12 +11,12 @@ typedef MethodCallHandler = Future<dynamic> Function(MethodCall);
 typedef MicroAppEventOnEvent = void Function(MicroAppEvent);
 typedef MicroAppEventOnDone = void Function();
 typedef MicroAppEventOnError = Function;
-typedef MicroAppEventSubscription
-    = StreamSubscription<MicroAppEvent<dynamic>> Function(MicroAppEventOnEvent?,
-        {bool? cancelOnError,
-        MicroAppEventOnDone? onDone,
-        MicroAppEventOnError? onError});
-typedef MicroAppEmitter = void Function(MicroAppEvent<dynamic> event);
+typedef MicroAppEventSubscription = StreamSubscription<MicroAppEvent> Function(
+    MicroAppEventOnEvent?,
+    {bool? cancelOnError,
+    MicroAppEventOnDone? onDone,
+    MicroAppEventOnError? onError});
+typedef MicroAppEmitter = void Function(MicroAppEvent event);
 typedef MicroAppBuilder = Widget Function(
     BuildContext context, AsyncSnapshot<MicroAppEvent> microAppEventSnapshot);
 typedef MicroAppFloatPageBuilder = Widget Function(

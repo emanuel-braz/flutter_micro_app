@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import '../../../flutter_micro_app.dart';
 import '../../controllers/app_event/micro_app_event_delegate.dart';
-import '../../utils/extensions/list_extension.dart';
 
 class MicroAppWidgetBuilder<T> extends StatefulWidget {
   const MicroAppWidgetBuilder({

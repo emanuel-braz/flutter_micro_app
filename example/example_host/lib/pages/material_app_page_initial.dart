@@ -12,8 +12,20 @@ class MaterialAppPageInitial extends StatefulWidget {
   State<MaterialAppPageInitial> createState() => _MaterialAppPageInitialState();
 }
 
-class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
+class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
+    with HandlerRegisterMixin {
   int count = 0;
+
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(event.cast()),
+      ));
+    }, channels: const ['show_snackbar'], distinct: false));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +49,29 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                child: const Text('Emit "my_event"'),
+                child: const Text('Show snackbar'),
                 onPressed: () {
                   MicroAppEventController().emit(
-                      MicroAppEvent<Map<String, dynamic>>(
-                          name: 'my_event',
-                          payload: const {'data': 'lorem ipsum'},
-                          channels: const ['abc']));
+                    MicroAppEvent(
+                      name: 'show_snackbar',
+                      payload: 'Hello World!',
+                      channels: const ['show_snackbar'],
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Emit "my_event"'),
+                onPressed: () async {
+                  final result = await MicroAppEventController()
+                      .emit(MicroAppEvent<Map<String, dynamic>>(
+                        name: 'my_event',
+                        payload: const {'data': 'lorem ipsum'},
+                        channels: const ['abc'],
+                      ))
+                      .getFirstResult();
+
+                  logger.d(result);
                 },
               ),
               ElevatedButton(
