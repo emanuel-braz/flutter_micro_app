@@ -69,7 +69,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
         channels: channels ?? this.channels);
   }
 
-  String get type => payload.runtimeType.toString();
+  Type get type => payload.runtimeType;
 
   @override
   List<Object?> get props => [name, payload, channels];

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../controllers/overlay/micro_overlay_controller.dart';
 import '../entities/events/micro_app_event.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, dynamic arguments);
@@ -18,3 +19,5 @@ typedef MicroAppEventSubscription
 typedef MicroAppEmitter = void Function(MicroAppEvent<dynamic> event);
 typedef MicroAppBuilder = Widget Function(
     BuildContext context, AsyncSnapshot<MicroAppEvent> microAppEventSnapshot);
+typedef MicroAppFloatPageBuilder = Widget Function(
+    Widget microPage, MicroAppOverlayController controller);

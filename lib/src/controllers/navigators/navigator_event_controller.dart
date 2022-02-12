@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 
-import '../entities/micro_app_preferences.dart';
-import '../services/native_service.dart';
-import '../utils/constants/constants.dart';
-import '../utils/enums/navigator_status.dart';
+import '../../entities/micro_app_preferences.dart';
+import '../../services/native_service.dart';
+import '../../utils/constants/constants.dart';
+import '../../utils/enums/navigator_status.dart';
 
 /// [MicroAppNavigatorEvent]
 class MicroAppNavigatorEvent extends Equatable {

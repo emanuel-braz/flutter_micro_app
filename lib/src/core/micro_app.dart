@@ -6,8 +6,8 @@ import 'micro_page.dart';
 /// [MicroApp] contract
 abstract class MicroApp<T> implements MicroAppRoutes {
   List<MicroAppPage> get pages;
-  Map<String, PageBuilder> get routes =>
+  Map<String, PageBuilder> get pageBuilders =>
       {for (var page in pages) page.name: page.builder};
-  bool get hasRoutes => routes.isNotEmpty;
+  bool get hasRoutes => pageBuilders.isNotEmpty;
   MicroAppEventHandler<T>? get microAppEventHandler;
 }

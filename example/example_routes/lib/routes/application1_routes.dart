@@ -6,4 +6,5 @@ class Application1Routes extends MicroAppRoutes {
   String get pageExample => baseRoute.path('example_page');
   String get pageExampleMaterialApp =>
       baseRoute.path('material_app_page', ['all', 'examples']);
+  String get pageExampleFragment => baseRoute.path('fragment');
 }

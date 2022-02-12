@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
+import 'package:example_external/pages/colors_float_page.dart';
+import 'package:example/pages/example_page_fragment.dart';
 import 'package:example_external/example_external.dart';
 import 'package:flutter/material.dart';
 import 'package:example/pages/example_page.dart';
@@ -7,6 +9,17 @@ import 'package:example_routes/example_routes.dart';
 import 'package:example/pages/material_app_page.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
+
+// It could be a BLoC, Mobx, Redux, GetX or whatever
+// but for now, it's just the incredible, super `ValueNotifier` :)
+class ColorController extends ValueNotifier<MaterialColor> {
+  ColorController([MaterialColor color = Colors.amber]) : super(color);
+  void changeColor(MaterialColor color) => value = color;
+}
+
+// Global instances, just for example purposes
+final backgroundColorController = ColorController();
+final buttonsColorController = ColorController(Colors.green);
 
 void main() {
   // Define micro app configurations here
@@ -52,15 +65,31 @@ class MicroApplication1 extends MicroApp with Application1Routes {
         MicroAppPage(
             name: pageExampleMaterialApp,
             builder: (context, arguments) => const MaterialAppPage()),
+        MicroAppPage(
+            name: pageExampleFragment,
+            builder: (context, arguments) => const ExamplePageFragment()),
       ];
 
-  // Event handler (listen all micro apps events)
+  // Event handler (listen all micro apps events on specifics channels)
+  //
+  // If you need the BuildContext, please register the handlers inside a widget
+  // and unregister them on dispose method.
+  // Or... you can use the mixin HandlerRegisterMixin on StatefulWidgets, in order to
+  // help you don't forget to unregister them
   @override
   MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((data) {
-        logger
-            .d(['(MicroAppExample) event received:', data.name, data.payload]);
-      }, channels: const ['abc', 'chatbot']);
+      MicroAppEventHandler((event) {
+        // You can use freezed here if you prefer more safety in cover possibilities
+        if (event.type == MaterialColor) {
+          if (event.name == 'change_background_color') {
+            backgroundColorController.changeColor(event.cast());
+          } else if (event.name == 'change_buttons_color') {
+            buttonsColorController.changeColor(event.cast());
+          }
+        }
+        logger.d(
+            ['(MicroAppExample) event received:', event.name, event.payload]);
+      }, channels: const ['abc', 'chatbot', 'colors']);
 }
 
 // This is host application
@@ -126,34 +155,94 @@ class MyApp extends MicroHostStatelessWidget {
 }
 
 // This widget is registered as initial route in [MyApp] pages list
-class BaseHomePage extends StatelessWidget {
+class BaseHomePage extends StatefulWidget {
   const BaseHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<BaseHomePage> createState() => _BaseHomePageState();
+}
+
+class _BaseHomePageState extends State<BaseHomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.amber,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              child: const Text('Open Example MaterialApp'),
-              onPressed: () {
-                NavigatorInstance.pushNamed(
-                    Application1Routes().pageExampleMaterialApp);
-              },
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            ElevatedButton(
-              child: const Text('Open Application2(package)'),
-              onPressed: () {
-                NavigatorInstance.pushNamed(
-                    Application2Routes().baseRoute.name);
-              },
-            ),
-          ],
-        ));
+    return AnimatedBuilder(
+        animation: Listenable.merge(<Listenable>[
+          backgroundColorController,
+          buttonsColorController,
+        ]),
+        builder: (context, child) {
+          return Container(
+              padding: const EdgeInsets.all(16),
+              color: backgroundColorController.value,
+              alignment: Alignment.center,
+              child: ElevatedButtonTheme(
+                data: ElevatedButtonThemeData(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          buttonsColorController.value)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton(
+                      child: const Text('Open Example MaterialApp'),
+                      onPressed: () {
+                        NavigatorInstance.pushNamed(
+                            Application1Routes().pageExampleMaterialApp);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ElevatedButton(
+                      child: const Text('Open Application2(package)'),
+                      onPressed: () {
+                        NavigatorInstance.pushNamed(
+                            Application2Routes().baseRoute.name);
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ElevatedButton(
+                      child: const Text('Open a float page'),
+                      onPressed: () {
+                        final controller = MicroAppOverlayController(
+                          isDraggable: true,
+                          position: Offset(
+                              (MediaQuery.of(context).size.width * .05), 100),
+                          size:
+                              Size(MediaQuery.of(context).size.width * .9, 160),
+                          route: Application2Routes().pageColors,
+                        );
+                        controller.open(
+                            builder: (child, controller) => ColorsFloatFrame(
+                                  child: child,
+                                  controller: controller,
+                                ));
+                      },
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    SizedBox(
+                        height: 50,
+                        child: NavigatorInstance.getFragment(
+                            Application1Routes().pageExampleFragment, context,
+                            orElse: Container(
+                              height: 200,
+                              width: 200,
+                              color: Colors.red,
+                            )))
+                  ],
+                ),
+              ));
+        });
   }
 }
