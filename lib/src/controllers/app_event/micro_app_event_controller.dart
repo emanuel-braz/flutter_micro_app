@@ -1,6 +1,7 @@
 // ignore_for_file: cancel_subscriptions
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
@@ -45,16 +46,24 @@ class MicroAppEventController {
   }
 
   /// ⚠️ It is used only for unit tests purposes
+  @visibleForTesting
   factory MicroAppEventController.$testOnlyPurpose() =>
       MicroAppEventController._();
 
   /// [MicroAppEvent]
-  void emit(MicroAppEvent event) {
+  List<Future> emit<T>(MicroAppEvent<T> event) {
+    final futures = <Future>[];
+
     if (MicroAppPreferences.config.nativeEventsEnabled) {
-      _microAppNativeService.emit(
+      final nativeFuture = _microAppNativeService.emit(
           Constants.methodMicroAppEvent, event.toString());
+      futures.add(nativeFuture);
     }
+
     _controller.add(event);
+    futures.add(event.asFuture);
+
+    return futures;
   }
 
   /// register handler

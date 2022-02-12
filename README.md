@@ -1,5 +1,7 @@
 
-### A package to speed up the creation of micro frontend(or independent features) structure in Flutter applications (beta version)
+### A package to speed up the creation of micro apps structure in Flutter applications (beta version)
+> Monolithic distribution with multiplatform independent components development, inspired in frameworks such as Single SPA and Systemjs.
+
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
 ![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)
 ![license](https://img.shields.io/github/license/emanuel-braz/flutter_micro_app)

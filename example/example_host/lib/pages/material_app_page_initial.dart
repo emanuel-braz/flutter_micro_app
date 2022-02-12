@@ -38,12 +38,16 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
             children: [
               ElevatedButton(
                 child: const Text('Emit "my_event"'),
-                onPressed: () {
-                  MicroAppEventController().emit(
-                      MicroAppEvent<Map<String, dynamic>>(
-                          name: 'my_event',
-                          payload: const {'data': 'lorem ipsum'},
-                          channels: const ['abc']));
+                onPressed: () async {
+                  final result = await MicroAppEventController()
+                      .emit(MicroAppEvent<Map<String, dynamic>>(
+                        name: 'my_event',
+                        payload: const {'data': 'lorem ipsum'},
+                        channels: const ['abc'],
+                      ))
+                      .getFirstResult();
+
+                  logger.d(result);
                 },
               ),
               ElevatedButton(

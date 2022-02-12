@@ -15,6 +15,7 @@ void main() {
       final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
         'name': 'nome',
         'payload': 'abc',
+        'distinct': true,
         'channels': ['channel1', 'channel2']
       }));
 
@@ -24,14 +25,19 @@ void main() {
       expect(eventFromJson?.name, 'nome');
       expect(eventFromJson?.payload, 'abc');
       expect(eventFromJson?.type, 'String');
+      expect(eventFromJson?.distinct, true);
     });
 
     test(
         'Deve converter um json válido, com lista de channels vazia, em um MicroAppEvent<String>',
         () {
       // arrange
-      final eventFromJson = MicroAppEvent.fromJson(
-          jsonEncode({'name': 'nome', 'payload': 'abc', 'channels': []}));
+      final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
+        'name': 'nome',
+        'payload': 'abc',
+        'channels': [],
+        'distinct': false,
+      }));
 
       // assert
       expect(eventFromJson, isA<MicroAppEvent>());
@@ -48,6 +54,7 @@ void main() {
       final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
         'name': 'nome',
         'payload': 'abc',
+        'distinct': true,
       }));
 
       // assert
@@ -63,6 +70,7 @@ void main() {
       final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
         'name': 123,
         'payload': null,
+        'distinct': true,
       }));
 
       // assert
@@ -74,7 +82,11 @@ void main() {
       () {
     // arrange
     final event = MicroAppEvent(
-        name: 'nome', payload: 'abc', channels: const ['channel1', 'channel2']);
+      name: 'nome',
+      payload: 'abc',
+      channels: const ['channel1', 'channel2'],
+      distinct: true,
+    );
 
     // act
     final eventAsString = event.toString();
@@ -83,27 +95,32 @@ void main() {
     expect(
         eventAsString,
         equals(
-            '{"name":"nome","payload":"abc","channels":["channel1","channel2"]}'));
+            '{"name":"nome","payload":"abc","channels":["channel1","channel2"],"distinct":true}'));
   });
 
   test('Deve converter o MicroAppEvent em um Map<String, dynamic> corretamente',
       () {
     // arrange
     final event = MicroAppEvent(
-        name: 'nome', payload: 'abc', channels: const ['channel1', 'channel2']);
+      name: 'nome',
+      payload: 'abc',
+      channels: const ['channel1', 'channel2'],
+      distinct: false,
+    );
 
     // act
     final map = event.toMap();
     final expectedResultMap = {
       'name': 'nome',
       'payload': 'abc',
+      'distinct': false,
       'channels': ['channel1', 'channel2']
     };
 
     // assert
     expect(map, equals(expectedResultMap));
     expect(map, isA<Map<String, dynamic>>());
-    expect(map.length, equals(3));
+    expect(map.length, equals(4));
   });
 
   test('Deve fazer o cast do payload para String, corretamente', () {
