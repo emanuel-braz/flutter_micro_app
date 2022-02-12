@@ -59,7 +59,12 @@ class _ColorsFloatFrameState extends State<ColorsFloatFrame> {
                   icon: const Icon(Icons.close)),
               IconButton(
                   onPressed: () {
-                    widget.controller.maximize(context);
+                    // Maximize
+                    widget.controller.x = 0;
+                    widget.controller.y = 0;
+                    widget.controller.size = MediaQuery.of(context).size;
+                    widget.controller.isDraggable = false;
+                    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
                   },
                   icon: const Icon(Icons.crop_square)),
             ],

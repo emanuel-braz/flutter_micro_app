@@ -139,13 +139,6 @@ class BaseHomePage extends StatefulWidget {
 }
 
 class _BaseHomePageState extends State<BaseHomePage> {
-  final controller = MicroAppOverlayController(
-    isDraggable: true,
-    position: const Offset(50, 100),
-    size: const Size(300, 500),
-    route: Application2Routes().pageColors,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -184,7 +177,12 @@ class _BaseHomePageState extends State<BaseHomePage> {
             ElevatedButton(
               child: const Text('Open a float page'),
               onPressed: () {
-                // controller.open();
+                final controller = MicroAppOverlayController(
+                  isDraggable: true,
+                  position: const Offset(50, 100),
+                  size: const Size(300, 500),
+                  route: Application2Routes().pageColors,
+                );
                 controller.open(
                     builder: (child, controller) => ColorsFloatFrame(
                           child: child,
