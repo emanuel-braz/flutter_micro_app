@@ -12,8 +12,20 @@ class MaterialAppPageInitial extends StatefulWidget {
   State<MaterialAppPageInitial> createState() => _MaterialAppPageInitialState();
 }
 
-class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
+class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
+    with HandlerRegisterMixin {
   int count = 0;
+
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(event.cast()),
+      ));
+    }, channels: const ['show_snackbar'], distinct: false));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +48,18 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              ElevatedButton(
+                child: const Text('Show snackbar'),
+                onPressed: () {
+                  MicroAppEventController().emit(
+                    MicroAppEvent(
+                      name: 'show_snackbar',
+                      payload: 'Hello World!',
+                      channels: const ['show_snackbar'],
+                    ),
+                  );
+                },
+              ),
               ElevatedButton(
                 child: const Text('Emit "my_event"'),
                 onPressed: () async {
