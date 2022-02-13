@@ -17,6 +17,7 @@ MicroAppNavigatorController get NavigatorInstance {
 
 /// [MicroAppNavigatorController]
 class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
+  Map<String, PageBuilder> pageBuilders = {};
   final MicroAppNavigatorEventController eventController;
 
   MicroAppNavigatorController(this.eventController) {
@@ -28,6 +29,13 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
 
   /// [NavigatorState]
   NavigatorState get nav => navigatorKey.currentState as NavigatorState;
+
+  /// [getFragment]
+  Widget getFragment(String name, BuildContext context,
+          {Object? arguments, String? type, Widget? orElse}) =>
+      getPageBuilder(name)?.call(context, arguments) ??
+      orElse ??
+      const SizedBox.shrink();
 
   /// [pushNamedNative]
   Future<T?> pushNamedNative<T>(String routeName,
@@ -108,12 +116,11 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   }
 
   /// [getPageRoute]
-  MaterialPageRoute? getPageRoute(
-      RouteSettings settings, Map<String, PageBuilder> routes,
+  MaterialPageRoute? getPageRoute(RouteSettings settings,
       {bool? routeNativeOnError}) {
     final routeName = settings.name;
     final routeArguments = settings.arguments;
-    final pageBuilder = routes[routeName];
+    final pageBuilder = getPageBuilder(routeName);
 
     if (pageBuilder == null) {
       if (routeName != null && (routeNativeOnError ?? false)) {
@@ -125,6 +132,10 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
     return MaterialPageRoute(
       builder: (context) => pageBuilder(context, routeArguments),
     );
+  }
+
+  PageBuilder? getPageBuilder(String? name) {
+    return pageBuilders[name];
   }
 
   /// [didPush]

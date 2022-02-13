@@ -1,10 +1,16 @@
 
-### A package to speed up the creation of micro frontend(or independent features) structure in Flutter applications (beta version)
-[![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+### A package to speed up the creation of micro apps structure in Flutter applications (beta version)
+> Monolithic distribution with multiplatform independent components development, inspired in frameworks such as Single SPA and Systemjs.
+
+[![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
+![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)
+![license](https://img.shields.io/github/license/emanuel-braz/flutter_micro_app)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 <br>
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
+[coming soon]  This diagram shows up the initial proposal about layers, their relationships and dependencies.
 
 ### ⛵️ Navigation between pages
 #### Use [NavigatorInstance] to navigate between pages
@@ -17,7 +23,7 @@ NavigatorInstance ...
 ```
 
 ### 📲 Open native (Android/iOS) pages, in this way
-#### It needs native implementation, you can see an example inside android folder
+#### It needs native implementation, you can see an example inside Android directory | coming soon, examples and modules to iOS, Desktop and Web, too.
 
 ```dart
 // If not implemented, always return null
@@ -62,6 +68,8 @@ Create the routing package: `flutter create --template=package micro_routes`
 
 ```dart 
 // Export all routes
+import 'package:flutter_micro_app/flutter_micro_app.dart';
+
 class Application1Routes implements MicroAppRoutes {
   @override
   MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('application1');
@@ -79,7 +87,7 @@ NavigatorInstance.pushNamed(Application1Routes().page1);
 
 
 
-### 🌐 🤝 Expose all pages throuth a contract `MicroApp` (Inside external projects or features folder)
+### 🤝 Expose all pages throuth a contract `MicroApp` (Inside external projects or features folder)
 ```dart
 import 'package:micro_routes/exports.dart';
 
@@ -100,7 +108,7 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 ### 🚀 Initialize the host, registering all micro apps
 - MicroHost is also a MicroApp, so you can register pages here too.
 - MyApp needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
-- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages.
+- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
 
 ```dart
 void main() {
@@ -140,6 +148,7 @@ class MyApp extends MicroHostStatelessWidget {
 
 ---
 ### 🤲 Handling micro apps events
+> 👀 As soon as I can, I'll do possible to filtering by event name, too.
 
 #### 🗣 Dispatches events to all handlers that listen to channels 'user_auth' and 'chatbot'
 ```dart
@@ -180,19 +189,45 @@ MicroAppEventController()
     );
 ```
 
+#### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, otherwise you will wait forever 😢
+
+`.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same  event.  
+
+For example, if you request a JWT token to all micro apps(broadcast), the first response(if more than one MA can respond) will end up your request with the resultSucces value or with a resultError, from the fastest micro app.
+
+```dart
+  final result = await MicroAppEventController()
+    .emit(MicroAppEvent<Map<String, String>>(
+      name: 'get_jwt',
+      payload: const {'userId': 'ABC123'},
+      channels: const ['jwt'],
+    )
+  ).getFirstResult(); // This will return the first response(fastest) among all micro app that eventually can respond to this same the event
+
+  print(result);
+```
+
+Later, when some micro app that is listening to same channel get triggered, it can answer success or error.
+```dart
+// results success
+event.resultSuccess(['success message by Wally West', 'your token, Sir.']);
+
+// results error
+event.resultError(['error message by Barry Allen', 'my bad 🤦']);
+
+// Who will respond faster? native? flutter?
+// If you don't want to take that risk, just deal with the List<Future> response.
+```
+
 #### 🦻 Listen to events (MicroApp)s
+`MicroApp` has a getter method that must be overwritten, it's called `microAppEventHandler`
+
+Some example scenarios:  
 ```dart
 // It listen to all events
 @override
   MicroAppEventHandler? get microAppEventHandler =>
       MicroAppEventHandler((event) => logger.d([ event.name, event.payload]));
-
-// It listen to events with id equals 123, only!
-@override
-  MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
-        logger.d([ event.name, event.payload]);
-      }, id: '123');
 
 // It listen to events with channels "chatbot" and "user_auth"
 @override
@@ -218,16 +253,42 @@ MicroAppEventController()
       }, distinct: false);
 ```
 
+#### Listen to events inside widgets (If need BuildContext)
+It can be achieved, registering the event handlers and unregistering them manually, or if you prefer, use a mixin called `HandlerRegisterMixin` to dispose handlers automatically when widget is disposed
+
+**Using mixin** `HandlerRegisterMixin` **example:**
+```dart
+class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
+
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(event.cast()),
+      ));
+    }, channels: const ['show_snackbar'], distinct: false));
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+```
+
 #### Managing events
 ```dart
 MicroAppEventController().unregisterHandler(id: '123');
+MicroAppEventController().unregisterHandler(handler: handlerInstance);
 MicroAppEventController().unregisterHandler(channels: ['user_auth']);
 MicroAppEventController().pauseAllHandlers();
 MicroAppEventController().resumeAllHandlers();
 MicroAppEventController().unregisterAllHandlers();
 ```
 
-### 🦻🌐 Initiating an event subscription anywhere in the application (inside a StatefulWidget, for example)
+### 🦻 Initiating an event subscription anywhere in the application (inside a StatefulWidget, for example)
 #### Using subscription
 ```dart
 final subscription = MicroAppEventController().stream.listen((MicroAppEvent event) {
@@ -248,7 +309,7 @@ MicroAppEventController().registerHandler(MicroAppEventHandler(id: '1234'));
 // later, in dispose method of the widget
 @override
 void dispose() {
-    MicroAppEventController().unregisterSubscription(id: '1234');
+    MicroAppEventController().unregisterHandler(id: '1234');
     super.dispose();
 }
 ```
@@ -256,7 +317,8 @@ void dispose() {
 ### 🏭 Using the pre-built widget `MicroAppWidgetBuilder` to display data on the screen
 It can be used to show visual info on the screen.
 In this example, it shows a button and the label changes when user clicks on the button
-> When user dispatched an event in the same channel that the widget is listening to, the widget redraw the updated info on the screen
+> ℹ️ When user dispatched an event in the same channel that the widget is listening to, the widget redraw the updated info on the screen.
+
 ```dart
 MicroAppWidgetBuilder(
   initialData: MicroAppEvent(name: 'my_event', payload: 0),
@@ -282,7 +344,7 @@ MicroAppWidgetBuilder(
 
 ### 📝 Overriding onGenerateRoute method
 
-If it fails to get a page route, ask for native(Android/iOS) to open the page
+If it fails to get a page route, ask for native(Android/iOS/Desktop/Web) to open the page
 ```dart
   @override
   Route? onGenerateRoute(RouteSettings settings, {bool? routeNativeOnError}) {

@@ -1,9 +1,10 @@
 import 'dart:async';
 
+import '../../../dependencies.dart';
 import '../../entities/events/micro_app_event.dart';
 import '../../entities/events/micro_app_event_handler.dart';
 
-class MicroAppEventHelper {
+class MicroAppEventDelegate {
   /// registerHandler
   StreamSubscription<MicroAppEvent> registerHandler(
       Stream<MicroAppEvent> stream, MicroAppEventHandler handler) {
@@ -45,8 +46,25 @@ class MicroAppEventHelper {
     handlers.clear();
   }
 
+  Future<MicroAppEventHandler?> unregisterThisOne(
+      MicroAppEventHandler handler,
+      Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>>
+          handlers) async {
+    final handlerEntry = handlers[handler];
+
+    try {
+      if (handlerEntry != null) {
+        handlers.remove(handler);
+        await handlerEntry.cancel();
+        return handler;
+      }
+    } catch (e) {
+      logger.e('Failed to unregister handler', error: e);
+    }
+  }
+
   /// unregisterSubscription
-  Future<void> unregisterSubscription(
+  Future<MicroAppEventHandler?> unregisterSubscription(
       Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> handlers,
       {String? id,
       List<String>? channels}) async {

@@ -1,11 +1,12 @@
 // ignore_for_file: cancel_subscriptions
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
 
-import 'micro_app_event_helper.dart';
+import 'micro_app_event_delegate.dart';
 
 /// [MicroAppEventController]
 class MicroAppEventController {
@@ -13,7 +14,7 @@ class MicroAppEventController {
   final StreamController<MicroAppEvent> _controller =
       StreamController.broadcast();
   late MicroAppNativeService _microAppNativeService;
-  late MicroAppEventHelper _handlerRegisterHelper;
+  late MicroAppEventDelegate _handlerRegisterDelegate;
 
   /// Used to listen all micro app events
   MicroAppEventSubscription get onEvent => _controller.stream.listen;
@@ -36,7 +37,7 @@ class MicroAppEventController {
   /// MicroAppController instance
   static MicroAppEventController instance = MicroAppEventController._();
   MicroAppEventController._() {
-    _handlerRegisterHelper = MicroAppEventHelper();
+    _handlerRegisterDelegate = MicroAppEventDelegate();
     _microAppNativeService = MicroAppNativeService(_channel,
         methodCallHandler: (MethodCall call) async {
       _controller
@@ -45,16 +46,24 @@ class MicroAppEventController {
   }
 
   /// ⚠️ It is used only for unit tests purposes
+  @visibleForTesting
   factory MicroAppEventController.$testOnlyPurpose() =>
       MicroAppEventController._();
 
   /// [MicroAppEvent]
-  void emit(MicroAppEvent event) {
+  List<Future> emit<T>(MicroAppEvent<T> event) {
+    final futures = <Future>[];
+
     if (MicroAppPreferences.config.nativeEventsEnabled) {
-      _microAppNativeService.emit(
+      final nativeFuture = _microAppNativeService.emit(
           Constants.methodMicroAppEvent, event.toString());
+      futures.add(nativeFuture);
     }
+
     _controller.add(event);
+    futures.add(event.asFuture);
+
+    return futures;
   }
 
   /// register handler
@@ -62,31 +71,36 @@ class MicroAppEventController {
       MicroAppEventHandler? handler) {
     if (handler == null) return null;
     final subscription =
-        _handlerRegisterHelper.registerHandler(stream, handler);
+        _handlerRegisterDelegate.registerHandler(stream, handler);
     _handlers.putIfAbsent(handler, () => subscription);
     return subscription;
   }
 
   /// pauseAllHandlers
   void pauseAllHandlers() =>
-      _handlerRegisterHelper.pauseAllSubscriptions(_handlers);
+      _handlerRegisterDelegate.pauseAllSubscriptions(_handlers);
 
   /// resumeAllHandlers
   void resumeAllHandlers() =>
-      _handlerRegisterHelper.resumeAllSubscriptions(_handlers);
+      _handlerRegisterDelegate.resumeAllSubscriptions(_handlers);
 
   /// unregisterAllHandlers
   Future<void> unregisterAllHandlers() =>
-      _handlerRegisterHelper.unregisterAllSubscriptions(_handlers);
+      _handlerRegisterDelegate.unregisterAllSubscriptions(_handlers);
 
   /// unregisterHandler
-  Future<void> unregisterHandler({String? id, List<String>? channels}) =>
-      _handlerRegisterHelper.unregisterSubscription(_handlers,
-          id: id, channels: channels);
+  Future<MicroAppEventHandler?> unregisterHandler(
+      {String? id, List<String>? channels, MicroAppEventHandler? handler}) {
+    if (handler != null) {
+      return _handlerRegisterDelegate.unregisterThisOne(handler, _handlers);
+    }
+    return _handlerRegisterDelegate.unregisterSubscription(_handlers,
+        id: id, channels: channels);
+  }
 
   /// hasHandler
   bool hasHandler({String? id, List<String>? channels}) =>
-      _handlerRegisterHelper
+      _handlerRegisterDelegate
           .findHandlerEntries(handlers, id: id, channels: channels)
           .isNotEmpty;
 

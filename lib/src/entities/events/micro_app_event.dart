@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
@@ -13,13 +14,15 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
   final String name;
   final T? payload;
   final bool distinct;
+  final Completer _completer = Completer();
+
   // ignore: prefer_const_constructors_in_immutables
-  MicroAppEvent(
-      {required this.name,
-      this.payload,
-      List<String> channels = const [],
-      this.distinct = true})
-      : super(channels);
+  MicroAppEvent({
+    required this.name,
+    this.payload,
+    List<String> channels = const [],
+    this.distinct = true,
+  }) : super(channels);
 
   T? cast() {
     try {
@@ -44,18 +47,28 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
       final map = jsonDecode(json);
       final name = map['name'];
       final payload = map['payload'];
+      final distinct = map['distinct'];
       List<dynamic>? list = map['channels'];
       final channels =
           list != null ? list.map((e) => e.toString()).toList() : <String>[];
-      return MicroAppEvent(name: name, payload: payload, channels: channels);
+      return MicroAppEvent(
+        name: name,
+        payload: payload,
+        channels: channels,
+        distinct: distinct,
+      );
     } catch (e) {
       return null;
     }
   }
 
   /// [toMap]
-  Map<String, dynamic> toMap() =>
-      {'name': name, 'payload': payload, 'channels': channels};
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'payload': payload,
+        'channels': channels,
+        'distinct': distinct,
+      };
 
   /// [MicroAppEvent.copyWith]
   MicroAppEvent<T> copyWith({
@@ -66,10 +79,23 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
     return MicroAppEvent<T>(
         name: name ?? this.name,
         payload: payload ?? this.payload,
-        channels: channels ?? this.channels);
+        channels: channels ?? this.channels,
+        distinct: distinct);
   }
 
-  String get type => payload.runtimeType.toString();
+  Type get type => payload.runtimeType;
+
+  /// Completes with success
+  void resultSuccess([FutureOr<dynamic>? value]) => _completer.complete(value);
+
+  /// Completes with error
+  void resultError(Object error, [StackTrace? stackTrace]) =>
+      _completer.completeError(error, stackTrace);
+
+  /// Returns a Future
+  ///
+  /// Use `event.resultSuccess(value)` or `event.resultError(error)` in order to complete this `Future`
+  Future get asFuture => _completer.future;
 
   @override
   List<Object?> get props => [name, payload, channels];

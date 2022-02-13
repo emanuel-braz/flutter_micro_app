@@ -12,8 +12,20 @@ class MaterialAppPageInitial extends StatefulWidget {
   State<MaterialAppPageInitial> createState() => _MaterialAppPageInitialState();
 }
 
-class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
+class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
+    with HandlerRegisterMixin {
   int count = 0;
+
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(event.cast()),
+      ));
+    }, channels: const ['show_snackbar'], distinct: false));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +40,38 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
       ),
       body: Container(
         color: Colors.green,
-        alignment: Alignment.center,
+        height: double.infinity,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                child: const Text('Emit "my_event"'),
+                child: const Text('Show snackbar'),
                 onPressed: () {
                   MicroAppEventController().emit(
-                      MicroAppEvent<Map<String, dynamic>>(
-                          name: 'my_event',
-                          payload: const {'data': 'lorem ipsum'},
-                          channels: const ['abc']));
+                    MicroAppEvent(
+                      name: 'show_snackbar',
+                      payload: 'Hello World!',
+                      channels: const ['show_snackbar'],
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Emit "my_event"'),
+                onPressed: () async {
+                  final result = await MicroAppEventController()
+                      .emit(MicroAppEvent<Map<String, dynamic>>(
+                        name: 'my_event',
+                        payload: const {'data': 'lorem ipsum'},
+                        channels: const ['abc'],
+                      ))
+                      .getFirstResult();
+
+                  logger.d(result);
                 },
               ),
               ElevatedButton(
@@ -94,9 +125,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                       'Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
                 },
               ),
-              const SizedBox(
-                height: 8,
-              ),
               ElevatedButton(
                 child: const Text('Try open a page that only exists in Native'),
                 onPressed: () {
@@ -106,17 +134,11 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                       arguments: 'some_arguments');
                 },
               ),
-              const SizedBox(
-                height: 8,
-              ),
               ElevatedButton(
                 child: const Text('Open SubPage (NavigatorInstance.pushNamed)'),
                 onPressed: () {
                   NavigatorInstance.pushNamed(Application1Routes().pageExample);
                 },
-              ),
-              const SizedBox(
-                height: 8,
               ),
               ElevatedButton(
                 child: const Text('Open SubPage (Navigator.of(context).push)'),
@@ -132,7 +154,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> {
                     if (eventSnapshot.hasError) return const Text('Error');
                     return ElevatedButton(
                       child: Text(
-                        'emit event in [widget_channel] count = ${eventSnapshot.data?.payload}',
+                        'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       onPressed: () {
