@@ -92,7 +92,7 @@ class MicroAppEventController {
   Future<MicroAppEventHandler?> unregisterHandler(
       {String? id, List<String>? channels, MicroAppEventHandler? handler}) {
     if (handler != null) {
-      return _handlerRegisterDelegate.unregisterThisOne(handler, _handlers);
+      return _handlerRegisterDelegate.unregisterHandler(handler, _handlers);
     }
     return _handlerRegisterDelegate.unregisterSubscription(_handlers,
         id: id, channels: channels);

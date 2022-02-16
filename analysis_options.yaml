@@ -1,5 +1,7 @@
-include: package:flutter_lints/flutter.yaml
+include: package:lints/recommended.yaml
+
 analyzer:
   errors:
-    use_key_in_widget_constructors: ignore
-    constant_identifier_names: ignore
+    lines_longer_than_80_chars: error
+    todo: warning
+    fixme: warning

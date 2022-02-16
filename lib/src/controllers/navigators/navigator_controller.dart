@@ -1,7 +1,12 @@
 // ignore_for_file: non_constant_identifier_names
+import '../../utils/platform/platform_stub.dart'
+    if (dart.library.io) '../../utils/platform/mobile_platform.dart'
+    if (dart.library.html) '../../utils/platform/web_platform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
+import 'package:flutter_micro_app/src/presentation/pages/page_transition/micro_page_transition.dart';
 import 'package:flutter_micro_app/src/utils/enums/navigator_status.dart';
-import 'package:flutter_micro_app/src/utils/typedefs.dart';
 
 import 'navigator_event_controller.dart';
 
@@ -28,12 +33,12 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   /// [NavigatorState]
-  NavigatorState get nav => navigatorKey.currentState as NavigatorState;
+  NavigatorState get _nav => navigatorKey.currentState as NavigatorState;
 
-  /// [getFragment]
-  Widget getFragment(String name, BuildContext context,
+  /// [getPageWidget]
+  Widget getPageWidget(String route, BuildContext context,
           {Object? arguments, String? type, Widget? orElse}) =>
-      getPageBuilder(name)?.call(context, arguments) ??
+      getPageBuilder(route)?.call(context, arguments) ??
       orElse ??
       const SizedBox.shrink();
 
@@ -49,11 +54,15 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
 
   /// [pushNamed]
   Future<T?> pushNamed<T extends Object?>(String routeName,
-      {Object? arguments, String? type}) {
+      {Object? arguments, String? type, BuildContext? context}) {
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushNamed.name);
-    return nav.pushNamed(routeName, arguments: arguments);
+    if (context != null) {
+      return Navigator.of(context).pushNamed(routeName, arguments: arguments);
+    } else {
+      return _nav.pushNamed(routeName, arguments: arguments);
+    }
   }
 
   /// [pushReplacementNamed]
@@ -61,28 +70,47 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       String routeName,
       {TO? result,
       Object? arguments,
-      String? type}) {
+      String? type,
+      BuildContext? context}) {
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushReplacementNamed.name);
-    return nav.pushReplacementNamed(routeName,
-        arguments: arguments, result: result);
+
+    if (context != null) {
+      return Navigator.of(context).pushReplacementNamed(routeName,
+          arguments: arguments, result: result);
+    } else {
+      return _nav.pushReplacementNamed(routeName,
+          arguments: arguments, result: result);
+    }
   }
 
   /// [push]
-  Future<T?> push<T extends Object?>(Route<T> route, String? type) {
+  Future<T?> push<T extends Object?>(Route<T> route,
+      {BuildContext? context, String? type}) {
     eventController.logNavigationEvent(route.settings.name,
         arguments: route.settings.arguments,
         type: type ?? MicroAppNavigationType.push.name);
-    return nav.push(route);
+
+    if (context != null) {
+      return Navigator.of(context).push(route);
+    } else {
+      return _nav.push(route);
+    }
   }
 
   /// [pop]
-  void pop<T extends Object?>([T? result, String? type]) {
+  void pop<T extends Object?>(
+      [T? result, BuildContext? context, String? type]) {
     eventController.logNavigationEvent(null,
         type: type ?? MicroAppNavigationType.pop.name,
         arguments: result?.toString());
-    return nav.pop(result);
+
+    if (context != null) {
+      return Navigator.of(context).pop(result);
+    } else {
+      return _nav.pop(result);
+    }
   }
 
   /// [popAndPushNamed]
@@ -90,37 +118,57 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       String routeName,
       {TO? result,
       Object? arguments,
-      String? type}) {
+      String? type,
+      BuildContext? context}) {
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.popAndPushNamed.name);
-    return nav.popAndPushNamed(routeName, arguments: arguments, result: result);
+    if (context != null) {
+      return Navigator.of(context)
+          .popAndPushNamed(routeName, arguments: arguments, result: result);
+    } else {
+      return _nav.popAndPushNamed(routeName,
+          arguments: arguments, result: result);
+    }
   }
 
   /// [pushNamedAndRemoveUntil]
   Future<T?> pushNamedAndRemoveUntil<T extends Object?>(
       String newRouteName, RoutePredicate predicate,
-      {Object? arguments, String? type}) {
+      {Object? arguments, String? type, BuildContext? context}) {
     eventController.logNavigationEvent(newRouteName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushNamedAndRemoveUntil.name);
-    return nav.pushNamedAndRemoveUntil(newRouteName, predicate,
-        arguments: arguments);
+
+    if (context != null) {
+      return Navigator.of(context).pushNamedAndRemoveUntil(
+          newRouteName, predicate,
+          arguments: arguments);
+    } else {
+      return _nav.pushNamedAndRemoveUntil(newRouteName, predicate,
+          arguments: arguments);
+    }
   }
 
   /// [popUntil]
-  void popUntil(RoutePredicate predicate, {String? type}) {
+  void popUntil(RoutePredicate predicate,
+      {String? type, BuildContext? context}) {
     eventController.logNavigationEvent(null,
         type: type ?? MicroAppNavigationType.popUntil.name);
-    nav.popUntil(predicate);
+
+    if (context != null) {
+      return Navigator.of(context).popUntil(predicate);
+    } else {
+      return _nav.popUntil(predicate);
+    }
   }
 
   /// [getPageRoute]
-  MaterialPageRoute? getPageRoute(RouteSettings settings,
-      {bool? routeNativeOnError}) {
+  PageRoute? getPageRoute(RouteSettings settings,
+      {MicroAppBaseRoute? baseRoute, bool? routeNativeOnError}) {
     final routeName = settings.name;
     final routeArguments = settings.arguments;
-    final pageBuilder = getPageBuilder(routeName);
+    final pageBuilder = getPageBuilder(routeName, baseRoute: baseRoute);
 
     if (pageBuilder == null) {
       if (routeName != null && (routeNativeOnError ?? false)) {
@@ -129,13 +177,41 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       return null;
     }
 
-    return MaterialPageRoute(
-      builder: (context) => pageBuilder(context, routeArguments),
-    );
+    final transitionType = MicroAppPreferences.config.pageTransitionType;
+
+    if (transitionType != MicroPageTransitionType.platform) {
+      return MicroPageTransition(
+          pageBuilder: pageBuilder, type: transitionType);
+    } else {
+      if (isIOS) {
+        return CupertinoPageRoute(
+          builder: (context) => pageBuilder(context, routeArguments),
+        );
+      } else {
+        return MaterialPageRoute(
+          builder: (context) => pageBuilder(context, routeArguments),
+        );
+      }
+    }
   }
 
-  PageBuilder? getPageBuilder(String? name) {
-    return pageBuilders[name];
+  PageBuilder? getPageBuilder(String? name, {MicroAppBaseRoute? baseRoute}) {
+    PageBuilder? pageBuilder;
+    if (baseRoute == null || baseRoute.toString().isEmpty) {
+      pageBuilder = pageBuilders[name];
+    } else {
+      final buildersForBaseRoute = filterPageBuilderForBaseRoute(baseRoute);
+      pageBuilder = buildersForBaseRoute[name];
+    }
+    return pageBuilder;
+  }
+
+  Map<String, PageBuilder> filterPageBuilderForBaseRoute(
+      MicroAppBaseRoute baseRoute) {
+    var filteredMap = Map<String, PageBuilder>.from(pageBuilders);
+    filteredMap
+        .removeWhere((key, value) => !key.startsWith(baseRoute.toString()));
+    return filteredMap;
   }
 
   /// [didPush]

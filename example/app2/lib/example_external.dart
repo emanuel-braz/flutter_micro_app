@@ -1,21 +1,33 @@
 import 'package:example_external/pages/colors_float_page.dart';
+import 'package:example_external/pages/page1.dart';
+import 'package:example_external/pages/page3.dart';
 
 import './pages/page2.dart';
 import 'package:example_routes/routes/application2_routes.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class MicroApplication2 extends MicroApp with Application2Routes {
+class MicroApplication2 extends MicroApp {
+  final baseRoute = Application2Routes();
   @override
   List<MicroAppPage> get pages => [
         MicroAppPage(
-            name: baseRoute.name,
-            builder: (context, arguments) => const Application2Initial()),
+            route: baseRoute.baseRoute.route,
+            pageBuilder: (context, arguments) => MicroAppNavigatorWidget(
+                microBaseRoute: baseRoute,
+                initialRoute: Application2Routes().page1)),
         MicroAppPage(
-            name: page2, builder: (context, arguments) => const Page2()),
+            route: baseRoute.page1,
+            pageBuilder: (context, arguments) => const Page1()),
         MicroAppPage(
-            name: pageColors, builder: (_, __) => const ColorsFloatPage()),
+            route: baseRoute.page2,
+            pageBuilder: (context, arguments) => const Page2()),
+        MicroAppPage(
+            route: baseRoute.page3,
+            pageBuilder: (context, arguments) => const Page3()),
+        MicroAppPage(
+            route: baseRoute.pageColors,
+            pageBuilder: (_, __) => const ColorsFloatPage()),
       ];
 
   @override
@@ -27,40 +39,4 @@ class MicroApplication2 extends MicroApp with Application2Routes {
           data.payload
         ]);
       }, id: '123');
-}
-
-class Application2Initial extends StatelessWidget {
-  const Application2Initial({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Application 2 Initial'),
-      ),
-      body: Container(
-        alignment: Alignment.center,
-        color: Colors.red,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              child: const Text('Open Page2'),
-              onPressed: () {
-                NavigatorInstance.pushNamed(Application2Routes().page2);
-              },
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            ElevatedButton(
-              child: const Text('Close MicroApp Application2'),
-              onPressed: () {
-                NavigatorInstance.pop();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
