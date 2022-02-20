@@ -16,6 +16,9 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
   int count = 0;
 
   @override
+  List<MicroAppEventHandler> get eventHandlers => [];
+
+  @override
   void initState() {
     registerEventHandler(MicroAppEventHandler<String>((event) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
