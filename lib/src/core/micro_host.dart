@@ -1,13 +1,7 @@
-import 'package:dart_log/dart_log.dart';
-import 'package:flutter/material.dart';
-
-import '../controllers/app_event/micro_app_event_controller.dart';
-import '../controllers/navigators/navigator_controller.dart';
-import '../utils/typedefs.dart';
-import 'micro_app.dart';
+import '../../flutter_micro_app.dart';
 
 /// [MicroHost] contract
-abstract class MicroHost with MicroApp {
+abstract class MicroHost implements MicroApp {
   static bool _microAppsRegistered = false;
 
   List<MicroApp> get microApps;
@@ -22,7 +16,7 @@ abstract class MicroHost with MicroApp {
     if (_microAppsRegistered) return;
 
     NavigatorInstance.pageBuilders = {
-      for (var page in pages) page.name: page.builder
+      for (var page in pages) page.route: page.pageBuilder
     };
 
     _registerEventHandler(this);
@@ -39,18 +33,5 @@ abstract class MicroHost with MicroApp {
   void _registerEventHandler(MicroApp microapp) {
     final handler = microapp.microAppEventHandler;
     MicroAppEventController().registerHandler(handler);
-  }
-
-  Route<dynamic>? onGenerateRoute(RouteSettings settings,
-      {bool? routeNativeOnError}) {
-    MaterialPageRoute<dynamic>? pageRoute = NavigatorInstance.getPageRoute(
-        settings,
-        routeNativeOnError: routeNativeOnError);
-    if (pageRoute == null) {
-      logger.e('Error: [onGenerateRoute] PageRoute is null',
-          error: 'Route "${settings.name}" not found!');
-    }
-
-    return pageRoute;
   }
 }

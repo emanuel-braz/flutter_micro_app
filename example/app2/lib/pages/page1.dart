@@ -2,14 +2,19 @@ import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class Page2 extends StatelessWidget {
-  const Page2({Key? key}) : super(key: key);
+class Page1 extends StatelessWidget {
+  const Page1({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Page 2'),
+        leading: IconButton(
+          icon: const Icon(Icons.exit_to_app_outlined),
+          onPressed: () {
+            context.maNav.pop();
+          },
+        ),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -18,13 +23,13 @@ class Page2 extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              child: const Text('Open page3 in nested Navigator)'),
+              child: const Text('Open page2'),
               onPressed: () {
-                context.maNav.pushNamed(Application2Routes().page3);
+                context.maNav.pushNamed(Application2Routes().page2);
               },
             ),
             ElevatedButton(
-              child: const Text('Close Page 2'),
+              child: const Text('Close Page 1'),
               onPressed: () {
                 context.maNav.pop();
               },

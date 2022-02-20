@@ -1,4 +1,4 @@
 class MicroAppPathSeparator {
-  static String dot = '.';
-  static String slash = '/';
+  static const String dot = '.';
+  static const String slash = '/';
 }

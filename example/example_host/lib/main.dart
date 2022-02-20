@@ -1,30 +1,18 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
 import 'package:example_external/pages/colors_float_page.dart';
-import 'package:example/pages/example_page_fragment.dart';
 import 'package:example_external/example_external.dart';
 import 'package:flutter/material.dart';
-import 'package:example/pages/example_page.dart';
 import 'package:example_routes/example_routes.dart';
-import 'package:example/pages/material_app_page.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
-
-// It could be a BLoC, Mobx, Redux, GetX or whatever
-// but for now, it's just the incredible, super `ValueNotifier` :)
-class ColorController extends ValueNotifier<MaterialColor> {
-  ColorController([MaterialColor color = Colors.amber]) : super(color);
-  void changeColor(MaterialColor color) => value = color;
-}
-
-// Global instances, just for example purposes
-final backgroundColorController = ColorController();
-final buttonsColorController = ColorController(Colors.green);
+import 'example_micro_app.dart';
 
 void main() {
   // Define micro app configurations here
   MicroAppPreferences.update(MicroAppConfig(
-      nativeEventsEnabled: true, pathSeparator: MicroAppPathSeparator.slash));
+      nativeEventsEnabled: true,
+      pageTransitionType: MicroPageTransitionType.platform));
 
   // Listen to navigation events
   final internalNavigationSubs =
@@ -53,47 +41,6 @@ void main() {
   runApp(MyApp());
 }
 
-// This micro app is registered in host application
-// You can mix with the routes in order to get page routes in a easier way
-// eg. pageExample, pageExampleMaterialApp
-class MicroApplication1 extends MicroApp with Application1Routes {
-  @override
-  List<MicroAppPage> get pages => [
-        MicroAppPage(
-            name: pageExample,
-            builder: (context, arguments) => const ExamplePage()),
-        MicroAppPage(
-            name: pageExampleMaterialApp,
-            builder: (context, arguments) => const MaterialAppPage()),
-        MicroAppPage(
-            name: pageExampleFragment,
-            builder: (context, arguments) => const ExamplePageFragment()),
-      ];
-
-  // Event handler (listen all micro apps events on specifics channels)
-  //
-  // If you need the BuildContext, please register the handlers inside a widget
-  // and unregister them on dispose method.
-  // Or... you can use the mixin HandlerRegisterMixin on StatefulWidgets, in order to
-  // help you don't forget to unregister them
-  @override
-  MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
-        // You can use freezed here if you prefer more safety in cover possibilities
-        if (event.type == MaterialColor) {
-          if (event.name == 'change_background_color') {
-            backgroundColorController.changeColor(event.cast());
-          } else if (event.name == 'change_buttons_color') {
-            buttonsColorController.changeColor(event.cast());
-          }
-        }
-        logger.d(
-            ['(MicroAppExample) event received:', event.name, event.payload]);
-
-        event.resultSuccess('success!!!');
-      }, channels: const ['abc', 'chatbot', 'colors']);
-}
-
 // This is host application
 class MyApp extends MicroHostStatelessWidget {
   MyApp({Key? key}) : super(key: key);
@@ -102,7 +49,8 @@ class MyApp extends MicroHostStatelessWidget {
   // Override `onGenerateRoute` in order to define a default error page (if needed)
   // or to request native app to open the route
   @override
-  Route? onGenerateRoute(RouteSettings settings, {bool? routeNativeOnError}) {
+  Route? onGenerateRoute(RouteSettings settings,
+      {bool? routeNativeOnError, MicroAppBaseRoute? baseRoute}) {
     //! If you wish native app receive requests to open routes, IN CASE there
     //! is no route registered in Flutter, please set [routeNativeOnError: true]
     final pageRoute = super.onGenerateRoute(settings, routeNativeOnError: true);
@@ -127,24 +75,22 @@ class MyApp extends MicroHostStatelessWidget {
       title: 'Flutter Demo',
       navigatorKey: NavigatorInstance.navigatorKey, // Required
       onGenerateRoute: onGenerateRoute,
-      initialRoute: baseRoute.name,
+      initialRoute:
+          maAppBaseRoute, // or MicroAppPreferences.config.appBaseRoute.baseRoute.route
       navigatorObservers: [
         HeroController(),
         // NavigatorInstance // Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
       ],
-      // home: const BaseHomePage(),
     );
   }
-
-  // Base route of host application
-  @override
-  MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('/');
 
   // Register all root [MicroAppPage]s in app host
   @override
   List<MicroAppPage> get pages => [
         MicroAppPage(
-            name: baseRoute.name, builder: (_, __) => const BaseHomePage())
+            route:
+                maAppBaseRoute, // or MicroAppPreferences.config.appBaseRoute.baseRoute.route
+            pageBuilder: (_, __) => const BaseHomePage())
       ];
 
   // Register all [MicroApp]s in app host
@@ -195,7 +141,7 @@ class _BaseHomePageState extends State<BaseHomePage> {
                     ElevatedButton(
                       child: const Text('Open Example MaterialApp'),
                       onPressed: () {
-                        NavigatorInstance.pushNamed(
+                        context.maNav.pushNamed(
                             Application1Routes().pageExampleMaterialApp);
                       },
                     ),
@@ -205,8 +151,8 @@ class _BaseHomePageState extends State<BaseHomePage> {
                     ElevatedButton(
                       child: const Text('Open Application2(package)'),
                       onPressed: () {
-                        NavigatorInstance.pushNamed(
-                            Application2Routes().baseRoute.name);
+                        context.maNav
+                            .pushNamed(Application2Routes().baseRoute.route);
                       },
                     ),
                     const SizedBox(
@@ -235,8 +181,8 @@ class _BaseHomePageState extends State<BaseHomePage> {
                     ),
                     SizedBox(
                         height: 50,
-                        child: NavigatorInstance.getFragment(
-                            Application1Routes().pageExampleFragment, context,
+                        child: context.maNav.getPageWidget(
+                            Application1Routes().pageExampleFragment,
                             orElse: Container(
                               height: 200,
                               width: 200,

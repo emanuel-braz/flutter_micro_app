@@ -46,7 +46,7 @@ class MicroAppEventDelegate {
     handlers.clear();
   }
 
-  Future<MicroAppEventHandler?> unregisterThisOne(
+  Future<MicroAppEventHandler?> unregisterHandler(
       MicroAppEventHandler handler,
       Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>>
           handlers) async {
@@ -74,6 +74,8 @@ class MicroAppEventDelegate {
       await entry.value.cancel();
       handlers.remove(entry.key);
     }
+
+    return null;
   }
 
   /// findHandlerEntries

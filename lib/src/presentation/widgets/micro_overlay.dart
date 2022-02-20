@@ -22,9 +22,9 @@ class _MicroAppOverlayState extends State<MicroAppOverlay> {
     controller = widget.controller;
     child = widget.builder != null
         ? widget.builder!(
-            NavigatorInstance.getFragment(widget.controller.route, context),
+            NavigatorInstance.getPageWidget(widget.controller.route, context),
             widget.controller)
-        : NavigatorInstance.getFragment(widget.controller.route, context);
+        : NavigatorInstance.getPageWidget(widget.controller.route, context);
   }
 
   @override

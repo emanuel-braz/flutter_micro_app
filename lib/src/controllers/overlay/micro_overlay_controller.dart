@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../flutter_micro_app.dart';
 import '../../presentation/widgets/micro_overlay.dart';
-import '../../utils/typedefs.dart';
-import '../navigators/navigator_controller.dart';
 
 class MicroAppOverlayController extends ChangeNotifier {
   final String route;
@@ -62,7 +61,7 @@ class MicroAppOverlayController extends ChangeNotifier {
     this.size = size;
   }
 
-  void open({MicroAppFloatPageBuilder? builder}) {
+  void open({MicroAppFloatPageBuilder? builder, BuildContext? context}) {
     entry ??= OverlayEntry(
       maintainState: true,
       opaque: false,
@@ -73,7 +72,11 @@ class MicroAppOverlayController extends ChangeNotifier {
         );
       },
     );
-    NavigatorInstance.nav.overlay?.insert(entry!);
+    if (context != null) {
+      Overlay.of(context)?.insert(entry!);
+    } else {
+      NavigatorInstance.navigatorKey.currentState?.overlay?.insert(entry!);
+    }
   }
 
   void close() {

@@ -1,23 +1,38 @@
 import '../micro_app_preferences.dart';
 
-abstract class MicroAppRoutes {
-  MicroAppBaseRoute get baseRoute;
+abstract class IMicroAppBaseRoute {
+  MicroAppRoute get baseRoute;
 }
 
-class MicroAppBaseRoute {
-  final String name;
-  static String pathSeparator = MicroAppPreferences.config.pathSeparator;
+class MicroAppRoute {
+  /// Gets the segments (initial path not included)
+  final List<String> segments;
 
-  MicroAppBaseRoute(this.name);
+  /// Gets only the initial path
+  final String path;
+  MicroAppRoute(this.path, [this.segments = const <String>[]]);
 
-  String path(String path, [List<String> segments = const []]) {
-    String route = '$name$pathSeparator$path';
+  /// Gets the full route
+  String get route => _getFullPath();
+
+  @override
+  String toString() {
+    return route;
+  }
+
+  _getFullPath() {
+    String pathSeparator = MicroAppPreferences.config.pathSeparator;
+    String route = path;
     for (var segment in segments) {
       route += '$pathSeparator$segment';
     }
     return route;
   }
+}
+
+abstract class MicroAppBaseRoute implements IMicroAppBaseRoute {
+  String path(List<String> path) => MicroAppRoute(toString(), path).toString();
 
   @override
-  String toString() => name;
+  String toString() => baseRoute.path;
 }

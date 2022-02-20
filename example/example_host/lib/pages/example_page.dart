@@ -7,7 +7,7 @@ class ExamplePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Example Sub Page'),
+        title: const Text('Sub Page (Opened by Root)'),
       ),
       body: Container(
         alignment: Alignment.center,
