@@ -55,6 +55,7 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
     MicroAppConfig(
       nativeEventsEnabled: true, // If you want to dispatch and listen to events between native(Android/iOS) [default = false]
       pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
+      pageTransitionType: MicroPageTransitionType.platform // Cupetino for iOS, Material for others
     )
   );
 ```
@@ -70,11 +71,13 @@ Create the routing package: `flutter create --template=package micro_routes`
 // Export all routes
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class Application1Routes implements MicroAppRoutes {
+class Application1Routes implements MicroAppBaseRoute {
   @override
-  MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('application1');
-  String get page1 => baseRoute.path('page1');
-  String get page2 => baseRoute.path('page2', ['segment1', 'segment2']);
+  MicroAppRoute get baseRoute => MicroAppRoute('application1');
+
+  String get pageExample => path(['example_page']);
+  String get page1 => path(['page1']);
+  String get page2 => path(['page2','segment1', 'segment2']);
 }
 ```
   
@@ -95,9 +98,9 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(name: baseRoute.name, builder: (context, arguments) => const Initial()),
-        MicroAppPage(name: page1, builder: (context, arguments) => const Page1()),
-        MicroAppPage(name: page2, builder: (context, arguments) {
+        MicroAppPage(route: baseRoute.name, pageBuilder: (context, arguments) => const Initial()),
+        MicroAppPage(route: page1, pageBuilder: (context, arguments) => const Page1()),
+        MicroAppPage(route: page2, pageBuilder: (context, arguments) {
             final page2Params.fromMap(arguments);
             return Page2(params: page2Params);
         }),
@@ -260,6 +263,11 @@ It can be achieved, registering the event handlers and unregistering them manual
 ```dart
 class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
 
+   @override
+  List<MicroAppEventHandler> get eventHandlers => [
+    MicroAppEventHandler<String>((event) {count++;})
+  ];
+
   @override
   void initState() {
     registerEventHandler(MicroAppEventHandler<String>((event) {
@@ -375,6 +383,40 @@ If it fails to get a page route, show a default error page
   }
      
 ```
+
+### ⫸ Nested Navigators
+It's possible to use a `MicroAppBaseRoute` inside a nested navigator `MicroAppNavigatorWidget`
+
+```dart
+final baseRoute = ApplicationRoutes();
+
+MicroAppNavigatorWidget(
+    microBaseRoute: baseRoute,
+    initialRoute: baseRoute.page1
+);
+
+// later, inside [page1]
+final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+
+context.maNav.push(baseRoute.page2);
+```
+
+It can be registered inside MicroPages list.
+```dart
+final routes = ApplicationRoutes();
+
+List<MicroAppPage> get pages => [
+  MicroAppPage(
+      route: routes.baseRoute.route,
+      pageBuilder: (context, arguments) => 
+
+        MicroAppNavigatorWidget(
+          microBaseRoute: baseRoute,
+          initialRoute: Application2Routes().page1)
+        )
+]
+```
+
 ### 📎 The following table shows how Dart values are received on the platform side and vice versa
 
 |Dart	                    |   Kotlin         |    Swift                                   |   Java

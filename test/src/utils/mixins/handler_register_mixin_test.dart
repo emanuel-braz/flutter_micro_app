@@ -40,7 +40,7 @@ void main() {
     expect(MicroAppEventController().handlers.length, equals(1));
 
     // act
-    var allHandlersInState = key.currentState?.eventHandlers;
+    var allHandlersInState = key.currentState?.eventHandlersRegistered;
     await tester.pumpWidget(MaterialApp(home: Container()));
 
     // assert
@@ -59,7 +59,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: myWidget));
 
     // assert
-    expect(key.currentState?.eventHandlers.length, equals(2));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(2));
     expect(MicroAppEventController().handlers.length, equals(2));
   });
 
@@ -74,11 +74,11 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: myWidget));
 
     // assert
-    expect(key.currentState?.eventHandlers.length, equals(2));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(2));
     expect(MicroAppEventController().handlers.length, equals(2));
 
     // act
-    var allHandlersInState = key.currentState?.eventHandlers;
+    var allHandlersInState = key.currentState?.eventHandlersRegistered;
     await tester.pumpWidget(MaterialApp(home: Container()));
 
     // assert
@@ -99,7 +99,7 @@ void main() {
 
     // assert
     expect(key.currentState?.count, equals(42));
-    expect(key.currentState?.eventHandlers.length, equals(1));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(1));
     expect(MicroAppEventController().handlers.length, equals(1));
   });
 
@@ -120,6 +120,43 @@ void main() {
     // assert
     expect(key.currentState?.count, equals(null));
   });
+
+  testWidgets(
+      'Não deve disparar o handlers que foram registrados'
+      ' quando o widget for destruido(dispose)', (tester) async {
+    // arrange
+    final key = GlobalKey<MyWidgetState3>();
+    final myWidget = MyWidget3(key: key);
+
+    // act
+    await tester.pumpWidget(MaterialApp(home: myWidget));
+    await tester.pumpWidget(MaterialApp(home: Container()));
+    MicroAppEventController.instance
+        .emit(MicroAppEvent<int>(name: 'name', payload: 42));
+    await tester.pump();
+
+    // assert
+    expect(key.currentState?.count, equals(null));
+  });
+
+  testWidgets(
+      'Deve disparar os 3 handlers registrados, os handlers da lista e também do initialState',
+      (tester) async {
+    // arrange
+    final key = GlobalKey<MyWidgetState3>();
+    final myWidget = MyWidget3(key: key);
+
+    // act
+    await tester.pumpWidget(MaterialApp(home: myWidget));
+    MicroAppEventController.instance
+        .emit(MicroAppEvent<int>(name: 'name', payload: 0));
+    await tester.pump();
+
+    // assert
+    expect(key.currentState?.count, equals(3));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(3));
+    expect(MicroAppEventController().handlers.length, equals(3));
+  });
 }
 
 // fixtures
@@ -135,9 +172,6 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
 
   @override
   void initState() {
-    registerEventHandler(MicroAppEventHandler<int>((event) {
-      count = event.cast();
-    }));
     super.initState();
   }
 
@@ -145,6 +179,13 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
   Widget build(BuildContext context) {
     return Container();
   }
+
+  @override
+  List<MicroAppEventHandler> get eventHandlers => [
+        MicroAppEventHandler<int>((event) {
+          count = event.cast();
+        })
+      ];
 }
 
 class MyWidget2 extends StatefulWidget {
@@ -158,13 +199,56 @@ class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterMixin {
   int count = 0;
 
   @override
+  List<MicroAppEventHandler> get eventHandlers => [
+        MicroAppEventHandler<String>((event) {
+          count++;
+        }),
+        MicroAppEventHandler<String>((event) {
+          count++;
+        })
+      ];
+
+  @override
   void initState() {
-    registerEventHandler(MicroAppEventHandler<String>((event) {
-      count++;
-    }));
-    registerEventHandler(MicroAppEventHandler<String>((event) {
-      count++;
-    }));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class MyWidget3 extends StatefulWidget {
+  const MyWidget3({Key? key}) : super(key: key);
+
+  @override
+  MyWidgetState3 createState() => MyWidgetState3();
+}
+
+class MyWidgetState3 extends State<MyWidget3> with HandlerRegisterMixin {
+  final shouldRegisterThisOne = true;
+  int count = 0;
+
+  @override
+  List<MicroAppEventHandler> get eventHandlers => [
+        MicroAppEventHandler<int>((event) {
+          count++;
+        }),
+        if (shouldRegisterThisOne)
+          MicroAppEventHandler<int>((event) {
+            count++;
+          })
+      ];
+
+  @override
+  void initState() {
+    if (shouldRegisterThisOne) {
+      registerEventHandler(MicroAppEventHandler<int>((event) {
+        count++;
+      }));
+    }
+
     super.initState();
   }
 

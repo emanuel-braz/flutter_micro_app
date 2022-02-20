@@ -2,7 +2,7 @@ name: Flutter Analyze
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master ]
   pull_request:
     branches: [ develop, master, release/* ]
     types: [opened, synchronize, reopened, ready_for_review]

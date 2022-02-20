@@ -4,30 +4,40 @@ import '../../../dependencies.dart';
 import '../../../flutter_micro_app.dart';
 
 mixin HandlerRegisterMixin<T extends StatefulWidget> on State<T> {
-  final List<MicroAppEventHandler> _handlers = [];
-  List<MicroAppEventHandler> get eventHandlers => _handlers;
+  final List<MicroAppEventHandler> eventHandlersRegistered = [];
+  List<MicroAppEventHandler> get eventHandlers;
+
+  @override
+  void initState() {
+    _registerEventHandlers();
+    super.initState();
+  }
 
   registerEventHandler(MicroAppEventHandler handler) {
     try {
       MicroAppEventController().registerHandler(handler);
-      _handlers.add(handler);
+      eventHandlersRegistered.add(handler);
     } catch (e) {
       logger.e('Failed to register handler', error: e);
     }
   }
 
-  registerEventHandlers([List<MicroAppEventHandler> handlers = const []]) {
-    for (var handler in handlers) {
+  _registerEventHandlers() {
+    for (var handler in eventHandlers) {
       registerEventHandler(handler);
     }
   }
 
-  @override
-  void dispose() {
-    for (var handler in _handlers) {
+  void unregisterEventHandlers() {
+    for (var handler in eventHandlersRegistered) {
       MicroAppEventController().unregisterHandler(handler: handler);
     }
-    _handlers.clear();
+    eventHandlersRegistered.clear();
+  }
+
+  @override
+  void dispose() {
+    unregisterEventHandlers();
     super.dispose();
   }
 }

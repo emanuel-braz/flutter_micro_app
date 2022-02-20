@@ -1,3 +1,17 @@
+## 0.5.0
+[2022-02-20]
+#### Added
+- Add event handler list to mixin
+- close navigator when firstpage pops
+- add transitions for navigation
+- fix lint warnings
+- add navigator widget
+- add maNav to BuildContext extension
+#### Break
+- change route to pageBuilder
+- getFragment becomes getPageBuilder
+
+
 ## 0.4.0
 [2022-02-12]
 #### Added

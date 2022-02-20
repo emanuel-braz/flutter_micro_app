@@ -1,8 +1,11 @@
-import '../utils/typedefs.dart';
+import '../../flutter_micro_app.dart';
 
 /// [MicroAppPage] Create pages to be registered in [MicroApp]s
 class MicroAppPage {
-  final String name;
-  final PageBuilder builder;
-  MicroAppPage({required this.name, required this.builder});
+  final String route;
+  final PageBuilder pageBuilder;
+  MicroAppPage({
+    required this.route,
+    required this.pageBuilder,
+  });
 }

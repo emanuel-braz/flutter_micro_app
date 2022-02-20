@@ -1,10 +1,11 @@
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class Application1Routes extends MicroAppRoutes {
+class Application1Routes extends MicroAppBaseRoute {
   @override
-  MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('example');
-  String get pageExample => baseRoute.path('example_page');
+  MicroAppRoute get baseRoute => MicroAppRoute('example');
+
+  String get pageExample => path(['example_page']);
   String get pageExampleMaterialApp =>
-      baseRoute.path('material_app_page', ['all', 'examples']);
-  String get pageExampleFragment => baseRoute.path('fragment');
+      path(['material_app_page', 'all', 'examples']);
+  String get pageExampleFragment => path(['fragment']);
 }
