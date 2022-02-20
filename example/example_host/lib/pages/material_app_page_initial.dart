@@ -1,4 +1,3 @@
-import 'package:example/pages/example_page.dart';
 import 'package:example_routes/routes/application1_routes.dart';
 import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +36,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
         title: const Text('Material App Page'),
         leading: IconButton(
             onPressed: () {
+              //! Because of MaterialApp above this widget, it need to call the [NativeInstance] singleton
               NavigatorInstance.pop();
             },
             icon: const Icon(Icons.arrow_back)),
@@ -112,7 +112,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
               ElevatedButton(
                 child: const Text('Native app requests Flutter to open Page2'),
                 onPressed: () {
-                  NavigatorInstance.pushNamedNative(Application2Routes().page2,
+                  context.maNav.pushNamedNative(Application2Routes().page2,
                       arguments: 'my arguments');
                 },
               ),
@@ -120,9 +120,8 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 child: const Text(
                     'Native responses is "true" after "dispose" a page'),
                 onPressed: () async {
-                  final isValidEmail =
-                      await NavigatorInstance.pushNamedNative<bool>(
-                          'emailValidator',
+                  final isValidEmail = await context.maNav
+                      .pushNamedNative<bool>('emailValidator',
                           arguments: 'validateEmail:lorem@ipsum.com');
                   logger.d(
                       'Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
@@ -133,21 +132,15 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () {
                   // If `onGenerateRoute.routeNativeOnError` is enabled, when there is no flutter page registered,
                   // it will try to open the page in Native(Android/iOS) automatically
-                  NavigatorInstance.pushNamed('only_native_page',
+                  context.maNav.pushNamed('only_native_page',
                       arguments: 'some_arguments');
                 },
               ),
               ElevatedButton(
-                child: const Text('Open SubPage (NavigatorInstance.pushNamed)'),
+                child: const Text('Try open Page - not exists'),
                 onPressed: () {
-                  NavigatorInstance.pushNamed(Application1Routes().pageExample);
-                },
-              ),
-              ElevatedButton(
-                child: const Text('Open SubPage (Navigator.of(context).push)'),
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ExamplePage()));
+                  context.maNav.pushNamed(Application1Routes()
+                      .pageExample); // There is no [pageExample] inside current MaterialApp
                 },
               ),
               MicroAppWidgetBuilder(
