@@ -13,21 +13,29 @@ class MicroApplication2 extends MicroApp {
   List<MicroAppPage> get pages => [
         MicroAppPage(
             route: baseRoute.baseRoute.route,
-            pageBuilder: (context, arguments) => MicroAppNavigatorWidget(
-                microBaseRoute: baseRoute,
-                initialRoute: Application2Routes().page1)),
+            pageBuilder: PageBuilder(
+              builder: (context, arguments) => MicroAppNavigatorWidget(
+                  microBaseRoute: baseRoute,
+                  initialRoute: Application2Routes().page1),
+              transitionType: MicroPageTransitionType.rippleLeftDown,
+            )),
         MicroAppPage(
             route: baseRoute.page1,
-            pageBuilder: (context, arguments) => const Page1()),
+            pageBuilder:
+                PageBuilder(builder: (context, arguments) => const Page1())),
         MicroAppPage(
-            route: baseRoute.page2,
-            pageBuilder: (context, arguments) => const Page2()),
+          route: baseRoute.page2,
+          pageBuilder:
+              PageBuilder(builder: (context, arguments) => const Page2()),
+        ),
         MicroAppPage(
             route: baseRoute.page3,
-            pageBuilder: (context, arguments) => const Page3()),
+            pageBuilder:
+                PageBuilder(builder: (context, arguments) => const Page3())),
         MicroAppPage(
             route: baseRoute.pageColors,
-            pageBuilder: (_, __) => const ColorsFloatPage()),
+            pageBuilder:
+                PageBuilder(builder: (_, __) => const ColorsFloatPage())),
       ];
 
   @override
