@@ -22,12 +22,21 @@ MicroAppNavigatorController get NavigatorInstance {
 
 /// [MicroAppNavigatorController]
 class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
-  Map<String, PageBuilder> pageBuilders = {};
+  final Map<String, PageBuilder> _pageBuilders = {};
   final MicroAppNavigatorEventController eventController;
 
   MicroAppNavigatorController(this.eventController) {
     _navigatorInstance = this;
   }
+
+  /// [addPageBuilders]
+  void addPageBuilders(Map<String, PageBuilder> map) {
+    _pageBuilders.addAll(map);
+  }
+
+  /// [hasRoute]
+  bool hasRoute(String route) => _pageBuilders.containsKey(route);
+  Map<String, PageBuilder> get pageBuilders => _pageBuilders;
 
   /// [navigatorKey]
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -199,7 +208,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   PageBuilder? getPageBuilder(String? name, {MicroAppBaseRoute? baseRoute}) {
     PageBuilder? pageBuilder;
     if (baseRoute == null || baseRoute.toString().isEmpty) {
-      pageBuilder = pageBuilders[name];
+      pageBuilder = _pageBuilders[name];
     } else {
       final buildersForBaseRoute = filterPageBuilderForBaseRoute(baseRoute);
       pageBuilder = buildersForBaseRoute[name];
@@ -209,7 +218,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
 
   Map<String, PageBuilder> filterPageBuilderForBaseRoute(
       MicroAppBaseRoute baseRoute) {
-    var filteredMap = Map<String, PageBuilder>.from(pageBuilders);
+    var filteredMap = Map<String, PageBuilder>.from(_pageBuilders);
     filteredMap
         .removeWhere((key, value) => !key.startsWith(baseRoute.toString()));
     return filteredMap;
