@@ -1,3 +1,11 @@
+## 0.6.0
+[2022-04-27]
+#### Break
+- PageBuilder `function` became `class`
+#### Added
+- Add transition animation per MicroPage
+
+
 ## 0.5.0
 [2022-02-20]
 #### Added
