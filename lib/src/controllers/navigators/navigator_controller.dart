@@ -1,13 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
-import '../../utils/platform/platform_stub.dart'
-    if (dart.library.io) '../../utils/platform/mobile_platform.dart'
-    if (dart.library.html) '../../utils/platform/web_platform.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/presentation/pages/page_transition/micro_page_transition.dart';
 import 'package:flutter_micro_app/src/utils/enums/navigator_status.dart';
 
+import '../../utils/platform/platform_stub.dart'
+    if (dart.library.io) '../../utils/platform/mobile_platform.dart'
+    if (dart.library.html) '../../utils/platform/web_platform.dart';
 import 'navigator_event_controller.dart';
 
 /// instance hidden
@@ -38,7 +38,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   /// [getPageWidget]
   Widget getPageWidget(String route, BuildContext context,
           {Object? arguments, String? type, Widget? orElse}) =>
-      getPageBuilder(route)?.call(context, arguments) ??
+      getPageBuilder(route)?.builder.call(context, arguments) ??
       orElse ??
       const SizedBox.shrink();
 
@@ -177,19 +177,20 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       return null;
     }
 
-    final transitionType = MicroAppPreferences.config.pageTransitionType;
+    final transitionType = pageBuilder.transitionType ??
+        MicroAppPreferences.config.pageTransitionType;
 
     if (transitionType != MicroPageTransitionType.platform) {
       return MicroPageTransition(
-          pageBuilder: pageBuilder, type: transitionType);
+          pageBuilder: pageBuilder.builder, type: transitionType);
     } else {
       if (isIOS) {
         return CupertinoPageRoute(
-          builder: (context) => pageBuilder(context, routeArguments),
+          builder: (context) => pageBuilder.builder(context, routeArguments),
         );
       } else {
         return MaterialPageRoute(
-          builder: (context) => pageBuilder(context, routeArguments),
+          builder: (context) => pageBuilder.builder(context, routeArguments),
         );
       }
     }

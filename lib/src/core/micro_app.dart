@@ -1,5 +1,5 @@
 import '../entities/events/micro_app_event_handler.dart';
-import '../utils/typedefs.dart';
+import '../entities/router/page_builder.dart';
 import 'micro_page.dart';
 
 /// [MicroApp] contract

@@ -1,4 +1,4 @@
-import '../../flutter_micro_app.dart';
+import '../entities/router/page_builder.dart';
 
 /// [MicroAppPage] Create pages to be registered in [MicroApp]s
 class MicroAppPage {

@@ -33,5 +33,7 @@ class MicroAppNativeService {
     } catch (e) {
       logger.e('Critical Router Error', error: e);
     }
+
+    return null;
   }
 }

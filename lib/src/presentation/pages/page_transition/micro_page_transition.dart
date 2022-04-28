@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_micro_app/src/presentation/pages/page_transition/transition_effects.dart';
-import 'package:flutter_micro_app/src/utils/enums/micro_page_transition_type.dart';
+
+import '../../../../flutter_micro_app.dart';
+import 'transition_effects.dart';
 
 class MicroPageTransition<T> extends PageRouteBuilder<T> {
   /// [childCurrent]
@@ -13,7 +14,7 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
   final Curve curve;
 
   /// [Alignment]
-  final Alignment? alignment;
+  final Alignment alignment;
 
   /// [Duration]
   final Duration duration;
@@ -30,12 +31,12 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
   MicroPageTransition({
     Key? key,
     required this.type,
-    required Widget Function(BuildContext, dynamic) pageBuilder,
+    required WidgetPageBuilder pageBuilder,
     this.childCurrent,
     this.context,
     this.inheritTheme = false,
     this.curve = Curves.linear,
-    this.alignment,
+    this.alignment = Alignment.center,
     this.duration = const Duration(milliseconds: 300),
     this.reverseDuration = const Duration(milliseconds: 300),
     bool fullscreenDialog = false,
@@ -106,7 +107,7 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
 
               case MicroPageTransitionType.scale:
                 return ScaleTransition(
-                  alignment: alignment!,
+                  alignment: alignment,
                   scale: CurvedAnimation(
                     parent: animation,
                     curve: Interval(
@@ -120,7 +121,7 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
 
               case MicroPageTransitionType.rotate:
                 return RotationTransition(
-                  alignment: alignment!,
+                  alignment: alignment,
                   turns: animation,
                   child: ScaleTransition(
                     alignment: alignment,
@@ -134,7 +135,7 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
 
               case MicroPageTransitionType.size:
                 return Align(
-                  alignment: alignment!,
+                  alignment: alignment,
                   child: SizeTransition(
                     sizeFactor: CurvedAnimation(
                       parent: animation,
