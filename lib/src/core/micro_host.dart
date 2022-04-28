@@ -15,15 +15,14 @@ abstract class MicroHost implements MicroApp {
   void registerRoutes() {
     if (_microAppsRegistered) return;
 
-    NavigatorInstance.pageBuilders = {
-      for (var page in pages) page.route: page.pageBuilder
-    };
+    NavigatorInstance.addPageBuilders(
+        {for (var page in pages) page.route: page.pageBuilder});
 
     _registerEventHandler(this);
 
     for (MicroApp microapp in microApps) {
       if (microapp.hasRoutes) {
-        NavigatorInstance.pageBuilders.addAll(microapp.pageBuilders);
+        NavigatorInstance.addPageBuilders(microapp.pageBuilders);
       }
       _registerEventHandler(microapp);
     }

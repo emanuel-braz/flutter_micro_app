@@ -14,9 +14,11 @@ class MicroApplication2 extends MicroApp {
         MicroAppPage(
             route: baseRoute.baseRoute.route,
             pageBuilder: PageBuilder(
-                builder: (context, arguments) => MicroAppNavigatorWidget(
-                    microBaseRoute: baseRoute,
-                    initialRoute: Application2Routes().page1))),
+              builder: (context, arguments) => MicroAppNavigatorWidget(
+                  microBaseRoute: baseRoute,
+                  initialRoute: Application2Routes().page1),
+              transitionType: MicroPageTransitionType.rippleLeftDown,
+            )),
         MicroAppPage(
             route: baseRoute.page1,
             pageBuilder:
