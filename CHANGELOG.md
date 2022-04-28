@@ -4,6 +4,7 @@
 - PageBuilder `function` became `class`
 #### Added
 - Add transition animation per MicroPage
+- Add hasRoute method to NavigatorInstance
 
 
 ## 0.5.0
