@@ -26,13 +26,17 @@ class MicroApplication1 extends MicroApp {
   List<MicroAppPage> get pages => [
         MicroAppPage(
             route: routes.pageExample,
-            pageBuilder: (context, arguments) => const ExamplePage()),
+            pageBuilder: PageBuilder(
+                builder: (context, arguments) => const ExamplePage())),
         MicroAppPage(
             route: routes.pageExampleMaterialApp,
-            pageBuilder: (context, arguments) => const MaterialAppPage()),
+            pageBuilder: PageBuilder(
+                builder: (context, arguments) => const MaterialAppPage(),
+                transitionType: MicroPageTransitionType.slideZoomUp)),
         MicroAppPage(
             route: routes.pageExampleFragment,
-            pageBuilder: (context, arguments) => const ExamplePageFragment()),
+            pageBuilder: PageBuilder(
+                builder: (context, arguments) => const ExamplePageFragment())),
       ];
 
   // Event handler (listen all micro apps events on specifics channels)

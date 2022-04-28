@@ -81,6 +81,8 @@ class MicroAppNavigatorEventController {
           jsonEncode(
               {_route: route, _arguments: arguments.toString(), _type: type}));
     }
+
+    return null;
   }
 
   /// [pushNamedNative]
@@ -95,6 +97,8 @@ class MicroAppNavigatorEventController {
             _type: type ?? MicroAppNavigationType.pushNamedNative.name
           }));
     }
+
+    return null;
   }
 
   /// dispose stream controllers (do not dispose this, if there is no a very specific situation case)

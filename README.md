@@ -98,12 +98,21 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(route: baseRoute.name, pageBuilder: (context, arguments) => const Initial()),
-        MicroAppPage(route: page1, pageBuilder: (context, arguments) => const Page1()),
-        MicroAppPage(route: page2, pageBuilder: (context, arguments) {
+
+        MicroAppPage(route: baseRoute.name, pageBuilder: PageBuilder(
+          builder: (context, arguments) => const Initial(),
+          transitionType: MicroPageTransitionType.slideZoomUp)),
+
+        MicroAppPage(route: page1, pageBuilder: PageBuilder(
+          builder:  (context, arguments) => const Page1()
+        )),
+
+        MicroAppPage(route: page2, pageBuilder: PageBuilder(
+          builder: (context, arguments) {
             final page2Params.fromMap(arguments);
             return Page2(params: page2Params);
-        }),
+          }
+        )),
       ];
 }
 ```
@@ -140,7 +149,9 @@ class MyApp extends MicroHostStatelessWidget {
   // Register all root [MicroAppPage]s here
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(name: baseRoute.name, builder: (_, __) => const HostHomePage())
+        MicroAppPage(name: baseRoute.name, pageBuilder: PageBuilder(
+          builder: (_, __) => const HostHomePage()
+        ))
       ];
 
   // Register all [MicroApp]s here
@@ -408,12 +419,13 @@ final routes = ApplicationRoutes();
 List<MicroAppPage> get pages => [
   MicroAppPage(
       route: routes.baseRoute.route,
-      pageBuilder: (context, arguments) => 
-
-        MicroAppNavigatorWidget(
-          microBaseRoute: baseRoute,
-          initialRoute: Application2Routes().page1)
-        )
+      pageBuilder: PageBuilder(
+        builder: (context, arguments) => 
+          MicroAppNavigatorWidget(
+            microBaseRoute: baseRoute,
+            initialRoute: Application2Routes().page1)
+          )
+      )
 ]
 ```
 

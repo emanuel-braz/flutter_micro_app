@@ -61,10 +61,12 @@ class MicroAppEventDelegate {
     } catch (e) {
       logger.e('Failed to unregister handler', error: e);
     }
+
+    return null;
   }
 
   /// unregisterSubscription
-  Future<MicroAppEventHandler?> unregisterSubscription(
+  Future<void> unregisterSubscription(
       Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> handlers,
       {String? id,
       List<String>? channels}) async {
@@ -74,8 +76,6 @@ class MicroAppEventDelegate {
       await entry.value.cancel();
       handlers.remove(entry.key);
     }
-
-    return null;
   }
 
   /// findHandlerEntries

@@ -90,7 +90,7 @@ class MyApp extends MicroHostStatelessWidget {
         MicroAppPage(
             route:
                 maAppBaseRoute, // or MicroAppPreferences.config.appBaseRoute.baseRoute.route
-            pageBuilder: (_, __) => const BaseHomePage())
+            pageBuilder: PageBuilder(builder: (_, __) => const BaseHomePage()))
       ];
 
   // Register all [MicroApp]s in app host
