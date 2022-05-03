@@ -149,10 +149,11 @@ class _BaseHomePageState extends State<BaseHomePage> {
                       height: 8,
                     ),
                     ElevatedButton(
-                      child: const Text('Open Application2(package)'),
+                      child: const Text('Open Nested MicroAppNavigator'),
                       onPressed: () {
-                        context.maNav
-                            .pushNamed(Application2Routes().baseRoute.route);
+                        context.maNav.pushNamed(
+                            Application2Routes().microAppNavigator,
+                            arguments: 'microAppNavigator argument');
                       },
                     ),
                     const SizedBox(

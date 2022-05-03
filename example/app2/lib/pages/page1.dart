@@ -2,8 +2,23 @@ import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class Page1 extends StatelessWidget {
+class Page1 extends StatefulWidget {
   const Page1({Key? key}) : super(key: key);
+
+  @override
+  State<Page1> createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      debugPrint(
+          'Nested InitialRouteSettings: ${MicroAppNavigator.getInitialRouteSettings(context).toString()}');
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +40,8 @@ class Page1 extends StatelessWidget {
             ElevatedButton(
               child: const Text('Open page2'),
               onPressed: () {
-                context.maNav.pushNamed(Application2Routes().page2);
+                context.maNav.pushNamed(Application2Routes().page2,
+                    arguments: 'Title Page 2');
               },
             ),
             ElevatedButton(
