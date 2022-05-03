@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
+import 'dart:io';
 import 'package:example_external/pages/colors_float_page.dart';
 import 'package:example_external/example_external.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,11 @@ import 'example_micro_app.dart';
 
 void main() {
   // Define micro app configurations here
+  final isAndroid = Platform.isAndroid;
   MicroAppPreferences.update(MicroAppConfig(
-      nativeEventsEnabled: true,
+      nativeEventsEnabled: isAndroid,
+      nativeNavigationCommandEnabled: isAndroid,
+      nativeNavigationLogEnabled: isAndroid,
       pageTransitionType: MicroPageTransitionType.platform));
 
   // Listen to navigation events
