@@ -47,7 +47,9 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   /// [getPageWidget]
   Widget getPageWidget(String route, BuildContext context,
           {Object? arguments, String? type, Widget? orElse}) =>
-      getPageBuilder(route)?.builder.call(context, arguments) ??
+      getPageBuilder(route)
+          ?.builder
+          .call(context, RouteSettings(arguments: arguments, name: route)) ??
       orElse ??
       const SizedBox.shrink();
 
@@ -191,15 +193,19 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
 
     if (transitionType != MicroPageTransitionType.platform) {
       return MicroPageTransition(
-          pageBuilder: pageBuilder.builder, type: transitionType);
+          settings: RouteSettings(arguments: routeArguments, name: routeName),
+          pageBuilder: pageBuilder.builder,
+          type: transitionType);
     } else {
       if (isIOS) {
         return CupertinoPageRoute(
-          builder: (context) => pageBuilder.builder(context, routeArguments),
+          builder: (context) => pageBuilder.builder(context,
+              RouteSettings(arguments: routeArguments, name: routeName)),
         );
       } else {
         return MaterialPageRoute(
-          builder: (context) => pageBuilder.builder(context, routeArguments),
+          builder: (context) => pageBuilder.builder(context,
+              RouteSettings(arguments: routeArguments, name: routeName)),
         );
       }
     }
