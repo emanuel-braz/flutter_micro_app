@@ -4,6 +4,7 @@ class Application2Routes extends MicroAppBaseRoute {
   @override
   MicroAppRoute get baseRoute => MicroAppRoute('example_external');
 
+  String get microAppNavigator => path(['microAppNavigator']);
   String get page1 => path(['page1']);
   String get page2 => path(['page2']);
   String get page3 => path(['page3']);

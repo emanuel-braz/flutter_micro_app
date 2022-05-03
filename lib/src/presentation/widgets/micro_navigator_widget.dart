@@ -44,6 +44,15 @@ class MicroAppNavigatorWidget extends StatefulWidget {
 
 class _MicroAppNavigatorWidgetState extends State<MicroAppNavigatorWidget>
     with RouterGenerator {
+  RouteSettings? initialSettings;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback(
+        (timeStamp) => initialSettings = ModalRoute.of(context)?.settings);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MicroAppNavigator(
@@ -71,6 +80,10 @@ class _MicroAppNavigatorWidgetState extends State<MicroAppNavigatorWidget>
 }
 
 class MicroAppNavigator extends Navigator {
+  static Object? getInitialRouteSettings(BuildContext context) => context
+      .findAncestorStateOfType<_MicroAppNavigatorWidgetState>()
+      ?.initialSettings;
+
   final MicroAppBaseRoute microBaseRoute;
   final bool closeOnPopFirstPage;
 

@@ -75,7 +75,7 @@ class MicroAppNavigatorEventController {
     _flutterLoggerController.add(
         MicroAppNavigatorEvent(route: route, arguments: arguments, type: type));
 
-    if (MicroAppPreferences.config.nativeEventsEnabled) {
+    if (MicroAppPreferences.config.nativeNavigationLogEnabled) {
       return _nativeLoggerService.emit(
           Constants.methodNavigationLog,
           jsonEncode(
@@ -88,7 +88,7 @@ class MicroAppNavigatorEventController {
   /// [pushNamedNative]
   Future<T?> pushNamedNative<T>(String route,
       {Object? arguments, String? type}) async {
-    if (MicroAppPreferences.config.nativeEventsEnabled) {
+    if (MicroAppPreferences.config.nativeNavigationCommandEnabled) {
       return _nativeCommandService.emit(
           Constants.methodNavigationCommand,
           jsonEncode({

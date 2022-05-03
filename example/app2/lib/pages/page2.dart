@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class Page2 extends StatelessWidget {
-  const Page2({Key? key}) : super(key: key);
+  final String? title;
+  const Page2({this.title, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Page 2'),
+        title: Text(title ?? 'Page 2'),
       ),
       body: Container(
         alignment: Alignment.center,

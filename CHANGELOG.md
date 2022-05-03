@@ -1,3 +1,11 @@
+## 0.7.0
+[2022-05-03]
+#### Break
+- WidgetPageBuilder (arguments:dynamic) parameter becomes (settings:RouteSettings)
+#### Added
+- Separation of native events enablers
+- Make optional the widgetbuilder channels
+
 ## 0.6.0
 [2022-04-27]
 #### Break

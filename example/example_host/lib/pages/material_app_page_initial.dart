@@ -153,18 +153,31 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                         'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload}',
                         style: const TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {
-                        MicroAppEventController().emit(MicroAppEvent<int>(
-                            name: 'my_event',
-                            payload: ++count,
-                            channels: const ['widget_channel']));
-                      },
+                      onPressed: incrementCounter,
                     );
                   }),
+              MicroAppWidgetBuilder<int>(builder: (context, eventSnapshot) {
+                if (eventSnapshot.hasError) return const Text('Error');
+                return ElevatedButton(
+                  child: Text(
+                    'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload ?? 0}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  onPressed: incrementCounter,
+                );
+              }),
+              const SizedBox(height: 40)
             ],
           ),
         ),
       ),
     );
+  }
+
+  incrementCounter() {
+    MicroAppEventController().emit(MicroAppEvent<int>(
+        name: 'my_event',
+        payload: ++count,
+        channels: const ['widget_channel']));
   }
 }

@@ -47,7 +47,12 @@ class MicroPageTransition<T> extends PageRouteBuilder<T> {
         super(
           pageBuilder: (BuildContext context, Animation<double> animation,
               Animation<double> secondaryAnimation) {
-            Widget child = pageBuilder(context, settings?.arguments);
+            Widget child = pageBuilder(
+                context,
+                RouteSettings(
+                  name: settings?.name,
+                  arguments: settings?.arguments,
+                ));
             return inheritTheme
                 ? InheritedTheme.captureAll(
                     context,

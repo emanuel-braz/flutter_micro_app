@@ -17,6 +17,8 @@ class MicroAppConfig {
   /// ⚠️ if you don't intend to implement native side callbacks, then disable events [nativeEventsEnabled = false]
   /// in order to Flutter doesn't show exceptions in the console
   final bool nativeEventsEnabled;
+  final bool nativeNavigationCommandEnabled;
+  final bool nativeNavigationLogEnabled;
 
   /// pathSeparator route segments
   final String pathSeparator;
@@ -32,6 +34,8 @@ class MicroAppConfig {
 
   MicroAppConfig(
       {this.nativeEventsEnabled = false,
+      this.nativeNavigationCommandEnabled = false,
+      this.nativeNavigationLogEnabled = false,
       this.pathSeparator = MicroAppPathSeparator.slash,
       this.consoleLogsEnabled = false,
       MicroAppBaseRoute? appBaseRoute,
@@ -45,13 +49,20 @@ class MicroAppConfig {
     MicroAppBaseRoute? appBaseRoute,
     bool? consoleLogsEnabled,
     MicroPageTransitionType? pageTransitionType,
+    bool? nativeNavigationCommandEnabled,
+    bool? nativeNavigationLogEnabled,
   }) =>
       MicroAppConfig(
-          nativeEventsEnabled: nativeEventsEnabled ?? this.nativeEventsEnabled,
-          pathSeparator: pathSeparator ?? this.pathSeparator,
-          appBaseRoute: appBaseRoute ?? _DefaultBaseRoute(),
-          consoleLogsEnabled: consoleLogsEnabled ?? this.consoleLogsEnabled,
-          pageTransitionType: pageTransitionType ?? this.pageTransitionType);
+        nativeEventsEnabled: nativeEventsEnabled ?? this.nativeEventsEnabled,
+        pathSeparator: pathSeparator ?? this.pathSeparator,
+        appBaseRoute: appBaseRoute ?? _DefaultBaseRoute(),
+        consoleLogsEnabled: consoleLogsEnabled ?? this.consoleLogsEnabled,
+        pageTransitionType: pageTransitionType ?? this.pageTransitionType,
+        nativeNavigationCommandEnabled: nativeNavigationCommandEnabled ??
+            this.nativeNavigationCommandEnabled,
+        nativeNavigationLogEnabled:
+            nativeNavigationLogEnabled ?? this.nativeNavigationLogEnabled,
+      );
 }
 
 class _DefaultBaseRoute extends MicroAppBaseRoute {

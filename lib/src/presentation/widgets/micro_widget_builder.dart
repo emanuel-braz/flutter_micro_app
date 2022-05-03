@@ -5,8 +5,8 @@ import '../../controllers/app_event/micro_app_event_delegate.dart';
 
 class MicroAppWidgetBuilder<T> extends StatefulWidget {
   const MicroAppWidgetBuilder({
-    required this.channels,
     required this.builder,
+    this.channels = const [],
     this.initialData,
     Key? key,
   }) : super(key: key);

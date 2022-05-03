@@ -54,6 +54,8 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
   MicroAppPreferences.update(
     MicroAppConfig(
       nativeEventsEnabled: true, // If you want to dispatch and listen to events between native(Android/iOS) [default = false]
+      nativeNavigationCommandEnabled: true,
+      nativeNavigationLogEnabled: true,
       pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
       pageTransitionType: MicroPageTransitionType.platform // Cupetino for iOS, Material for others
     )
@@ -99,17 +101,26 @@ class Application1MicroApp extends MicroApp with Application1Routes {
   @override
   List<MicroAppPage> get pages => [
 
-        MicroAppPage(route: baseRoute.name, pageBuilder: PageBuilder(
-          builder: (context, arguments) => const Initial(),
-          transitionType: MicroPageTransitionType.slideZoomUp)),
+        MicroAppPage(
+          route: baseRoute.route, 
+          pageBuilder: PageBuilder(
+            builder: (context, settings) => const Initial(),
+            transitionType: MicroPageTransitionType.slideZoomUp
+          ),
+        ),
 
-        MicroAppPage(route: page1, pageBuilder: PageBuilder(
-          builder:  (context, arguments) => const Page1()
-        )),
+        MicroAppPage(
+          route: page1, 
+          pageBuilder: PageBuilder(
+            builder:  (context, settings) => const Page1()
+          )
+        ),
 
-        MicroAppPage(route: page2, pageBuilder: PageBuilder(
-          builder: (context, arguments) {
-            final page2Params.fromMap(arguments);
+        MicroAppPage(
+          route: page2, 
+          pageBuilder: PageBuilder(
+          builder: (context, settings) {
+            final page2Params.fromMap(settings.arguments);
             return Page2(params: page2Params);
           }
         )),
@@ -135,7 +146,7 @@ class MyApp extends MicroHostStatelessWidget {
       title: 'Flutter Demo',
       navigatorKey: NavigatorInstance.navigatorKey, // Required
       onGenerateRoute: onGenerateRoute, // [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
-      initialRoute: baseRoute.name,
+      initialRoute: baseRoute.route,
       navigatorObservers: [
         NavigatorInstance // Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
       ],
@@ -149,8 +160,10 @@ class MyApp extends MicroHostStatelessWidget {
   // Register all root [MicroAppPage]s here
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(name: baseRoute.name, pageBuilder: PageBuilder(
-          builder: (_, __) => const HostHomePage()
+        MicroAppPage(
+          name: baseRoute.route, 
+          pageBuilder: PageBuilder(
+            builder: (_, __) => const HostHomePage()
         ))
       ];
 
@@ -162,7 +175,6 @@ class MyApp extends MicroHostStatelessWidget {
 
 ---
 ### 🤲 Handling micro apps events
-> 👀 As soon as I can, I'll do possible to filtering by event name, too.
 
 #### 🗣 Dispatches events to all handlers that listen to channels 'user_auth' and 'chatbot'
 ```dart
@@ -407,6 +419,8 @@ MicroAppNavigatorWidget(
 );
 
 // later, inside [page1]
+MicroAppNavigator.getInitialRouteSettings(context) as ScreenArguments;
+//or
 final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
 
 context.maNav.push(baseRoute.page2);
