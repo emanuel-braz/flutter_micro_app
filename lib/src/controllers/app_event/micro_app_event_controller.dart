@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
 
+import '../../infra/adapters/micro_app_event/micro_app_event_adapter.dart';
+import '../../infra/adapters/micro_app_event/micro_app_event_json_adapter.dart';
 import 'micro_app_event_delegate.dart';
 
 /// [MicroAppEventController]
@@ -40,8 +42,10 @@ class MicroAppEventController {
     _handlerRegisterDelegate = MicroAppEventDelegate();
     _microAppNativeService = MicroAppNativeService(_channel,
         methodCallHandler: (MethodCall call) async {
-      _controller
-          .add(MicroAppEvent(name: call.method, payload: call.arguments));
+      MicroAppEventAdapter adapter = MicroAppEventJsonAdapter();
+      final event = adapter.parse(call);
+
+      _controller.add(event);
     });
   }
 
