@@ -51,7 +51,8 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
         'payload': payload,
         'channels': channels,
         'distinct': distinct,
-        'methodCall': methodCall.toString(),
+        'methodCall':
+            methodCall.toString() != 'null' ? methodCall.toString() : null,
         'version': version,
         'timestamp': timestamp.toIso8601String()
       });

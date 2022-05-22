@@ -30,8 +30,8 @@ class MicroAppNativeService {
           error: e.message);
     } on PlatformException catch (e) {
       logger.e('Router Platform Error:', error: e.message);
-    } catch (e) {
-      logger.e('Critical Router Error', error: e);
+    } on Exception {
+      logger.e('Critical Router Error');
     }
 
     return null;
