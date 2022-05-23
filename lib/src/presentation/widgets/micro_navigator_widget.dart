@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_micro_app/flutter_micro_app.dart';
-import 'package:flutter_micro_app/src/utils/mixins/router_generator_mixin.dart';
+
+import '../../entities/router/base_route.dart';
+import '../../utils/mixins/router_generator_mixin.dart';
 
 class MicroAppNavigatorWidget extends StatefulWidget {
   final MicroAppBaseRoute microBaseRoute;

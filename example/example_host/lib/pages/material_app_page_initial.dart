@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:example_routes/routes/application1_routes.dart';
 import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
@@ -21,6 +24,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
   @override
   void initState() {
     registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(event.cast()),
       ));
@@ -141,6 +145,31 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () {
                   context.maNav.pushNamed(Application1Routes()
                       .pageExample); // There is no [pageExample] inside current MaterialApp
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Receive Native Event'),
+                onPressed: () async {
+                  try {
+                    final result = await MicroAppEventController()
+                        .emit(MicroAppEvent(
+                          name: 'event_from_flutter',
+                          payload: const {'app': 'Flutter'},
+                        ))
+                        .getFirstResult()
+                        .timeout(const Duration(seconds: 1));
+                    logger.d('Result is: $result');
+                  } on TimeoutException catch (e) {
+                    logger.e(
+                        'The native platform did not respond to the request',
+                        error: e);
+                  } on PlatformException catch (e) {
+                    logger.e(
+                        'The native platform respond to the request with some error',
+                        error: e);
+                  } on Exception {
+                    logger.e('Generic Error');
+                  }
                 },
               ),
               MicroAppWidgetBuilder(

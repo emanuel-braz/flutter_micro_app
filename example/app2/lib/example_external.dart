@@ -41,7 +41,7 @@ class MicroApplication2 extends MicroApp {
   MicroAppEventHandler? get microAppEventHandler =>
       MicroAppEventHandler((data) {
         logger.d([
-          '(MicroAppExampleExternal) ALSO received here! :',
+          '(MicroAppExampleExternal - No channels) received here! :',
           data.name,
           data.payload
         ]);
