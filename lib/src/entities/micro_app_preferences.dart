@@ -12,6 +12,7 @@ class MicroAppPreferences {
           appBaseRoute: _DefaultBaseRoute()));
 
   static MicroAppConfig get config => _config.value;
+  static ValueNotifier<MicroAppConfig> get configListenable => _config;
 
   static update(MicroAppConfig config) {
     _config.value = config;
