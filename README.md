@@ -10,7 +10,6 @@
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
-[coming soon]  This diagram shows up the initial proposal about layers, their relationships and dependencies.
 
 ### ⛵️ Navigation between pages
 #### Use [NavigatorInstance] to navigate between pages
@@ -216,7 +215,7 @@ MicroAppEventController()
 ```
 
 > **Note**
-> ❕ Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
+> Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
 
 <details open>
 <summary style="font-size:14px"> Dispatching event from native, using Json</summary>
@@ -228,7 +227,7 @@ MicroAppEventController()
  "distinct": true, // Optional
  "channels": [], // Optional
  "version": "1.0.0", // Optional
- "timestamp": "2020-01-01T00:00:00.000Z" // Optional
+ "datetime": "2020-01-01T00:00:00.000Z" // Optional
 }
 ```
 </details>
@@ -246,7 +245,7 @@ arguments["payload"] = payload
 arguments["distinct"] = true
 arguments["channels"] = listOf("abc", "chatbot")
 arguments["version"] = "1.0.0"
-arguments["timestamp"] = "2020-01-01T00:00:00.000Z"
+arguments["datetime"] = "2020-01-01T00:00:00.000Z"
 
 appEventChannelMessenger.invokeMethod("app_event", arguments)
 ```
