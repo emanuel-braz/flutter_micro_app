@@ -18,7 +18,7 @@ void main() {
         'distinct': true,
         'channels': ['channel1', 'channel2'],
         'version': '1.0.0',
-        'timestamp': '2020-01-01T00:00:00.000Z'
+        'datetime': '2020-01-01T00:00:00.000Z'
       }));
 
       // assert
@@ -32,7 +32,7 @@ void main() {
     });
 
     test(
-        'Deve converter um json(String) válido em um MicroAppEvent<String> sem informar timestamp',
+        'Deve converter um json(String) válido em um MicroAppEvent<String> sem informar datetime',
         () {
       // arrange
       final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
@@ -49,7 +49,7 @@ void main() {
       expect(eventFromJson?.payload, 'abc');
       expect(eventFromJson?.distinct, true);
       expect(eventFromJson?.type, equals(String));
-      expect(eventFromJson?.version, equals(null));
+      expect(eventFromJson?.version, isNull);
     });
 
     test(
@@ -61,7 +61,7 @@ void main() {
         'payload': 123,
         'channels': [],
         'distinct': false,
-        'timestamp': '2020-01-01T00:00:00.000Z'
+        'datetime': '2020-01-01T00:00:00.000Z'
       }));
 
       // assert
@@ -70,8 +70,8 @@ void main() {
       expect(eventFromJson?.name, 'nome');
       expect(eventFromJson?.payload, 123);
       expect(eventFromJson?.type, equals(int));
-      expect(eventFromJson?.version, equals(null));
-      expect(eventFromJson?.timestamp,
+      expect(eventFromJson?.version, isNull);
+      expect(eventFromJson?.datetime,
           equals(DateTime.parse('2020-01-01T00:00:00.000Z')));
     });
 
@@ -109,13 +109,13 @@ void main() {
   test('Deve retornar uma String com valores do MicroAppEvent, corretamente',
       () {
     // arrange
-    final timeStamp = DateTime.now();
+    final datetime = DateTime.now();
     final event = MicroAppEvent(
         name: 'nome',
         payload: 'abc',
         channels: const ['channel1', 'channel2'],
         distinct: true,
-        timestamp: timeStamp);
+        datetime: datetime);
 
     // act
     final eventAsString = event.toString();
@@ -124,7 +124,7 @@ void main() {
     expect(
         eventAsString,
         equals(
-            '{"name":"nome","payload":"abc","channels":["channel1","channel2"],"distinct":true,"methodCall":"null","version":null,"timestamp":"${timeStamp.toIso8601String()}"}'));
+            '{"name":"nome","payload":"abc","channels":["channel1","channel2"],"distinct":true,"methodCall":null,"version":null,"datetime":"${datetime.toIso8601String()}"}'));
   });
 
   test('Deve converter o MicroAppEvent em um Map<String, dynamic> corretamente',
@@ -145,7 +145,7 @@ void main() {
     expect(map['payload'], equals('abc'));
     expect(map['distinct'], equals(false));
     expect(map['channels'], equals(['channel1', 'channel2']));
-    expect(map['version'], equals(null));
+    expect(map['version'], isNull);
 
     expect(map, isA<Map<String, dynamic>>());
     expect(map.length, equals(6));

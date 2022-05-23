@@ -16,7 +16,7 @@ import 'micro_app_event_adapter.dart';
 ///  "distinct": true, // Optional
 ///  "channels": [], // Optional
 ///  "version": "1.0.0", // Optional
-///  "timestamp": "2020-01-01T00:00:00.000Z" // Optional
+///  "datetime": "2020-01-01T00:00:00.000Z" // Optional
 /// }
 /// ```
 ///
@@ -27,20 +27,23 @@ import 'micro_app_event_adapter.dart';
 ///   payload: methodCall.arguments,
 ///   distinct: true,
 ///   channels: [],
-///   timestamp: DateTime.now(),
+///   datetime: DateTime.now(),
 /// );
 /// ```
 class MicroAppEventJsonAdapter implements MicroAppEventAdapter {
   @override
   MicroAppEvent parse(MethodCall methodCall) {
     try {
-      final map = jsonDecode(jsonEncode(methodCall.arguments as Object?));
+      final type = methodCall.arguments.runtimeType;
+      final map = type == String
+          ? jsonDecode(methodCall.arguments)
+          : methodCall.arguments;
       final name = map['name'] ?? methodCall.method;
       final payload = map['payload'];
-      final distinct = map['distinct'];
+      final distinct = map['distinct'] ?? true;
       final version = map['version'];
-      final timestamp = map['timestamp'] != null
-          ? DateTime.tryParse(map['timestamp'] ?? '')
+      final datetime = map['datetime'] != null
+          ? DateTime.tryParse(map['datetime'] ?? '')
           : null;
 
       List<dynamic>? list = map['channels'];
@@ -53,7 +56,7 @@ class MicroAppEventJsonAdapter implements MicroAppEventAdapter {
           distinct: distinct,
           channels: channels,
           version: version,
-          timestamp: timestamp);
+          datetime: datetime);
     } catch (e) {
       logger.e('MicroAppEventJsonAdapter', error: e);
       return MicroAppEvent(

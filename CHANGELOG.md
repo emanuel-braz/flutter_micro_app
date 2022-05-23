@@ -1,3 +1,15 @@
+## 0.8.0
+[2022-05-22]
+
+#### Break
+- Using Map as default data transfer object, instead string
+
+#### Fix
+- Enable/disable native requets in navigation events
+
+#### Added
+- Parses event data from native platform
+
 ## 0.7.0
 [2022-05-03]
 #### Break

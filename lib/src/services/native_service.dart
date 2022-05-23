@@ -2,6 +2,7 @@ import 'package:dart_log/dart_log.dart';
 import 'package:flutter/services.dart';
 
 import '../entities/micro_app_preferences.dart';
+import '../utils/constants/constants.dart';
 import '../utils/typedefs.dart';
 
 class MicroAppNativeService {
@@ -19,7 +20,11 @@ class MicroAppNativeService {
   MicroAppNativeService(this.channel, {this.methodCallHandler});
 
   Future<T?> emit<T>(String method, dynamic arguments) async {
-    if (!MicroAppPreferences.config.nativeEventsEnabled) return null;
+    if (!MicroAppPreferences.config.nativeEventsEnabled &&
+        method == Constants.methodMicroAppEvent) return null;
+    if (!MicroAppPreferences.config.nativeNavigationLogEnabled &&
+        method == Constants.methodNavigationLog) return null;
+
     try {
       return platform.invokeMethod(method, arguments);
     } on MissingPluginException catch (e) {
@@ -29,9 +34,9 @@ class MicroAppNativeService {
           'MicroAppPreferences.update(MicroAppPreferences.config.copyWith(nativeEventsEnabled: false));',
           error: e.message);
     } on PlatformException catch (e) {
-      logger.e('Router Platform Error:', error: e.message);
-    } on Exception {
-      logger.e('Critical Router Error');
+      logger.e('Platform Exception:', error: e.message);
+    } on Exception catch (e) {
+      logger.e('Critical Error', error: e);
     }
 
     return null;

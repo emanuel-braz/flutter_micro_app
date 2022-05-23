@@ -215,6 +215,45 @@ MicroAppEventController()
     );
 ```
 
+> **Note**
+> ❕ Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
+
+<details open>
+<summary style="font-size:14px"> Dispatching event from native, using Json</summary>
+
+```json
+{
+ "name": "", // Required
+ "payload": {}, // Optional
+ "distinct": true, // Optional
+ "channels": [], // Optional
+ "version": "1.0.0", // Optional
+ "timestamp": "2020-01-01T00:00:00.000Z" // Optional
+}
+```
+</details>
+
+<details open>
+<summary style="font-size:14px"> Dispatching event from native(Android), using Kotlin</summary>
+
+```kotlin
+val payload: MutableMap<String, Any> = HashMap()
+payload["platform"] = "Android"
+
+val arguments: MutableMap<String, Any> = HashMap()
+arguments["name"] = "event_from_native"
+arguments["payload"] = payload
+arguments["distinct"] = true
+arguments["channels"] = listOf("abc", "chatbot")
+arguments["version"] = "1.0.0"
+arguments["timestamp"] = "2020-01-01T00:00:00.000Z"
+
+appEventChannelMessenger.invokeMethod("app_event", arguments)
+```
+</details>
+
+
+
 #### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, otherwise you will wait forever 😢
 
 `.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same  event.  
@@ -243,6 +282,30 @@ event.resultError(['error message by Barry Allen', 'my bad 🤦']);
 
 // Who will respond faster? native? flutter?
 // If you don't want to take that risk, just deal with the List<Future> response.
+```
+
+**Dealing with errors and timeout:**
+```dart
+try {
+  final result = await MicroAppEventController()
+      .emit(MicroAppEvent<String>(
+        name: 'event_from_flutter',
+        payload: 'My payload',
+      ))
+      .getFirstResult()
+      .timeout(const Duration(seconds: 1));
+  logger.d('Result is: $result');
+} on TimeoutException catch (e) {
+  logger.e(
+      'The native platform did not respond to the request',
+      error: e);
+} on PlatformException catch (e) {
+  logger.e(
+      'The native platform respond to the request with some error',
+      error: e);
+} on Exception {
+  logger.e('Generic Error');
+}
 ```
 
 #### 🦻 Listen to events (MicroApp)s

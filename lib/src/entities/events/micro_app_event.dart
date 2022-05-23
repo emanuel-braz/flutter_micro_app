@@ -18,18 +18,18 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
   final bool distinct;
   final MethodCall? methodCall;
   final String? version;
-  final DateTime timestamp;
+  final DateTime datetime;
   final Completer _completer = Completer();
 
   MicroAppEvent({
     List<String> channels = const [],
-    DateTime? timestamp,
+    DateTime? datetime,
     required this.name,
     this.payload,
     this.distinct = true,
     this.methodCall,
     this.version,
-  })  : timestamp = timestamp ?? DateTime.now(),
+  })  : datetime = datetime ?? DateTime.now(),
         super(channels);
 
   // Verify if the event's origin is a [MethodCall]
@@ -48,13 +48,13 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
     try {
       return jsonEncode({
         'name': name,
-        'payload': payload,
+        'payload': payload?.toString(),
         'channels': channels,
         'distinct': distinct,
         'methodCall':
             methodCall.toString() != 'null' ? methodCall.toString() : null,
         'version': version,
-        'timestamp': timestamp.toIso8601String()
+        'datetime': datetime.toIso8601String()
       });
     } catch (e) {
       return super.toString();
@@ -68,7 +68,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
     bool? distinct,
     MethodCall? methodCall,
     String? version,
-    DateTime? timestamp,
+    DateTime? datetime,
   }) {
     return MicroAppEvent<T>(
         name: name ?? this.name,
@@ -76,7 +76,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
         distinct: distinct ?? this.distinct,
         methodCall: methodCall ?? this.methodCall,
         version: version ?? this.version,
-        timestamp: timestamp ?? this.timestamp,
+        datetime: datetime ?? this.datetime,
         channels: channels);
   }
 
@@ -101,11 +101,11 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'payload': payload,
+      'payload': payload?.toString(),
       'channels': channels,
       'distinct': distinct,
       'version': version,
-      'timestamp': timestamp.toIso8601String(),
+      'datetime': datetime.toIso8601String(),
     };
   }
 
@@ -119,7 +119,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
       payload: map['payload'],
       distinct: map['distinct'] ?? false,
       version: map['version'],
-      timestamp: DateTime.tryParse(map['timestamp'] ?? '') ?? DateTime.now(),
+      datetime: DateTime.tryParse(map['datetime'] ?? '') ?? DateTime.now(),
       channels: channels,
     );
   }

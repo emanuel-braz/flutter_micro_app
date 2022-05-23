@@ -44,7 +44,6 @@ class MicroAppEventController {
         methodCallHandler: (MethodCall call) async {
       MicroAppEventAdapter adapter = MicroAppEventJsonAdapter();
       final event = adapter.parse(call);
-
       _controller.add(event);
     });
   }
@@ -60,7 +59,7 @@ class MicroAppEventController {
 
     if (MicroAppPreferences.config.nativeEventsEnabled) {
       final nativeFuture = _microAppNativeService.emit(
-          Constants.methodMicroAppEvent, event.toString());
+          Constants.methodMicroAppEvent, event.toMap());
       futures.add(nativeFuture);
     }
 
