@@ -253,9 +253,10 @@ appEventChannelMessenger.invokeMethod("app_event", arguments)
 
 
 
-#### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, otherwise you will wait forever 😢
+#### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, or use `timeout` parameter to set a wait limit time, otherwise you will wait forever 😢 
+remember, _with great power comes great responsibility_
 
-`.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same  event.  
+`.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same event.  
 
 For example, if you request a JWT token to all micro apps(broadcast), the first response(if more than one MA can respond) will end up your request with the resultSucces value or with a resultError, from the fastest micro app.
 
@@ -284,15 +285,22 @@ event.resultError(['error message by Barry Allen', 'my bad 🤦']);
 ```
 
 **Dealing with errors and timeout:**
+
+`timeout` is an optional parameter, use only if you intends to wait for 
+the event to be sent back, otherwise this can throw uncaught timeout exceptions.
+
+If you need an EDA approach, use the `MicroAppEventHandler` as a consumer, in order to get all event dispatched by producers.
 ```dart
 try {
   final result = await MicroAppEventController()
-      .emit(MicroAppEvent<String>(
-        name: 'event_from_flutter',
-        payload: 'My payload',
-      ))
-      .getFirstResult()
-      .timeout(const Duration(seconds: 1));
+      .emit(
+        MicroAppEvent<String>(
+          name: 'event_from_flutter',
+          payload: 'My payload',
+        ),
+        timeout: const Duration(seconds: 2)
+      )
+      .getFirstResult();
   logger.d('Result is: $result');
 } on TimeoutException catch (e) {
   logger.e(
@@ -305,6 +313,34 @@ try {
 } on Exception {
   logger.e('Generic Error');
 }
+```
+or
+```dart
+final futures = MicroAppEventController().emit(
+  MicroAppEvent(
+      name: 'show_snackbar',
+      payload: 'Hello World!',
+      channels: const ['show_snackbar'],
+    ),
+    timeout: const Duration(seconds: 3)
+  ); 
+
+futures
+  .getFirstResult()
+  .then((value) => {
+    // 2 - this line will be executed later
+        logger.d(
+            '** { You can capture data asyncronously later } **')
+      })
+  .catchError((error) async {
+  logger.e(
+      '** { You can capture errors asyncronously later } **',
+      error: error);
+  return <dynamic>{};
+});
+
+  // 1 - this line will be executed first
+logger.d('** { You do not need to wait for a TimeoutException } **');
 ```
 
 #### 🦻 Listen to events (MicroApp)s
@@ -371,7 +407,7 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
 }
 ```
 
-#### Managing events
+#### Managing event handlers
 ```dart
 MicroAppEventController().unregisterHandler(id: '123');
 MicroAppEventController().unregisterHandler(handler: handlerInstance);

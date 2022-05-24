@@ -9,6 +9,7 @@
 
 #### Added
 - Parses event data from native platform
+- Add optional timeout parameter, but still can use timeout in the old way as well
 
 ## 0.7.0
 [2022-05-03]

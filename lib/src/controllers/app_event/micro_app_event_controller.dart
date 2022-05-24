@@ -53,18 +53,26 @@ class MicroAppEventController {
   factory MicroAppEventController.$testOnlyPurpose() =>
       MicroAppEventController._();
 
-  /// [MicroAppEvent]
-  List<Future> emit<T>(MicroAppEvent<T> event) {
+  /// [MicroAppEvent] the event that is emitted to the micro apps (Managed by event broker)
+  List<Future> emit<T>(MicroAppEvent<T> event, {Duration? timeout}) {
     final futures = <Future>[];
 
     if (MicroAppPreferences.config.nativeEventsEnabled) {
       final nativeFuture = _microAppNativeService.emit(
           Constants.methodMicroAppEvent, event.toMap());
-      futures.add(nativeFuture);
+      if (timeout == null) {
+        futures.add(nativeFuture);
+      } else {
+        futures.add(nativeFuture.timeout(timeout));
+      }
     }
 
     _controller.add(event);
-    futures.add(event.asFuture);
+    if (timeout == null) {
+      futures.add(event.asFuture);
+    } else {
+      futures.add(event.asFuture.timeout(timeout));
+    }
 
     return futures;
   }
