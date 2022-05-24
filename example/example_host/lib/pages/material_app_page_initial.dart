@@ -28,6 +28,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(event.cast()),
       ));
+      event.resultSuccess(true);
     }, channels: const ['show_snackbar'], distinct: false));
 
     super.initState();
@@ -58,13 +59,31 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
               ElevatedButton(
                 child: const Text('Show snackbar'),
                 onPressed: () {
-                  MicroAppEventController().emit(
-                    MicroAppEvent(
-                      name: 'show_snackbar',
-                      payload: 'Hello World!',
-                      channels: const ['show_snackbar'],
-                    ),
-                  );
+                  final futures = MicroAppEventController().emit(
+                      MicroAppEvent(
+                        name: 'show_snackbar',
+                        payload: 'Hello World!',
+                        channels: const ['show_snackbar'],
+                      ),
+                      timeout: const Duration(
+                          seconds:
+                              3)); // timeout is a optional parameter, use only if you want to wait for the event to be sent back, otherwise this can throw a timeout exception
+
+                  futures
+                      .getFirstResult()
+                      .then((value) => {
+                            logger.d(
+                                '** { You can capture data asyncronously later (value = $value) } **')
+                          })
+                      .catchError((error) async {
+                    logger.e(
+                        '** { But you can capture errors asyncronously later } **',
+                        error: error);
+                    return <dynamic>{};
+                  });
+
+                  logger.d(
+                      '** { You do not need to wait for a TimeoutException } **');
                 },
               ),
               ElevatedButton(
@@ -152,12 +171,13 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () async {
                   try {
                     final result = await MicroAppEventController()
-                        .emit(MicroAppEvent(
-                          name: 'event_from_flutter',
-                          payload: const {'app': 'Flutter'},
-                        ))
-                        .getFirstResult()
-                        .timeout(const Duration(seconds: 1));
+                        .emit(
+                            MicroAppEvent(
+                              name: 'event_from_flutter',
+                              payload: const {'app': 'Flutter'},
+                            ),
+                            timeout: const Duration(seconds: 2))
+                        .getFirstResult();
                     logger.d('Result is: $result');
                   } on TimeoutException catch (e) {
                     logger.e(
