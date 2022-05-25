@@ -1,3 +1,16 @@
+## 0.8.0
+[2022-05-22]
+
+#### Break
+- Using Map as default data transfer object, instead string
+
+#### Fix
+- Enable/disable native requets in navigation events
+
+#### Added
+- Parses event data from native platform
+- Add optional timeout parameter, but still can use timeout in the old way as well
+
 ## 0.7.0
 [2022-05-03]
 #### Break

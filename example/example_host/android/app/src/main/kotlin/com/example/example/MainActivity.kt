@@ -20,10 +20,52 @@ class MainActivity: FlutterActivity() {
         val routerChannelMessenger =
             MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_ROUTER_COMMAND)
 
+        val appEventChannelMessenger =
+            MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_MICRO_APP)
+
         MethodChannel(flutterEngine.dartExecutor,CHANNEL_MICRO_APP).setMethodCallHandler{
                 call,result ->
             when (call.method) {
                 "app_event" -> {
+
+                     if (call.hasArgument("name") && call.argument<String>("name") == "event_from_flutter") {
+                         // Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
+
+                             /*
+                             val argumentsAsJsonString = """
+                                {
+                                 "name": "event_from_native",
+                                 "payload": {},
+                                 "distinct": true,
+                                 "channels": [],
+                                 "version": "1.0.0",
+                                 "datetime": "2020-01-01T00:00:00.000Z"
+                                }
+                             """.trimIndent()
+
+                             appEventChannelMessenger.invokeMethod("app_event", argumentsAsJsonString)
+                            */
+
+
+                         
+                         val payload: MutableMap<String, Any> = HashMap()
+                         payload["platform"] = "Android"
+
+                         val arguments: MutableMap<String, Any> = HashMap()
+                         arguments["name"] = "event_from_native"
+                         arguments["payload"] = payload
+                         arguments["distinct"] = true
+                         arguments["channels"] = emptyList<String>()
+                         arguments["version"] = "1.0.0"
+                         arguments["datetime"] = "2020-01-01T00:00:00.000Z"
+
+                         // Send event in other thread to flutter side
+                         appEventChannelMessenger.invokeMethod("app_event", arguments)
+
+                         // Also, respond in the same thread to flutter side
+                         result.success(true)
+                     }
+
                     println("*** Native Android receive (channel: flutter/micro_app/app/events): 'app_event' with arguments: ${call.arguments.toString()} !!")
                 } else -> {
                     println("*** Native Android receive (channel: flutter/micro_app/app/events): ${call.method} with arguments: ${call.arguments.toString()} !!")

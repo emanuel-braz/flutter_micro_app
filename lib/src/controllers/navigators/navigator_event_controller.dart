@@ -56,14 +56,14 @@ class MicroAppNavigatorEventController {
   MicroAppNavigatorEventController() {
     _nativeLoggerService = MicroAppNativeService(_channelRouterLogger,
         methodCallHandler: (MethodCall call) async {
-      if (MicroAppPreferences.config.nativeEventsEnabled) {
+      if (MicroAppPreferences.config.nativeNavigationLogEnabled) {
         _nativeLoggerController.add(call);
       }
     });
 
     _nativeCommandService = MicroAppNativeService(_channelRouterCommand,
         methodCallHandler: (MethodCall call) async {
-      if (MicroAppPreferences.config.nativeEventsEnabled) {
+      if (MicroAppPreferences.config.nativeNavigationCommandEnabled) {
         _nativeCommandController.add(call);
       }
     });

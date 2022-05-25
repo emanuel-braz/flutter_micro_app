@@ -10,7 +10,6 @@
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
-[coming soon]  This diagram shows up the initial proposal about layers, their relationships and dependencies.
 
 ### ⛵️ Navigation between pages
 #### Use [NavigatorInstance] to navigate between pages
@@ -215,9 +214,49 @@ MicroAppEventController()
     );
 ```
 
-#### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, otherwise you will wait forever 😢
+> **Note**
+> Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
 
-`.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same  event.  
+<details open>
+<summary style="font-size:14px"> Dispatching event from native, using Json</summary>
+
+```json
+{
+ "name": "", // Required
+ "payload": {}, // Optional
+ "distinct": true, // Optional
+ "channels": [], // Optional
+ "version": "1.0.0", // Optional
+ "datetime": "2020-01-01T00:00:00.000Z" // Optional
+}
+```
+</details>
+
+<details open>
+<summary style="font-size:14px"> Dispatching event from native(Android), using Kotlin</summary>
+
+```kotlin
+val payload: MutableMap<String, Any> = HashMap()
+payload["platform"] = "Android"
+
+val arguments: MutableMap<String, Any> = HashMap()
+arguments["name"] = "event_from_native"
+arguments["payload"] = payload
+arguments["distinct"] = true
+arguments["channels"] = listOf("abc", "chatbot")
+arguments["version"] = "1.0.0"
+arguments["datetime"] = "2020-01-01T00:00:00.000Z"
+
+appEventChannelMessenger.invokeMethod("app_event", arguments)
+```
+</details>
+
+
+
+#### 🌐 It is possible to wait for other micro apps to respond to the event you issued, but make sure someone else will respond to your event, or use `timeout` parameter to set a wait limit time, otherwise you will wait forever 😢 
+remember, _with great power comes great responsibility_
+
+`.getFirstResult()` will return the first response(fastest) among all micro apps that eventually can respond to this same event.  
 
 For example, if you request a JWT token to all micro apps(broadcast), the first response(if more than one MA can respond) will end up your request with the resultSucces value or with a resultError, from the fastest micro app.
 
@@ -243,6 +282,65 @@ event.resultError(['error message by Barry Allen', 'my bad 🤦']);
 
 // Who will respond faster? native? flutter?
 // If you don't want to take that risk, just deal with the List<Future> response.
+```
+
+**Dealing with errors and timeout:**
+
+`timeout` is an optional parameter, use only if you intends to wait for 
+the event to be sent back, otherwise this can throw uncaught timeout exceptions.
+
+If you need an EDA approach, use the `MicroAppEventHandler` as a consumer, in order to get all event dispatched by producers.
+```dart
+try {
+  final result = await MicroAppEventController()
+      .emit(
+        MicroAppEvent<String>(
+          name: 'event_from_flutter',
+          payload: 'My payload',
+        ),
+        timeout: const Duration(seconds: 2)
+      )
+      .getFirstResult();
+  logger.d('Result is: $result');
+} on TimeoutException catch (e) {
+  logger.e(
+      'The native platform did not respond to the request',
+      error: e);
+} on PlatformException catch (e) {
+  logger.e(
+      'The native platform respond to the request with some error',
+      error: e);
+} on Exception {
+  logger.e('Generic Error');
+}
+```
+or
+```dart
+final futures = MicroAppEventController().emit(
+  MicroAppEvent(
+      name: 'show_snackbar',
+      payload: 'Hello World!',
+      channels: const ['show_snackbar'],
+    ),
+    timeout: const Duration(seconds: 3)
+  ); 
+
+futures
+  .getFirstResult()
+  .then((value) => {
+    // 2 - this line will be executed later
+        logger.d(
+            '** { You can capture data asyncronously later } **')
+      })
+  .catchError((error) async {
+  logger.e(
+      '** { You can capture errors asyncronously later } **',
+      error: error);
+  return <dynamic>{};
+});
+
+  // 1 - this line will be executed first
+logger.d('** { You do not need to wait for a TimeoutException } **');
 ```
 
 #### 🦻 Listen to events (MicroApp)s
@@ -309,7 +407,7 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
 }
 ```
 
-#### Managing events
+#### Managing event handlers
 ```dart
 MicroAppEventController().unregisterHandler(id: '123');
 MicroAppEventController().unregisterHandler(handler: handlerInstance);

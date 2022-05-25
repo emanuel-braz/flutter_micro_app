@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
 
+import '../../infra/adapters/micro_app_event/micro_app_event_adapter.dart';
+import '../../infra/adapters/micro_app_event/micro_app_event_json_adapter.dart';
 import 'micro_app_event_delegate.dart';
 
 /// [MicroAppEventController]
@@ -40,8 +42,9 @@ class MicroAppEventController {
     _handlerRegisterDelegate = MicroAppEventDelegate();
     _microAppNativeService = MicroAppNativeService(_channel,
         methodCallHandler: (MethodCall call) async {
-      _controller
-          .add(MicroAppEvent(name: call.method, payload: call.arguments));
+      MicroAppEventAdapter adapter = MicroAppEventJsonAdapter();
+      final event = adapter.parse(call);
+      _controller.add(event);
     });
   }
 
@@ -50,18 +53,26 @@ class MicroAppEventController {
   factory MicroAppEventController.$testOnlyPurpose() =>
       MicroAppEventController._();
 
-  /// [MicroAppEvent]
-  List<Future> emit<T>(MicroAppEvent<T> event) {
+  /// [MicroAppEvent] the event that is emitted to the micro apps (Managed by event broker)
+  List<Future> emit<T>(MicroAppEvent<T> event, {Duration? timeout}) {
     final futures = <Future>[];
 
     if (MicroAppPreferences.config.nativeEventsEnabled) {
       final nativeFuture = _microAppNativeService.emit(
-          Constants.methodMicroAppEvent, event.toString());
-      futures.add(nativeFuture);
+          Constants.methodMicroAppEvent, event.toMap());
+      if (timeout == null) {
+        futures.add(nativeFuture);
+      } else {
+        futures.add(nativeFuture.timeout(timeout));
+      }
     }
 
     _controller.add(event);
-    futures.add(event.asFuture);
+    if (timeout == null) {
+      futures.add(event.asFuture);
+    } else {
+      futures.add(event.asFuture.timeout(timeout));
+    }
 
     return futures;
   }

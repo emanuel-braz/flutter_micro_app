@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:example_routes/routes/application1_routes.dart';
 import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
@@ -21,9 +24,11 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
   @override
   void initState() {
     registerEventHandler(MicroAppEventHandler<String>((event) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(event.cast()),
       ));
+      event.resultSuccess(true);
     }, channels: const ['show_snackbar'], distinct: false));
 
     super.initState();
@@ -54,13 +59,31 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
               ElevatedButton(
                 child: const Text('Show snackbar'),
                 onPressed: () {
-                  MicroAppEventController().emit(
-                    MicroAppEvent(
-                      name: 'show_snackbar',
-                      payload: 'Hello World!',
-                      channels: const ['show_snackbar'],
-                    ),
-                  );
+                  final futures = MicroAppEventController().emit(
+                      MicroAppEvent(
+                        name: 'show_snackbar',
+                        payload: 'Hello World!',
+                        channels: const ['show_snackbar'],
+                      ),
+                      timeout: const Duration(
+                          seconds:
+                              3)); // timeout is a optional parameter, use only if you want to wait for the event to be sent back, otherwise this can throw a timeout exception
+
+                  futures
+                      .getFirstResult()
+                      .then((value) => {
+                            logger.d(
+                                '** { You can capture data asyncronously later (value = $value) } **')
+                          })
+                      .catchError((error) async {
+                    logger.e(
+                        '** { But you can capture errors asyncronously later } **',
+                        error: error);
+                    return <dynamic>{};
+                  });
+
+                  logger.d(
+                      '** { You do not need to wait for a TimeoutException } **');
                 },
               ),
               ElevatedButton(
@@ -141,6 +164,32 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () {
                   context.maNav.pushNamed(Application1Routes()
                       .pageExample); // There is no [pageExample] inside current MaterialApp
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Receive Native Event'),
+                onPressed: () async {
+                  try {
+                    final result = await MicroAppEventController()
+                        .emit(
+                            MicroAppEvent(
+                              name: 'event_from_flutter',
+                              payload: const {'app': 'Flutter'},
+                            ),
+                            timeout: const Duration(seconds: 2))
+                        .getFirstResult();
+                    logger.d('Result is: $result');
+                  } on TimeoutException catch (e) {
+                    logger.e(
+                        'The native platform did not respond to the request',
+                        error: e);
+                  } on PlatformException catch (e) {
+                    logger.e(
+                        'The native platform respond to the request with some error',
+                        error: e);
+                  } on Exception {
+                    logger.e('Generic Error');
+                  }
                 },
               ),
               MicroAppWidgetBuilder(

@@ -1,14 +1,21 @@
-import 'package:flutter_micro_app/flutter_micro_app.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../flutter_micro_app.dart';
 
 final maAppBaseRoute = MicroAppPreferences.config.appBaseRoute.baseRoute.route;
 
 class MicroAppPreferences {
-  static MicroAppConfig config = MicroAppConfig(
-      nativeEventsEnabled: false,
-      pathSeparator: MicroAppPathSeparator.slash,
-      appBaseRoute: _DefaultBaseRoute());
-  static update(MicroAppConfig _config) {
-    config = _config;
+  static final ValueNotifier<MicroAppConfig> _config = ValueNotifier(
+      MicroAppConfig(
+          nativeEventsEnabled: false,
+          pathSeparator: MicroAppPathSeparator.slash,
+          appBaseRoute: _DefaultBaseRoute()));
+
+  static MicroAppConfig get config => _config.value;
+  static ValueNotifier<MicroAppConfig> get configListenable => _config;
+
+  static update(MicroAppConfig config) {
+    _config.value = config;
   }
 }
 

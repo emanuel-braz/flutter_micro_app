@@ -9,8 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-// It could be a BLoC, Mobx, Redux, GetX or whatever
-// but for now, it's just the incredible, super `ValueNotifier` :)
 class ColorController extends ValueNotifier<MaterialColor> {
   ColorController([MaterialColor color = Colors.amber]) : super(color);
   void changeColor(MaterialColor color) => value = color;
@@ -56,8 +54,11 @@ class MicroApplication1 extends MicroApp {
             buttonsColorController.changeColor(event.cast());
           }
         }
-        logger.d(
-            ['(MicroAppExample) event received:', event.name, event.payload]);
+        logger.d([
+          '(MicroAppExample - channels(abc, chatbot, colors) event received:',
+          event.name,
+          event.payload
+        ]);
 
         event.resultSuccess('success!!!');
       }, channels: const ['abc', 'chatbot', 'colors']);

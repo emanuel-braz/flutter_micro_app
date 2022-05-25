@@ -16,7 +16,9 @@ void main() {
         'name': 'nome',
         'payload': 'abc',
         'distinct': true,
-        'channels': ['channel1', 'channel2']
+        'channels': ['channel1', 'channel2'],
+        'version': '1.0.0',
+        'datetime': '2020-01-01T00:00:00.000Z'
       }));
 
       // assert
@@ -26,14 +28,41 @@ void main() {
       expect(eventFromJson?.payload, 'abc');
       expect(eventFromJson?.distinct, true);
       expect(eventFromJson?.type, equals(String));
+      expect(eventFromJson?.version, equals('1.0.0'));
+    });
+
+    test(
+        'Deve converter um json(String) válido em um MicroAppEvent<String> sem informar datetime',
+        () {
+      // arrange
+      final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
+        'name': 'nome',
+        'payload': 'abc',
+        'distinct': true,
+        'channels': ['channel1', 'channel2'],
+      }));
+
+      // assert
+      expect(eventFromJson, isA<MicroAppEvent>());
+      expect(eventFromJson?.channels.length, 2);
+      expect(eventFromJson?.name, 'nome');
+      expect(eventFromJson?.payload, 'abc');
+      expect(eventFromJson?.distinct, true);
+      expect(eventFromJson?.type, equals(String));
+      expect(eventFromJson?.version, isNull);
     });
 
     test(
         'Deve converter um json válido, com lista de channels vazia, em um MicroAppEvent<int>',
         () {
       // arrange
-      final eventFromJson = MicroAppEvent.fromJson(jsonEncode(
-          {'name': 'nome', 'payload': 123, 'channels': [], 'distinct': false}));
+      final eventFromJson = MicroAppEvent.fromJson(jsonEncode({
+        'name': 'nome',
+        'payload': 123,
+        'channels': [],
+        'distinct': false,
+        'datetime': '2020-01-01T00:00:00.000Z'
+      }));
 
       // assert
       expect(eventFromJson, isA<MicroAppEvent>());
@@ -41,6 +70,9 @@ void main() {
       expect(eventFromJson?.name, 'nome');
       expect(eventFromJson?.payload, 123);
       expect(eventFromJson?.type, equals(int));
+      expect(eventFromJson?.version, isNull);
+      expect(eventFromJson?.datetime,
+          equals(DateTime.parse('2020-01-01T00:00:00.000Z')));
     });
 
     test(
@@ -77,12 +109,13 @@ void main() {
   test('Deve retornar uma String com valores do MicroAppEvent, corretamente',
       () {
     // arrange
+    final datetime = DateTime.now();
     final event = MicroAppEvent(
-      name: 'nome',
-      payload: 'abc',
-      channels: const ['channel1', 'channel2'],
-      distinct: true,
-    );
+        name: 'nome',
+        payload: 'abc',
+        channels: const ['channel1', 'channel2'],
+        distinct: true,
+        datetime: datetime);
 
     // act
     final eventAsString = event.toString();
@@ -91,7 +124,7 @@ void main() {
     expect(
         eventAsString,
         equals(
-            '{"name":"nome","payload":"abc","channels":["channel1","channel2"],"distinct":true}'));
+            '{"name":"nome","payload":"abc","channels":["channel1","channel2"],"distinct":true,"methodCall":null,"version":null,"datetime":"${datetime.toIso8601String()}"}'));
   });
 
   test('Deve converter o MicroAppEvent em um Map<String, dynamic> corretamente',
@@ -106,17 +139,16 @@ void main() {
 
     // act
     final map = event.toMap();
-    final expectedResultMap = {
-      'name': 'nome',
-      'payload': 'abc',
-      'distinct': false,
-      'channels': ['channel1', 'channel2']
-    };
 
     // assert
-    expect(map, equals(expectedResultMap));
+    expect(map['name'], equals('nome'));
+    expect(map['payload'], equals('abc'));
+    expect(map['distinct'], equals(false));
+    expect(map['channels'], equals(['channel1', 'channel2']));
+    expect(map['version'], isNull);
+
     expect(map, isA<Map<String, dynamic>>());
-    expect(map.length, equals(4));
+    expect(map.length, equals(6));
   });
 
   test('Deve fazer o cast do payload para String, corretamente', () {
