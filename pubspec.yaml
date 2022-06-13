@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   
-  dart_log: ^1.1.1
+  dart_log: ^1.2.0
   equatable: ^2.0.3
 
 dev_dependencies:

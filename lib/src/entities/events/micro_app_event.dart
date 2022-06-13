@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dart_log/dart_log.dart';
 import 'package:equatable/equatable.dart';
@@ -69,10 +70,29 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
     MethodCall? methodCall,
     String? version,
     DateTime? datetime,
+    List<String>? channels,
   }) {
     return MicroAppEvent<T>(
         name: name ?? this.name,
         payload: payload ?? this.payload,
+        distinct: distinct ?? this.distinct,
+        methodCall: methodCall ?? this.methodCall,
+        version: version ?? this.version,
+        datetime: datetime ?? this.datetime,
+        channels: channels ?? this.channels);
+  }
+
+  MicroAppEvent<D?> copyWithTyped<D>({
+    String? name,
+    D? payload,
+    bool? distinct,
+    MethodCall? methodCall,
+    String? version,
+    DateTime? datetime,
+  }) {
+    return MicroAppEvent<D?>(
+        name: name ?? this.name,
+        payload: payload as D ?? this.payload as D,
         distinct: distinct ?? this.distinct,
         methodCall: methodCall ?? this.methodCall,
         version: version ?? this.version,
@@ -126,12 +146,44 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
 
   String toJson() => json.encode(toMap());
 
-  static MicroAppEvent? fromJson(String source) {
+  static MicroAppEvent<T>? fromJson<T>(String source) {
     try {
-      return MicroAppEvent.fromMap(json.decode(source));
+      return MicroAppEvent<T>.fromMap(json.decode(source));
     } catch (e) {
       logger.e('[MicroAppEvent]: error parsing json', error: e);
       return null;
+    }
+  }
+
+  dynamic copyTyped() {
+    if (type == <String, dynamic>{}.runtimeType) {
+      return copyWithTyped<Map<String, dynamic>?>();
+    } else if (type == <dynamic, dynamic>{}.runtimeType) {
+      return copyWithTyped<Map<dynamic, dynamic>?>();
+    } else if (type == <String, String>{}.runtimeType) {
+      return copyWithTyped<Map<String, String>?>();
+    } else if (type == bool) {
+      return copyWithTyped<bool?>();
+    } else if (type == int) {
+      return copyWithTyped<int?>();
+    } else if (type == double) {
+      return copyWithTyped<double?>();
+    } else if (type == String) {
+      return copyWithTyped<String?>();
+    } else if (type == Uint8List) {
+      return copyWithTyped<Uint8List?>();
+    } else if (type == Int32List) {
+      return copyWithTyped<Int32List?>();
+    } else if (type == Int64List) {
+      return copyWithTyped<Int64List?>();
+    } else if (type == Float32List) {
+      return copyWithTyped<Float32List?>();
+    } else if (type == Float64List) {
+      return copyWithTyped<Float64List?>();
+    } else if (type == List) {
+      return copyWithTyped<List?>();
+    } else {
+      return this;
     }
   }
 }

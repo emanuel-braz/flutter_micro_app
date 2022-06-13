@@ -17,6 +17,7 @@ class MicroAppEventController {
       StreamController.broadcast();
   late MicroAppNativeService _microAppNativeService;
   late MicroAppEventDelegate _handlerRegisterDelegate;
+  GenericMicroAppEventController? webMicroAppEventController;
 
   /// Used to listen all micro app events
   MicroAppEventSubscription get onEvent => _controller.stream.listen;
@@ -57,6 +58,7 @@ class MicroAppEventController {
   List<Future> emit<T>(MicroAppEvent<T> event, {Duration? timeout}) {
     final futures = <Future>[];
 
+    // Native mobile events
     if (MicroAppPreferences.config.nativeEventsEnabled) {
       final nativeFuture = _microAppNativeService.emit(
           Constants.methodMicroAppEvent, event.toMap());
@@ -67,6 +69,14 @@ class MicroAppEventController {
       }
     }
 
+    // Webview events
+    if (webMicroAppEventController != null) {
+      final webFuture =
+          webMicroAppEventController!.emit(event, timeout: timeout);
+      futures.add(webFuture);
+    }
+
+    // Flutter events
     _controller.add(event);
     if (timeout == null) {
       futures.add(event.asFuture);

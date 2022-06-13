@@ -24,9 +24,10 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
   @override
   void initState() {
     registerEventHandler(MicroAppEventHandler<String>((event) {
+      String? message = event.cast();
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(event.cast()),
+        content: Text(message ?? 'Unknown'),
       ));
       event.resultSuccess(true);
     }, channels: const ['show_snackbar'], distinct: false));
