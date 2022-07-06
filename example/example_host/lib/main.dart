@@ -1,12 +1,14 @@
 // ignore_for_file: unused_local_variable
 import 'dart:convert';
 import 'dart:io';
-import 'package:example_external/pages/colors_float_page.dart';
+
 import 'package:example_external/example_external.dart';
-import 'package:flutter/material.dart';
+import 'package:example_external/pages/colors_float_page.dart';
 import 'package:example_routes/example_routes.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
+
 import 'example_micro_app.dart';
 
 void main() {
@@ -42,12 +44,18 @@ void main() {
     }
   });
 
+  // Register a orphan handler, just to example purpose
+  MicroAppEventController().registerHandler(MicroAppEventHandler((e) {}));
+
   runApp(MyApp());
 }
 
 // This is host application
-class MyApp extends MicroHostStatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+class MyApp extends MicroHostStatelessWidget with HandlerRegisterMixin {
+  MyApp({Key? key}) : super(key: key) {
+    registerEventHandler(
+        MicroAppEventHandler<int>((e) {}, channels: const ['day_update']));
+  }
 
   // This is completely OPTIONAL!
   // Override `onGenerateRoute` in order to define a default error page (if needed)
@@ -91,7 +99,7 @@ class MyApp extends MicroHostStatelessWidget {
   // Register all root [MicroAppPage]s in app host
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(
+        MicroAppPage<BaseHomePage>(
             route:
                 maAppBaseRoute, // or MicroAppPreferences.config.appBaseRoute.baseRoute.route
             pageBuilder: PageBuilder(builder: (_, __) => const BaseHomePage()))
@@ -99,11 +107,11 @@ class MyApp extends MicroHostStatelessWidget {
 
   // Register all [MicroApp]s in app host
   @override
-  List<MicroApp> get microApps => [MicroApplication1(), MicroApplication2()];
+  List<MicroApp> get initialMicroApps =>
+      [MicroApplication1(), MicroApplication2()];
 
-  // Listen to all micro apps events
   @override
-  MicroAppEventHandler? get microAppEventHandler => null;
+  String get name => 'MicroHost';
 }
 
 // This widget is registered as initial route in [MyApp] pages list
@@ -142,6 +150,12 @@ class _BaseHomePageState extends State<BaseHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    ElevatedButton(
+                      child: const Text('Open Micro Board'),
+                      onPressed: () {
+                        MicroBoard().show();
+                      },
+                    ),
                     ElevatedButton(
                       child: const Text('Open Example MaterialApp'),
                       onPressed: () {

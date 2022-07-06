@@ -4,7 +4,21 @@ import '../../flutter_micro_app.dart';
 abstract class MicroHost implements MicroApp {
   static bool _microAppsRegistered = false;
 
-  List<MicroApp> get microApps;
+  static List<MicroApp> microApps = [];
+  List<MicroApp> get initialMicroApps;
+
+  static MicroApp? registerMicroApp(MicroApp microApp) {
+    if (microApps.isEmpty) {
+      microApps.add(microApp);
+      return microApp;
+    }
+
+    final containsMicroApp = microApps.contains(microApp);
+    if (!containsMicroApp) {
+      microApps.add(microApp);
+      return microApp;
+    }
+  }
 
   @override
   Map<String, PageBuilder> get pageBuilders => NavigatorInstance.pageBuilders;
@@ -18,19 +32,14 @@ abstract class MicroHost implements MicroApp {
     NavigatorInstance.addPageBuilders(
         {for (var page in pages) page.route: page.pageBuilder});
 
-    _registerEventHandler(this);
+    registerMicroApp(this);
 
-    for (MicroApp microapp in microApps) {
+    for (MicroApp microapp in initialMicroApps) {
       if (microapp.hasRoutes) {
         NavigatorInstance.addPageBuilders(microapp.pageBuilders);
       }
-      _registerEventHandler(microapp);
+      registerMicroApp(microapp);
     }
     _microAppsRegistered = true;
-  }
-
-  void _registerEventHandler(MicroApp microapp) {
-    final handler = microapp.microAppEventHandler;
-    MicroAppEventController().registerHandler(handler);
   }
 }

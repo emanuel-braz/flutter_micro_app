@@ -167,7 +167,7 @@ class MyWidget extends StatefulWidget {
   MyWidgetState createState() => MyWidgetState();
 }
 
-class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
+class MyWidgetState extends State<MyWidget> with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
@@ -195,7 +195,7 @@ class MyWidget2 extends StatefulWidget {
   MyWidgetState2 createState() => MyWidgetState2();
 }
 
-class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterMixin {
+class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
@@ -226,7 +226,7 @@ class MyWidget3 extends StatefulWidget {
   MyWidgetState3 createState() => MyWidgetState3();
 }
 
-class MyWidgetState3 extends State<MyWidget3> with HandlerRegisterMixin {
+class MyWidgetState3 extends State<MyWidget3> with HandlerRegisterStateMixin {
   final shouldRegisterThisOne = true;
   int count = 0;
 

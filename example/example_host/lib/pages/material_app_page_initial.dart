@@ -15,11 +15,8 @@ class MaterialAppPageInitial extends StatefulWidget {
 }
 
 class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
-    with HandlerRegisterMixin {
+    with HandlerRegisterStateMixin {
   int count = 0;
-
-  @override
-  List<MicroAppEventHandler> get eventHandlers => [];
 
   @override
   void initState() {
@@ -57,6 +54,12 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
+                child: const Text('Open Micro Board'),
+                onPressed: () async {
+                  MicroBoard().show();
+                },
+              ),
+              ElevatedButton(
                 child: const Text('Show snackbar'),
                 onPressed: () {
                   final futures = MicroAppEventController().emit(
@@ -93,7 +96,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                       .emit(MicroAppEvent<Map<String, dynamic>>(
                         name: 'my_event',
                         payload: const {'data': 'lorem ipsum'},
-                        channels: const ['abc'],
+                        channels: const ['generic_events'],
                       ))
                       .getFirstResult();
 
@@ -108,10 +111,10 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
               ),
               ElevatedButton(
                 child: const Text(
-                    'Unregister event handlers with (channel="abc")'),
+                    'Unregister event handlers with (channel="colors")'),
                 onPressed: () {
                   MicroAppEventController()
-                      .unregisterHandler(channels: ['abc']);
+                      .unregisterHandler(channels: ['colors']);
                 },
               ),
               ElevatedButton(
