@@ -54,12 +54,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                child: const Text('Open Micro Board'),
-                onPressed: () async {
-                  MicroBoard().show();
-                },
-              ),
-              ElevatedButton(
                 child: const Text('Show snackbar'),
                 onPressed: () {
                   final futures = MicroAppEventController().emit(

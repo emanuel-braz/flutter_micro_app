@@ -121,7 +121,7 @@ class MicroBoard {
     }).toList();
   }
 
-  void show() {
+  void showBoard() {
     final apps = MicroBoard().getMicroBoardApps;
     final orphanHandlers = getOrphanHandlers();
     final widgetHandlers = getWidgetsHandlers();
@@ -129,6 +129,71 @@ class MicroBoard {
     NavigatorInstance.push(MaterialPageRoute(
         builder: (context) =>
             MicroBoardWidget(apps, orphanHandlers, widgetHandlers)));
+  }
+
+  static Offset? _buttonOverlayOffset;
+  static OverlayEntry? _buttonOverlay;
+
+  static final _floatButton = Material(
+      type: MaterialType.transparency,
+      child: Ink(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white.withOpacity(0.8), width: 2),
+          color: Colors.grey.withOpacity(0.5),
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.all(
+            Radius.circular(12),
+          ),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          onTap: () {
+            MicroBoard().showBoard();
+          },
+          onLongPress: hideButton,
+          child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Icon(
+                Icons.dashboard_outlined,
+                color: Colors.white.withOpacity(.5),
+                size: 30,
+              )),
+        ),
+      ));
+
+  static showButton() {
+    Future.delayed(Duration.zero, () {
+      try {
+        final size = NavigatorInstance.navigatorKey.currentState?.context.size;
+        final double width = size?.width ?? 200;
+        final double height = size?.height ?? 250;
+
+        _buttonOverlayOffset ??= Offset(width - 100, height - 100);
+
+        _buttonOverlay ??= OverlayEntry(
+          maintainState: true,
+          opaque: false,
+          builder: (context) {
+            return Positioned(
+                top: _buttonOverlayOffset!.dy,
+                left: _buttonOverlayOffset!.dx,
+                child: Draggable(
+                  onDragEnd: (DraggableDetails detail) =>
+                      _buttonOverlayOffset = detail.offset,
+                  childWhenDragging: Container(),
+                  child: _floatButton,
+                  feedback: _floatButton,
+                ));
+          },
+        );
+        final overlay = NavigatorInstance.navigatorKey.currentState?.overlay;
+        overlay?.insert(_buttonOverlay!);
+      } catch (_) {}
+    });
+  }
+
+  static hideButton() {
+    _buttonOverlay?.remove();
   }
 
   MicroBoard();

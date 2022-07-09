@@ -123,6 +123,7 @@ class _BaseHomePageState extends State<BaseHomePage> {
   @override
   void initState() {
     super.initState();
+    MicroBoard.showButton();
   }
 
   @override
@@ -147,12 +148,6 @@ class _BaseHomePageState extends State<BaseHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ElevatedButton(
-                      child: const Text('Open Micro Board'),
-                      onPressed: () {
-                        MicroBoard().show();
-                      },
-                    ),
                     ElevatedButton(
                       child: const Text('Open Example MaterialApp'),
                       onPressed: () {
