@@ -70,6 +70,7 @@ class MicroBoard {
         return MicroBoardApp(
           type: currentMicroApp.runtimeType.toString(),
           name: currentMicroApp.name,
+          description: currentMicroApp.description,
           route: microAppRoute,
           pages: routes,
           handlers: handlers,
@@ -136,6 +137,7 @@ class MicroBoard {
 class MicroBoardApp {
   final String type;
   final String name;
+  final String description;
   final String route;
   final List<MicroBoardRoute> pages;
   final List<MicroBoardHandler> handlers;
@@ -143,6 +145,7 @@ class MicroBoardApp {
   MicroBoardApp({
     required this.type,
     required this.name,
+    required this.description,
     required this.route,
     required this.pages,
     required this.handlers,
@@ -194,11 +197,11 @@ class _MicroBoardWidgetState extends State<MicroBoardWidget> {
           padding: EdgeInsets.all(8),
           children: [
             ...widget.apps.map((e) => MicroBoardItemWidget(e)).toList(),
-            WidgetsHandlers(
+            HandlersWidget(
               widgetHandlers: widget.widgetHandlers,
               title: 'Widget Handlers',
             ),
-            WidgetsHandlers(
+            HandlersWidget(
                 widgetHandlers: widget.orphanHandlers,
                 title: 'Orphan Handlers',
                 titleColor: Colors.red),
@@ -238,6 +241,14 @@ class MicroBoardItemWidget extends StatelessWidget {
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
+            if (app.description.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  app.description,
+                  style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ),
             Card(
               margin: EdgeInsets.all(4),
               color: Colors.grey[200],
@@ -338,11 +349,11 @@ class MicroBoardItemWidget extends StatelessWidget {
   }
 }
 
-class WidgetsHandlers extends StatelessWidget {
+class HandlersWidget extends StatelessWidget {
   final List<MicroBoardHandler> widgetHandlers;
   final String title;
   final Color? titleColor;
-  const WidgetsHandlers(
+  const HandlersWidget(
       {required this.widgetHandlers,
       required this.title,
       this.titleColor,

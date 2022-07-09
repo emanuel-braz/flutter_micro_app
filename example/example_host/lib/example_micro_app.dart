@@ -28,6 +28,7 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
   @override
   List<MicroAppPage> get pages => [
         MicroAppPage<ExamplePage>(
+            description: 'This is the example page',
             route: routes.pageExample,
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const ExamplePage())),

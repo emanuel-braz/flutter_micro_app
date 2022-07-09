@@ -26,6 +26,12 @@ abstract class MicroHost implements MicroApp {
   @override
   bool get hasRoutes => pageBuilders.isNotEmpty;
 
+  @override
+  String get name => 'Micro Host';
+
+  @override
+  String get description => 'It bootstraps the entire application';
+
   void registerRoutes() {
     if (_microAppsRegistered) return;
 

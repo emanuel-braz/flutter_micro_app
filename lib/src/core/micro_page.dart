@@ -6,8 +6,10 @@ import '../entities/router/page_builder.dart';
 class MicroAppPage<T extends Widget> {
   final String route;
   final PageBuilder<T> pageBuilder;
+  final String description;
   MicroAppPage({
     required this.route,
     required this.pageBuilder,
+    this.description = '',
   });
 }

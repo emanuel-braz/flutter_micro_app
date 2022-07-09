@@ -6,6 +6,7 @@ import 'micro_page.dart';
 /// [MicroApp] contract
 abstract class MicroApp<T> {
   String get name;
+  String get description => '';
   List<MicroAppPage> get pages;
   Map<String, PageBuilder> get pageBuilders =>
       {for (var page in pages) page.route: page.pageBuilder};

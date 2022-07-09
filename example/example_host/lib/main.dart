@@ -109,9 +109,6 @@ class MyApp extends MicroHostStatelessWidget with HandlerRegisterMixin {
   @override
   List<MicroApp> get initialMicroApps =>
       [MicroApplication1(), MicroApplication2()];
-
-  @override
-  String get name => 'MicroHost';
 }
 
 // This widget is registered as initial route in [MyApp] pages list
