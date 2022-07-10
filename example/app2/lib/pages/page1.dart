@@ -12,7 +12,7 @@ class Page1 extends StatefulWidget {
 class _Page1State extends State<Page1> {
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    ambiguate(WidgetsBinding.instance)!.addPostFrameCallback((timeStamp) {
       debugPrint(
           'Nested InitialRouteSettings: ${MicroAppNavigator.getInitialRouteSettings(context).toString()}');
     });

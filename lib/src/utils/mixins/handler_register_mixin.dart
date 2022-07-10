@@ -3,28 +3,21 @@ import 'package:flutter/widgets.dart';
 import '../../../dependencies.dart';
 import '../../../flutter_micro_app.dart';
 
-mixin HandlerRegisterMixin<T extends StatefulWidget> on State<T> {
+mixin HandlerRegisterStateMixin<T extends StatefulWidget> on State<T> {
   final List<MicroAppEventHandler> eventHandlersRegistered = [];
-  List<MicroAppEventHandler> get eventHandlers;
 
-  @override
-  void initState() {
-    _registerEventHandlers();
-    super.initState();
-  }
-
-  registerEventHandler(MicroAppEventHandler handler) {
+  registerEventHandler<R>(MicroAppEventHandler<R> eventHandler) {
     try {
-      MicroAppEventController().registerHandler(handler);
-      eventHandlersRegistered.add(handler);
+      final eventHandlerCopied =
+          eventHandler.copyWith<R>(parentName: widget.runtimeType.toString());
+      MicroAppEventController().registerHandler(
+        eventHandlerCopied,
+      );
+      eventHandlersRegistered.add(eventHandlerCopied);
     } catch (e) {
-      logger.e('Failed to register handler', error: e);
-    }
-  }
-
-  _registerEventHandlers() {
-    for (var handler in eventHandlers) {
-      registerEventHandler(handler);
+      logger.e(
+          '[HandlerRegisterStateMixin] An error occurred while trying to register the event handler',
+          error: e);
     }
   }
 
@@ -39,5 +32,21 @@ mixin HandlerRegisterMixin<T extends StatefulWidget> on State<T> {
   void dispose() {
     unregisterEventHandlers();
     super.dispose();
+  }
+}
+
+mixin HandlerRegisterMixin on MicroApp {
+  MicroAppEventHandler<R>? registerEventHandler<R>(
+      MicroAppEventHandler<R> eventHandler) {
+    try {
+      final eventHandlerCopied = eventHandler.copyWith<R>(parentName: name);
+      MicroAppEventController().registerHandler(eventHandlerCopied);
+      return eventHandlerCopied;
+    } catch (e) {
+      logger.e(
+          '[HandlerRegisterMixin] An error occurred while trying to register the event handler',
+          error: e);
+      return null;
+    }
   }
 }
