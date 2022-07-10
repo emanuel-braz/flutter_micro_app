@@ -16,7 +16,6 @@ export 'src/entities/router/base_route.dart';
 export 'src/entities/router/page_builder.dart';
 export 'src/presentation/widgets/micro_navigator_widget.dart';
 export 'src/presentation/widgets/micro_widget_builder.dart';
-export 'src/utils/ambiguate.dart';
 export 'src/utils/constants/constants.dart';
 export 'src/utils/constants/path_separator.dart';
 export 'src/utils/enums/micro_page_transition_type.dart';
