@@ -141,7 +141,7 @@ class MicroBoard {
 
     NavigatorInstance.push(MaterialPageRoute(
         builder: (context) =>
-            MicroBoardWidget(apps, orphanHandlers, widgetHandlers)));
+            MicroBoardPage(apps, orphanHandlers, widgetHandlers)));
   }
 
   static Offset? _buttonOverlayOffset;

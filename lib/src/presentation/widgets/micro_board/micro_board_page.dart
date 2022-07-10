@@ -5,19 +5,19 @@ import '../../../entities/micro_board/micro_board_handler.dart';
 import 'micro_board_card_handler.dart';
 import 'micro_board_ma_widget.dart';
 
-class MicroBoardWidget extends StatefulWidget {
+class MicroBoardPage extends StatefulWidget {
   final List<MicroBoardApp> apps;
   final List<MicroBoardHandler> orphanHandlers;
   final List<MicroBoardHandler> widgetHandlers;
-  const MicroBoardWidget(this.apps, this.orphanHandlers, this.widgetHandlers,
+  const MicroBoardPage(this.apps, this.orphanHandlers, this.widgetHandlers,
       {Key? key})
       : super(key: key);
 
   @override
-  State<MicroBoardWidget> createState() => _MicroBoardWidgetState();
+  State<MicroBoardPage> createState() => _MicroBoardPageState();
 }
 
-class _MicroBoardWidgetState extends State<MicroBoardWidget> {
+class _MicroBoardPageState extends State<MicroBoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
