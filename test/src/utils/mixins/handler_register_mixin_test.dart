@@ -21,7 +21,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: myWidget));
 
     // assert
-    expect(key.currentState?.eventHandlers.length, equals(1));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(1));
     expect(MicroAppEventController().handlers.length, equals(1));
   });
 
@@ -36,7 +36,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: myWidget));
 
     // assert
-    expect(key.currentState?.eventHandlers.length, equals(1));
+    expect(key.currentState?.eventHandlersRegistered.length, equals(1));
     expect(MicroAppEventController().handlers.length, equals(1));
 
     // act
@@ -167,11 +167,16 @@ class MyWidget extends StatefulWidget {
   MyWidgetState createState() => MyWidgetState();
 }
 
-class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
+class MyWidgetState extends State<MyWidget> with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
   void initState() {
+    registerEventHandler(
+      MicroAppEventHandler<int>((event) {
+        count = event.cast();
+      }),
+    );
     super.initState();
   }
 
@@ -179,13 +184,6 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
   Widget build(BuildContext context) {
     return Container();
   }
-
-  @override
-  List<MicroAppEventHandler> get eventHandlers => [
-        MicroAppEventHandler<int>((event) {
-          count = event.cast();
-        })
-      ];
 }
 
 class MyWidget2 extends StatefulWidget {
@@ -195,21 +193,18 @@ class MyWidget2 extends StatefulWidget {
   MyWidgetState2 createState() => MyWidgetState2();
 }
 
-class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterMixin {
+class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
-  List<MicroAppEventHandler> get eventHandlers => [
-        MicroAppEventHandler<String>((event) {
-          count++;
-        }),
-        MicroAppEventHandler<String>((event) {
-          count++;
-        })
-      ];
-
-  @override
   void initState() {
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      count++;
+    }));
+
+    registerEventHandler(MicroAppEventHandler<String>((event) {
+      count++;
+    }));
     super.initState();
   }
 
@@ -226,23 +221,22 @@ class MyWidget3 extends StatefulWidget {
   MyWidgetState3 createState() => MyWidgetState3();
 }
 
-class MyWidgetState3 extends State<MyWidget3> with HandlerRegisterMixin {
+class MyWidgetState3 extends State<MyWidget3> with HandlerRegisterStateMixin {
   final shouldRegisterThisOne = true;
   int count = 0;
 
   @override
-  List<MicroAppEventHandler> get eventHandlers => [
-        MicroAppEventHandler<int>((event) {
-          count++;
-        }),
-        if (shouldRegisterThisOne)
-          MicroAppEventHandler<int>((event) {
-            count++;
-          })
-      ];
-
-  @override
   void initState() {
+    registerEventHandler(MicroAppEventHandler<int>((event) {
+      count++;
+    }));
+
+    if (shouldRegisterThisOne) {
+      registerEventHandler(MicroAppEventHandler<int>((event) {
+        count++;
+      }));
+    }
+
     if (shouldRegisterThisOne) {
       registerEventHandler(MicroAppEventHandler<int>((event) {
         count++;
