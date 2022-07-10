@@ -133,6 +133,8 @@ class MicroBoard {
   }
 
   void showBoard() {
+    if (NavigatorInstance.navigatorKey.currentState == null) return;
+
     final apps = MicroBoard().getMicroBoardApps;
     final orphanHandlers = getOrphanHandlers();
     final widgetHandlers = getWidgetsHandlers();
@@ -174,6 +176,8 @@ class MicroBoard {
 
   static showButton({bool forceInReleaseMode = false}) {
     if (kReleaseMode && !forceInReleaseMode) return;
+
+    if (NavigatorInstance.navigatorKey.currentState == null) return;
 
     Future.delayed(Duration.zero, () {
       try {
