@@ -1,0 +1,81 @@
+import 'package:flutter/material.dart';
+
+import '../../../entities/micro_board/micro_board_app.dart';
+import '../../../utils/constants/constants.dart';
+
+class MicroBoardCardHandlers extends StatelessWidget {
+  const MicroBoardCardHandlers({
+    Key? key,
+    required this.app,
+  }) : super(key: key);
+
+  final MicroBoardApp app;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(4),
+      color: Colors.grey[100],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Text('Handlers', style: TextStyle(fontSize: 18)),
+                ),
+                Spacer(),
+                Chip(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  label: Text(app.handlers.length.toString(),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[200])),
+                )
+              ],
+            ),
+            Divider(
+              thickness: 2,
+            ),
+            ...app.handlers
+                .map((e) => Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    shadowColor: Colors.blue[200],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Chip(
+                            label: Text(e.type),
+                            backgroundColor: e.type == Constants.notTyped
+                                ? Colors.amber
+                                : Colors.blue[200],
+                          ),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 0,
+                            children: e.channels
+                                .map((e) => Chip(
+                                    label: Text(e),
+                                    backgroundColor: Colors.green[200]))
+                                .toList(),
+                          )
+                        ],
+                      ),
+                    )))
+                .toList(),
+          ],
+        ),
+      ),
+    );
+  }
+}

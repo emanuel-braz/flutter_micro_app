@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../flutter_micro_app.dart';
 import '../entities/micro_board/micro_board_app.dart';
 import '../entities/micro_board/micro_board_handler.dart';
 import '../entities/micro_board/micro_board_route.dart';
-import '../presentation/widgets/micro_board/micro_board_widget.dart';
+import '../presentation/widgets/micro_board/micro_board_page.dart';
 
 class MicroBoard {
   List<MicroBoardApp> get getMicroBoardApps {
@@ -12,6 +13,7 @@ class MicroBoard {
       final microBoardApps = MicroHost.microApps.map((currentMicroApp) {
         String microAppRoute = '';
         String microPageRoute = '';
+        String parentName = '';
 
         if (currentMicroApp is MicroAppWithBaseRoute) {
           microAppRoute = currentMicroApp.baseRoute.baseRoute.route;
@@ -33,25 +35,23 @@ class MicroBoard {
                 microAppRoute = splited.first;
               }
 
-              if (splited.length > 1) {
-                splited.removeAt(0);
-                microPageRoute =
-                    splited.join(MicroAppPreferences.config.pathSeparator);
-              } else {
-                microPageRoute = splited.first;
-              }
+              microPageRoute = e.route;
             }
           }
 
-          String widget = e.pageBuilder.runtimeType.toString();
-          if (widget == 'PageBuilder<Widget>') {
-            widget = '';
+          parentName = e.pageBuilder.runtimeType.toString();
+          if (parentName == 'PageBuilder<Widget>') {
+            parentName = '';
           } else {
-            widget = widget.replaceFirst('PageBuilder<', '');
-            widget = widget.replaceFirst('>', '', widget.lastIndexOf('>'));
+            parentName = parentName.replaceFirst('PageBuilder<', '');
+            parentName =
+                parentName.replaceFirst('>', '', parentName.lastIndexOf('>'));
           }
 
-          return MicroBoardRoute(route: microPageRoute, widget: widget);
+          return MicroBoardRoute(
+              route: microPageRoute,
+              widget: parentName,
+              description: e.description);
         }).toList();
 
         final handlers = MicroAppEventController()
@@ -67,7 +67,9 @@ class MicroBoard {
           }
 
           return MicroBoardHandler(
-              type: handlerType, channels: entry.key.channels);
+              type: handlerType,
+              channels: entry.key.channels,
+              parentName: parentName);
         }).toList();
 
         return MicroBoardApp(
@@ -99,7 +101,10 @@ class MicroBoard {
         handlerType = handlerType.replaceFirst('MicroAppEventHandler', '');
       }
 
-      return MicroBoardHandler(type: handlerType, channels: entry.key.channels);
+      return MicroBoardHandler(
+          type: handlerType,
+          channels: entry.key.channels,
+          parentName: entry.key.parentName ?? '');
     }).toList();
   }
 
@@ -112,15 +117,18 @@ class MicroBoard {
             .contains(element.key.parentName))
         .where((element) => element.key.parentName?.isNotEmpty == true)
         .map((entry) {
+      String parentName = entry.key.parentName ?? '';
       String handlerType = entry.key.runtimeType.toString();
       if (handlerType == 'MicroAppEventHandler<dynamic>') {
         handlerType = 'Not Typed';
       } else {
         handlerType = handlerType.replaceFirst('MicroAppEventHandler', '');
-        handlerType = '<${entry.key.parentName}$handlerType>';
       }
 
-      return MicroBoardHandler(type: handlerType, channels: entry.key.channels);
+      return MicroBoardHandler(
+          type: handlerType,
+          channels: entry.key.channels,
+          parentName: parentName);
     }).toList();
   }
 
@@ -164,7 +172,9 @@ class MicroBoard {
         ),
       ));
 
-  static showButton() {
+  static showButton({bool forceInReleaseMode = false}) {
+    if (kReleaseMode && !forceInReleaseMode) return;
+
     Future.delayed(Duration.zero, () {
       try {
         final size = NavigatorInstance.navigatorKey.currentState?.context.size;

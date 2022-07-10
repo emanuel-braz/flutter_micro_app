@@ -46,6 +46,7 @@ mixin HandlerRegisterMixin on MicroApp {
       logger.e(
           '[HandlerRegisterMixin] An error occurred while trying to register the event handler',
           error: e);
+      return null;
     }
   }
 }

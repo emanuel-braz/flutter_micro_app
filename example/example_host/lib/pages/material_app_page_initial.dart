@@ -97,12 +97,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                   logger.d(result);
                 },
               ),
-              ElevatedButton(
-                child: const Text('Unregister events handler with (id=123)'),
-                onPressed: () {
-                  MicroAppEventController().unregisterHandler(id: '123');
-                },
-              ),
+              const _CustomButton(),
               ElevatedButton(
                 child: const Text(
                     'Unregister event handlers with (channel="colors")'),
@@ -225,5 +220,36 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
         name: 'my_event',
         payload: ++count,
         channels: const ['widget_channel']));
+  }
+}
+
+class _CustomButton extends StatefulWidget {
+  const _CustomButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_CustomButton> createState() => _CustomButtonState();
+}
+
+class _CustomButtonState extends State<_CustomButton>
+    with HandlerRegisterStateMixin {
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<MicroAppConfig>(
+      (event) {},
+      channels: const ['app_config', 'config'],
+    ));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: const Text('Unregister events handler with (id=123)'),
+      onPressed: () {
+        MicroAppEventController().unregisterHandler(id: '123');
+      },
+    );
   }
 }

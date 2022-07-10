@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_micro_app/src/entities/micro_board/micro_board_app.dart';
-import 'package:flutter_micro_app/src/entities/micro_board/micro_board_handler.dart';
 
-import 'micro_board_handler_widget.dart';
-import 'micro_board_item_widget.dart';
+import '../../../entities/micro_board/micro_board_app.dart';
+import '../../../entities/micro_board/micro_board_handler.dart';
+import 'micro_board_card_handler.dart';
+import 'micro_board_ma_widget.dart';
 
 class MicroBoardWidget extends StatefulWidget {
   final List<MicroBoardApp> apps;
@@ -22,7 +22,7 @@ class _MicroBoardWidgetState extends State<MicroBoardWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Micro Board'),
+        title: Text('${widget.apps.length} Micro App(s)'),
       ),
       body: Container(
         color: Colors.amber,
@@ -30,11 +30,11 @@ class _MicroBoardWidgetState extends State<MicroBoardWidget> {
           padding: EdgeInsets.all(8),
           children: [
             ...widget.apps.map((e) => MicroBoardItemWidget(e)).toList(),
-            HandlersWidget(
+            MicroBoardHandlerCard(
               widgetHandlers: widget.widgetHandlers,
               title: 'Widget Handlers',
             ),
-            HandlersWidget(
+            MicroBoardHandlerCard(
                 widgetHandlers: widget.orphanHandlers,
                 title: 'Orphan Handlers',
                 titleColor: Colors.red),

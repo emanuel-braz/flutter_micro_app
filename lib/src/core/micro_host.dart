@@ -18,6 +18,8 @@ abstract class MicroHost implements MicroApp {
       microApps.add(microApp);
       return microApp;
     }
+
+    return null;
   }
 
   @override

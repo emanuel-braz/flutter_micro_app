@@ -21,7 +21,9 @@ class MicroApplication2 extends MicroAppWithBaseRoute
 
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(
+        MicroAppPage<MicroAppNavigatorWidget>(
+            description:
+                'This route is responsible to expose internal routes. Using the the custom navigator [MicroAppNavigatorWidget] is possible to nest navigators.',
             route: baseRoute.microAppNavigator,
             pageBuilder: PageBuilder(
               builder: (_, __) => MicroAppNavigatorWidget(
@@ -29,7 +31,7 @@ class MicroApplication2 extends MicroAppWithBaseRoute
                   initialRoute: Application2Routes().page1),
               transitionType: MicroPageTransitionType.rippleLeftDown,
             )),
-        MicroAppPage(
+        MicroAppPage<Page1>(
             route: baseRoute.page1,
             pageBuilder: PageBuilder(builder: (_, settings) => const Page1())),
         MicroAppPage(
@@ -38,10 +40,12 @@ class MicroApplication2 extends MicroAppWithBaseRoute
               builder: (_, settings) =>
                   Page2(title: settings.arguments as String?)),
         ),
-        MicroAppPage(
+        MicroAppPage<Page3>(
             route: baseRoute.page3,
             pageBuilder: PageBuilder(builder: (_, __) => const Page3())),
-        MicroAppPage(
+        MicroAppPage<ColorsFloatPage>(
+            description:
+                'This page is responsible to change buttons and background colors',
             route: baseRoute.pageColors,
             pageBuilder:
                 PageBuilder(builder: (_, __) => const ColorsFloatPage())),
@@ -52,4 +56,7 @@ class MicroApplication2 extends MicroAppWithBaseRoute
 
   @override
   String get name => 'Micro App 2';
+
+  @override
+  String get description => 'This micro app is a external package';
 }
