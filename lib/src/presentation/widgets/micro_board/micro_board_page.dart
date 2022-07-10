@@ -9,8 +9,13 @@ class MicroBoardPage extends StatefulWidget {
   final List<MicroBoardApp> apps;
   final List<MicroBoardHandler> orphanHandlers;
   final List<MicroBoardHandler> widgetHandlers;
-  const MicroBoardPage(this.apps, this.orphanHandlers, this.widgetHandlers,
-      {Key? key})
+  final List<String> conflictingChannels;
+  const MicroBoardPage(
+      {required this.apps,
+      required this.orphanHandlers,
+      required this.widgetHandlers,
+      this.conflictingChannels = const <String>[],
+      Key? key})
       : super(key: key);
 
   @override
@@ -29,14 +34,20 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
         child: ListView(
           padding: EdgeInsets.all(8),
           children: [
-            ...widget.apps.map((e) => MicroBoardItemWidget(e)).toList(),
+            ...widget.apps
+                .map((e) => MicroBoardItemWidget(
+                      e,
+                      conflictingChannels: widget.conflictingChannels,
+                    ))
+                .toList(),
             MicroBoardHandlerCard(
-              widgetHandlers: widget.widgetHandlers,
-              title: 'Widget Handlers',
-            ),
+                widgetHandlers: widget.widgetHandlers,
+                title: 'Widget Handlers',
+                conflictingChannels: widget.conflictingChannels),
             MicroBoardHandlerCard(
                 widgetHandlers: widget.orphanHandlers,
                 title: 'Orphan Handlers',
+                conflictingChannels: widget.conflictingChannels,
                 titleColor: Colors.red),
             SizedBox(
               height: 54,

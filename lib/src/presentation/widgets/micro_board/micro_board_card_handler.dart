@@ -7,10 +7,12 @@ class MicroBoardHandlerCard extends StatelessWidget {
   final List<MicroBoardHandler> widgetHandlers;
   final String title;
   final Color? titleColor;
+  final List<String> conflictingChannels;
   const MicroBoardHandlerCard(
       {required this.widgetHandlers,
       required this.title,
       this.titleColor,
+      required this.conflictingChannels,
       Key? key})
       : super(key: key);
 
@@ -42,7 +44,12 @@ class MicroBoardHandlerCard extends StatelessWidget {
             Divider(
               thickness: 2,
             ),
-            ...widgetHandlers.map((e) => MicroBoardHandlerCardItem(e)).toList(),
+            ...widgetHandlers
+                .map((e) => MicroBoardHandlerCardItem(
+                      e,
+                      conflictingChannels: conflictingChannels,
+                    ))
+                .toList(),
           ],
         ),
       ),
@@ -52,8 +59,10 @@ class MicroBoardHandlerCard extends StatelessWidget {
 
 class MicroBoardHandlerCardItem extends StatelessWidget {
   final MicroBoardHandler _microBoardHandler;
+  final List<String> conflictingChannels;
   const MicroBoardHandlerCardItem(
     this._microBoardHandler, {
+    required this.conflictingChannels,
     Key? key,
   }) : super(key: key);
 
@@ -111,8 +120,16 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
                       runSpacing: 0,
                       children: _microBoardHandler.channels
                           .map((e) => Chip(
-                                label: Text(e),
-                                backgroundColor: Colors.green[200],
+                                label: Text(
+                                  e,
+                                  style: TextStyle(
+                                      color: conflictingChannels.contains(e)
+                                          ? Colors.white
+                                          : null),
+                                ),
+                                backgroundColor: conflictingChannels.contains(e)
+                                    ? Colors.red
+                                    : Colors.green[200],
                               ))
                           .toList(),
                     )

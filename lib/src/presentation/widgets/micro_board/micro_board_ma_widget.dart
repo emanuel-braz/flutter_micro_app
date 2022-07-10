@@ -6,7 +6,10 @@ import 'micro_board_card_routes.dart';
 
 class MicroBoardItemWidget extends StatelessWidget {
   final MicroBoardApp app;
-  const MicroBoardItemWidget(this.app, {Key? key}) : super(key: key);
+  final List<String> conflictingChannels;
+  const MicroBoardItemWidget(this.app,
+      {required this.conflictingChannels, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +44,8 @@ class MicroBoardItemWidget extends StatelessWidget {
                 ),
               ),
             MicroBoardCardRoutes(app: app),
-            MicroBoardCardHandlers(app: app),
+            MicroBoardCardHandlers(
+                app: app, conflictingChannels: conflictingChannels),
           ],
         ),
       ),

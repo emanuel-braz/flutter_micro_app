@@ -136,12 +136,40 @@ class MicroBoard {
     if (NavigatorInstance.navigatorKey.currentState == null) return;
 
     final apps = MicroBoard().getMicroBoardApps;
+
     final orphanHandlers = getOrphanHandlers();
     final widgetHandlers = getWidgetsHandlers();
 
+    var conflictingChannels = <String>[];
+
+    for (var app in apps) {
+      for (var handler in app.handlers) {
+        conflictingChannels.addAll(handler.channels);
+      }
+    }
+
+    for (var handler in orphanHandlers) {
+      conflictingChannels.addAll(handler.channels);
+    }
+
+    for (var handler in widgetHandlers) {
+      conflictingChannels.addAll(handler.channels);
+    }
+
+    conflictingChannels = conflictingChannels
+        .where((filter) =>
+            conflictingChannels.where((element) => element == filter).length >
+            1)
+        .toSet()
+        .toList();
+
     NavigatorInstance.push(MaterialPageRoute(
-        builder: (context) =>
-            MicroBoardPage(apps, orphanHandlers, widgetHandlers)));
+        builder: (context) => MicroBoardPage(
+              apps: apps,
+              orphanHandlers: orphanHandlers,
+              widgetHandlers: widgetHandlers,
+              conflictingChannels: conflictingChannels,
+            )));
   }
 
   static Offset? _buttonOverlayOffset;

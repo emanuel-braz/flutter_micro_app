@@ -73,5 +73,10 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
       },
       channels: const ['lorem', 'ipsum', 'colors'],
     ));
+
+    registerEventHandler<String>(MicroAppEventHandler(
+      (event) {},
+      channels: const ['config'],
+    ));
   }
 }
