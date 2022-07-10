@@ -75,4 +75,13 @@ class Nav {
   void popUntil(RoutePredicate predicate, {String? type}) {
     NavigatorInstance.popUntil(predicate, context: context);
   }
+
+  RouteSettings? getInitialRouteSettings() {
+    try {
+      final arguments = MicroAppNavigator.getInitialRouteSettings(context);
+      return arguments as RouteSettings;
+    } catch (_) {
+      return null;
+    }
+  }
 }

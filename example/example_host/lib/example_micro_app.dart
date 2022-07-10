@@ -37,7 +37,8 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const MaterialAppPage(),
                 transitionType: MicroPageTransitionType.slideZoomUp)),
-        MicroAppPage(
+        MicroAppPage<ExamplePageFragment>(
+            description: 'Fragment can be used as a simple Widget',
             route: routes.pageExampleFragment,
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const ExamplePageFragment())),
