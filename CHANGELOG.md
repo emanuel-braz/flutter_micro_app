@@ -9,6 +9,9 @@
 #### Added
 - Add micro board - A page to show all micro applications, routes and event handlers
 
+#### Chore
+- Supports both Flutter version 2 and version 3
+
 ## 0.8.0
 [2022-05-22]
 
