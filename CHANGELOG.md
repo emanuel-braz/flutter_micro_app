@@ -1,3 +1,14 @@
+## 0.9.0
+[2022-07-10]
+
+#### Break
+- `registerEventHandler` method is available by mixins `HandlerRegisterMixin` and `HandlerRegisterStateMixin`
+- MicroAppEventHandler is no required to micro apps
+- Micro apps requires a name
+
+#### Added
+- Add micro board - A page to show all micro applications, routes and event handlers
+
 ## 0.8.0
 [2022-05-22]
 
