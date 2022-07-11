@@ -82,7 +82,7 @@ class _MicroAppNavigatorWidgetState extends State<MicroAppNavigatorWidget>
 }
 
 class MicroAppNavigator extends Navigator {
-  static Object? getInitialRouteSettings(BuildContext context) => context
+  static RouteSettings? getInitialRouteSettings(BuildContext context) => context
       .findAncestorStateOfType<_MicroAppNavigatorWidgetState>()
       ?.initialSettings;
 
