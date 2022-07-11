@@ -15,15 +15,12 @@ class MaterialAppPageInitial extends StatefulWidget {
 }
 
 class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
-    with HandlerRegisterMixin {
+    with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
-  List<MicroAppEventHandler> get eventHandlers => [];
-
-  @override
   void initState() {
-    registerEventHandler(MicroAppEventHandler<String>((event) {
+    registerEventHandler<String>(MicroAppEventHandler<String>((event) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(event.cast()),
@@ -93,25 +90,20 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                       .emit(MicroAppEvent<Map<String, dynamic>>(
                         name: 'my_event',
                         payload: const {'data': 'lorem ipsum'},
-                        channels: const ['abc'],
+                        channels: const ['generic_events'],
                       ))
                       .getFirstResult();
 
                   logger.d(result);
                 },
               ),
-              ElevatedButton(
-                child: const Text('Unregister events handler with (id=123)'),
-                onPressed: () {
-                  MicroAppEventController().unregisterHandler(id: '123');
-                },
-              ),
+              const _CustomButton(),
               ElevatedButton(
                 child: const Text(
-                    'Unregister event handlers with (channel="abc")'),
+                    'Unregister event handlers with (channel="colors")'),
                 onPressed: () {
                   MicroAppEventController()
-                      .unregisterHandler(channels: ['abc']);
+                      .unregisterHandler(channels: ['colors']);
                 },
               ),
               ElevatedButton(
@@ -228,5 +220,36 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
         name: 'my_event',
         payload: ++count,
         channels: const ['widget_channel']));
+  }
+}
+
+class _CustomButton extends StatefulWidget {
+  const _CustomButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_CustomButton> createState() => _CustomButtonState();
+}
+
+class _CustomButtonState extends State<_CustomButton>
+    with HandlerRegisterStateMixin {
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<MicroAppConfig>(
+      (event) {},
+      channels: const ['app_config', 'config'],
+    ));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: const Text('Unregister events handler with (id=123)'),
+      onPressed: () {
+        MicroAppEventController().unregisterHandler(id: '123');
+      },
+    );
   }
 }
