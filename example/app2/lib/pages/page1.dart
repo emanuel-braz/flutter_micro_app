@@ -1,5 +1,6 @@
 import 'package:example_routes/routes/application2_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/ambiguate.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class Page1 extends StatefulWidget {
@@ -13,8 +14,9 @@ class _Page1State extends State<Page1> {
   @override
   void initState() {
     ambiguate(WidgetsBinding.instance)!.addPostFrameCallback((timeStamp) {
-      debugPrint(
-          'Nested InitialRouteSettings: ${MicroAppNavigator.getInitialRouteSettings(context).toString()}');
+      final settings = MicroAppNavigator.getInitialRouteSettings(context);
+      // final settings = context.maNav.getInitialRouteSettings();
+      debugPrint('[Nested InitialRouteSettings]: ${settings?.arguments}');
     });
 
     super.initState();

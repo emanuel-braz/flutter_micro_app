@@ -22,7 +22,8 @@ NavigatorInstance ...
 ```
 
 ### 📲 Open native (Android/iOS) pages, in this way
-#### It needs native implementation, you can see an example inside Android directory | coming soon, examples and modules to iOS, Desktop and Web, too.
+#### It needs native implementation, you can see an example inside Android directory
+Examples and new modules to Android, iOS and Web soon
 
 ```dart
 // If not implemented, always return null
@@ -56,7 +57,10 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
       nativeNavigationCommandEnabled: true,
       nativeNavigationLogEnabled: true,
       pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
-      pageTransitionType: MicroPageTransitionType.platform // Cupetino for iOS, Material for others
+
+      // the [MicroPageTransitionType.platform] is a dynamic transition type, 
+      // for iOS it will use Cupertino, and for others it will use Material.
+      pageTransitionType: MicroPageTransitionType.platform 
     )
   );
 ```
@@ -85,13 +89,20 @@ class Application1Routes implements MicroAppBaseRoute {
 
 #### For example, you can open a page that is inside other MicroApp, in this way:
 ```dart
-NavigatorInstance.pushNamed(OtherMicroAppRoutes().specificPage);
-NavigatorInstance.pushNamed(Application1Routes().page1);
+NavigatorInstance.pushNamed(Application2Routes().page1);
+NavigatorInstance.pushNamed('microapp2/page1');
+```
+
+#### or you can use the context, to get the scoped Navigator [`maNav`]
+
+```dart
+context.maNav.pushNamed(Application2Routes().page2);
+context.maNav.pushNamed('microapp2/page2');
 ```
 
 
 
-### 🤝 Expose all pages throuth a contract `MicroApp` (Inside external projects or features folder)
+### 🤝 Exposing all pages through a contract `MicroApp`
 ```dart
 import 'package:micro_routes/exports.dart';
 
@@ -100,7 +111,8 @@ class Application1MicroApp extends MicroApp with Application1Routes {
   @override
   List<MicroAppPage> get pages => [
 
-        MicroAppPage(
+        MicroAppPage<Initial>(
+          description: 'The initial page of the micro app 1',
           route: baseRoute.route, 
           pageBuilder: PageBuilder(
             builder: (context, settings) => const Initial(),
@@ -108,14 +120,16 @@ class Application1MicroApp extends MicroApp with Application1Routes {
           ),
         ),
 
-        MicroAppPage(
+        MicroAppPage<Page1>(
+          description: 'Display all buttons of the showcase',
           route: page1, 
           pageBuilder: PageBuilder(
             builder:  (context, settings) => const Page1()
           )
         ),
 
-        MicroAppPage(
+        MicroAppPage<Page2>(
+          description: 'The page two',
           route: page2, 
           pageBuilder: PageBuilder(
           builder: (context, settings) {
@@ -127,9 +141,8 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 }
 ```
 
-### 🚀 Initialize the host, registering all micro apps
-- MicroHost is also a MicroApp, so you can register pages here too.
-- MyApp needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
+### 🚀 Initialize the micro host, registering all micro apps
+- MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
 - The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
 
 ```dart
@@ -145,30 +158,28 @@ class MyApp extends MicroHostStatelessWidget {
       title: 'Flutter Demo',
       navigatorKey: NavigatorInstance.navigatorKey, // Required
       onGenerateRoute: onGenerateRoute, // [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
-      initialRoute: baseRoute.route,
+      initialRoute:  '/host_home_page',
       navigatorObservers: [
         NavigatorInstance // Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
       ],
     );
   }
 
-  // Base route of host application
-  @override
-  MicroAppBaseRoute get baseRoute => MicroAppBaseRoute('/');
-
   // Register all root [MicroAppPage]s here
   @override
   List<MicroAppPage> get pages => [
         MicroAppPage(
-          name: baseRoute.route, 
+          route:  '/host_home_page', 
           pageBuilder: PageBuilder(
             builder: (_, __) => const HostHomePage()
-        ))
+          ),
+          description: 'The initial page of the application',
+        )
       ];
 
   // Register all [MicroApp]s here
   @override
-  List<MicroApp> get microApps => [MicroApplication1(), MicroApplication2()];
+  List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
 }
 ```
 
@@ -343,58 +354,65 @@ futures
 logger.d('** { You do not need to wait for a TimeoutException } **');
 ```
 
-#### 🦻 Listen to events (MicroApp)s
-`MicroApp` has a getter method that must be overwritten, it's called `microAppEventHandler`
+#### 🦻 Listen to events (MicroApps)
+Use the mixin `HandlerRegisterMixin` in order to get the method `registerEventHandler`
+
+```dart
+class MyMicroApplication extends MicroApp with HandlerRegisterMixin {
+  
+  MyMicroApplication() {
+    // It listen to all events
+    // Avoid using such a generic handler, prefer to use handlers by type 
+    // and with channels for a granular and specialized treatment
+    registerEventHandler(
+      MicroAppEventHandler(
+        (event) => logger.d([ event.name, event.payload])
+      );
+    );
+  }
+
+}
+```
 
 Some example scenarios:  
 ```dart
-// It listen to all events
-@override
-  MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((event) => logger.d([ event.name, event.payload]));
-
 // It listen to events with channels "chatbot" and "user_auth"
-@override
-  MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
-        // User auth feature, asked to show a popup :)
-        myController.showDialog(event.payload);
-      }, channels: ['chatbot', 'user_auth']);
+registerEventHandler(
+  MicroAppEventHandler((event) {
+    // User auth feature, asked to show a popup :)
+    myController.showDialog(event.payload);
+  }, channels: ['chatbot', 'user_auth']);
+);
+
 
 // It listen to events with type String (only)
-@override
-  MicroAppEventHandler<String>? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
-        // Use .cast() to automatically cast the payload data to String? type
-        logger.d(event.cast()); 
-      });
+registerEventHandler<String>(
+  MicroAppEventHandler((event) {
+    // Use .cast() to automatically cast the payload data to String? type
+    logger.d(event.cast()); 
+  });
+);    
 
 // It will be fired for every event, even if the value is the same (distinct = false)
-@override
-  MicroAppEventHandler<String>? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
-        logger.d(event.cast()); 
-      }, distinct: false);
+registerEventHandler(
+  MicroAppEventHandler((event) {
+    logger.d(event.cast()); 
+  }, distinct: false);
+);   
 ```
 
-#### Listen to events inside widgets (If need BuildContext)
-It can be achieved, registering the event handlers and unregistering them manually, or if you prefer, use a mixin called `HandlerRegisterMixin` to dispose handlers automatically when widget is disposed
+#### Listen to events inside widgets (If need BuildContext or if you need to unregister event handlers automatically)
+It can be achieved, registering the event handlers and unregistering them manually, but is advised to use a mixin called `HandlerRegisterStateMixin` to dispose handlers automatically when widget is disposed
 
-**Using mixin** `HandlerRegisterMixin` **example:**
+**Using mixin** `HandlerRegisterStateMixin` **example:**
 ```dart
-class MyWidgetState extends State<MyWidget> with HandlerRegisterMixin {
-
-   @override
-  List<MicroAppEventHandler> get eventHandlers => [
-    MicroAppEventHandler<String>((event) {count++;})
-  ];
+class MyWidgetState extends State<MyWidget> with HandlerRegisterStateMixin {
 
   @override
   void initState() {
-    registerEventHandler(MicroAppEventHandler<String>((event) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(event.cast()),
-      ));
+    registerEventHandler(
+      MicroAppEventHandler<String>((event) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.cast())));
     }, channels: const ['show_snackbar'], distinct: false));
 
     super.initState();
@@ -417,7 +435,10 @@ MicroAppEventController().resumeAllHandlers();
 MicroAppEventController().unregisterAllHandlers();
 ```
 
-### 🦻 Initiating an event subscription anywhere in the application (inside a StatefulWidget, for example)
+### 🦻 Initiating an event subscription anywhere in the application
+Take care when registering an event handler directly in the controller, as you will need to manually unregister them when they are no longer needed.
+
+Always prefer to use the `HandlerRegisterStateMixin` and `HandlerRegisterMixin` mixins, as they take care to unregister event handlers when they are no longer useful.
 #### Using subscription
 ```dart
 final subscription = MicroAppEventController().stream.listen((MicroAppEvent event) {
@@ -508,6 +529,11 @@ If it fails to get a page route, show a default error page
 ### ⫸ Nested Navigators
 It's possible to use a `MicroAppBaseRoute` inside a nested navigator `MicroAppNavigatorWidget`
 
+**IMPORTANT:** user the `context.maNav` to navigate:
+```dart
+context.maNav.push(baseRoute.page2);
+```
+
 ```dart
 final baseRoute = ApplicationRoutes();
 
@@ -517,10 +543,12 @@ MicroAppNavigatorWidget(
 );
 
 // later, inside [page1]
-MicroAppNavigator.getInitialRouteSettings(context) as ScreenArguments;
+final settings = MicroAppNavigator.getInitialRouteSettings(context);
 //or
-final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+final settings = context.maNav.getInitialRouteSettings();
 
+
+//IMPORTANT: user the context to navigate
 context.maNav.push(baseRoute.page2);
 ```
 
@@ -531,6 +559,7 @@ final routes = ApplicationRoutes();
 List<MicroAppPage> get pages => [
   MicroAppPage(
       route: routes.baseRoute.route,
+      description: 'The nested navigator',
       pageBuilder: PageBuilder(
         builder: (context, arguments) => 
           MicroAppNavigatorWidget(
@@ -540,6 +569,26 @@ List<MicroAppPage> get pages => [
       )
 ]
 ```
+
+### 📊 Micro Board
+#### The Micro Board (dashboard) enables you to inspect all micro apps, routes and event handlers.
+- Inspect which handler channels are duplicated
+- Inspect the types and amount of handlers and their channels per micro app
+- Inspect the types and amount of handlers and their channels by Widget
+- Inspect orphaned handlers
+- Inspect all registered routes from the application
+
+**Show Micro Board button (longPress hides the button, and click opens the Micro Board)**  
+This will create a draggable floating button, that enables you to open the Micro Board. By default it is not displayed in release mode.
+```dart
+MicroBoard.showButton();
+MicroBoard.hideButton()
+```
+or
+```dart
+MicroBoard().showBoard();
+```
+
 
 ### 📎 The following table shows how Dart values are received on the platform side and vice versa
 
