@@ -1,10 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_micro_app/flutter_micro_app.dart';
-import 'package:flutter_micro_app/src/presentation/pages/page_transition/micro_page_transition.dart';
-import 'package:flutter_micro_app/src/utils/enums/navigator_status.dart';
 
+import '../../entities/micro_app_preferences.dart';
+import '../../entities/router/base_route.dart';
+import '../../entities/router/page_builder.dart';
+import '../../presentation/pages/page_transition/micro_page_transition.dart';
+import '../../utils/enums/micro_page_transition_type.dart';
+import '../../utils/enums/navigator_status.dart';
 import '../../utils/platform/platform_stub.dart'
     if (dart.library.io) '../../utils/platform/mobile_platform.dart'
     if (dart.library.html) '../../utils/platform/web_platform.dart';
