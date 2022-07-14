@@ -18,11 +18,17 @@ class ColorController extends ValueNotifier<MaterialColor> {
 final backgroundColorController = ColorController();
 final buttonsColorController = ColorController(Colors.green);
 
-class MicroApplication1 extends MicroApp {
+class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
+  MicroApplication1() {
+    registerAllMicroEventHandlers();
+  }
+
   final routes = Application1Routes();
+
   @override
   List<MicroAppPage> get pages => [
-        MicroAppPage(
+        MicroAppPage<ExamplePage>(
+            description: 'This is the example page',
             route: routes.pageExample,
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const ExamplePage())),
@@ -31,21 +37,25 @@ class MicroApplication1 extends MicroApp {
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const MaterialAppPage(),
                 transitionType: MicroPageTransitionType.slideZoomUp)),
-        MicroAppPage(
+        MicroAppPage<ExamplePageFragment>(
+            description: 'Fragment can be used as a simple Widget',
             route: routes.pageExampleFragment,
             pageBuilder: PageBuilder(
                 builder: (context, arguments) => const ExamplePageFragment())),
       ];
 
-  // Event handler (listen all micro apps events on specifics channels)
-  //
-  // If you need the BuildContext, please register the handlers inside a widget
-  // and unregister them on dispose method.
-  // Or... you can use the mixin HandlerRegisterMixin on StatefulWidgets, in order to
-  // help you don't forget to unregister them
   @override
-  MicroAppEventHandler? get microAppEventHandler =>
-      MicroAppEventHandler((event) {
+  String get name => 'Micro App 1';
+
+  registerAllMicroEventHandlers() {
+    // Event handler (listen all micro apps events on specifics channels)
+    //
+    // If you need the BuildContext, please register the handlers inside a widget
+    // and unregister them on dispose method.
+    // Or... you can use the mixin HandlerRegisterMixin on StatefulWidgets, in order to
+    // help you don't forget to unregister them
+    registerEventHandler<MaterialColor>(MicroAppEventHandler(
+      (event) {
         // You can use freezed here if you prefer more safety in cover possibilities
         if (event.type == MaterialColor) {
           if (event.name == 'change_background_color') {
@@ -55,11 +65,19 @@ class MicroApplication1 extends MicroApp {
           }
         }
         logger.d([
-          '(MicroAppExample - channels(abc, chatbot, colors) event received:',
+          '(MicroAppExample - channel(colors) event received:',
           event.name,
           event.payload
         ]);
 
         event.resultSuccess('success!!!');
-      }, channels: const ['abc', 'chatbot', 'colors']);
+      },
+      channels: const ['lorem', 'ipsum', 'colors'],
+    ));
+
+    registerEventHandler<String>(MicroAppEventHandler(
+      (event) {},
+      channels: const ['config'],
+    ));
+  }
 }

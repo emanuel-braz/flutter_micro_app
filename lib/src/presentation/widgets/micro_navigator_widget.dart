@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../entities/router/base_route.dart';
+import '../../utils/ambiguate.dart';
 import '../../utils/mixins/router_generator_mixin.dart';
 
 class MicroAppNavigatorWidget extends StatefulWidget {
@@ -49,7 +50,7 @@ class _MicroAppNavigatorWidgetState extends State<MicroAppNavigatorWidget>
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback(
+    ambiguate(WidgetsBinding.instance)!.addPostFrameCallback(
         (timeStamp) => initialSettings = ModalRoute.of(context)?.settings);
     super.initState();
   }
@@ -81,7 +82,7 @@ class _MicroAppNavigatorWidgetState extends State<MicroAppNavigatorWidget>
 }
 
 class MicroAppNavigator extends Navigator {
-  static Object? getInitialRouteSettings(BuildContext context) => context
+  static RouteSettings? getInitialRouteSettings(BuildContext context) => context
       .findAncestorStateOfType<_MicroAppNavigatorWidgetState>()
       ?.initialSettings;
 

@@ -103,7 +103,11 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
   Type get type => payload.runtimeType;
 
   /// Completes with success
-  void resultSuccess([FutureOr<dynamic>? value]) => _completer.complete(value);
+  void resultSuccess([FutureOr<dynamic>? value]) {
+    if (!_completer.isCompleted) {
+      _completer.complete(value);
+    }
+  }
 
   /// Completes with error
   void resultError(Object error, [StackTrace? stackTrace]) =>

@@ -14,16 +14,12 @@ class MaterialAppPageInitial extends StatefulWidget {
   State<MaterialAppPageInitial> createState() => _MaterialAppPageInitialState();
 }
 
-class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
-    with HandlerRegisterMixin {
+class _MaterialAppPageInitialState extends State<MaterialAppPageInitial> with HandlerRegisterStateMixin {
   int count = 0;
 
   @override
-  List<MicroAppEventHandler> get eventHandlers => [];
-
-  @override
   void initState() {
-    registerEventHandler(MicroAppEventHandler<String>((event) {
+    registerEventHandler<String>(MicroAppEventHandler<String>((event) {
       String? message = event.cast();
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -72,19 +68,14 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
 
                   futures
                       .getFirstResult()
-                      .then((value) => {
-                            logger.d(
-                                '** { You can capture data asyncronously later (value = $value) } **')
-                          })
+                      .then(
+                          (value) => {logger.d('** { You can capture data asyncronously later (value = $value) } **')})
                       .catchError((error) async {
-                    logger.e(
-                        '** { But you can capture errors asyncronously later } **',
-                        error: error);
+                    logger.e('** { But you can capture errors asyncronously later } **', error: error);
                     return <dynamic>{};
                   });
 
-                  logger.d(
-                      '** { You do not need to wait for a TimeoutException } **');
+                  logger.d('** { You do not need to wait for a TimeoutException } **');
                 },
               ),
               ElevatedButton(
@@ -94,25 +85,18 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                       .emit(MicroAppEvent<Map<String, dynamic>>(
                         name: 'my_event',
                         payload: const {'data': 'lorem ipsum'},
-                        channels: const ['abc'],
+                        channels: const ['generic_events'],
                       ))
                       .getFirstResult();
 
                   logger.d(result);
                 },
               ),
+              const _CustomButton(),
               ElevatedButton(
-                child: const Text('Unregister events handler with (id=123)'),
+                child: const Text('Unregister event handlers with (channel="colors")'),
                 onPressed: () {
-                  MicroAppEventController().unregisterHandler(id: '123');
-                },
-              ),
-              ElevatedButton(
-                child: const Text(
-                    'Unregister event handlers with (channel="abc")'),
-                onPressed: () {
-                  MicroAppEventController()
-                      .unregisterHandler(channels: ['abc']);
+                  MicroAppEventController().unregisterHandler(channels: ['colors']);
                 },
               ),
               ElevatedButton(
@@ -136,19 +120,16 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
               ElevatedButton(
                 child: const Text('Native app requests Flutter to open Page2'),
                 onPressed: () {
-                  context.maNav.pushNamedNative(Application2Routes().page2,
-                      arguments: 'my arguments');
+                  context.maNav.pushNamedNative(Application2Routes().page2, arguments: 'my arguments');
                 },
               ),
               ElevatedButton(
-                child: const Text(
-                    'Native responses is "true" after "dispose" a page'),
+                child: const Text('Native responses is "true" after "dispose" a page'),
                 onPressed: () async {
                   final isValidEmail = await context.maNav
-                      .pushNamedNative<bool>('emailValidator',
-                          arguments: 'validateEmail:lorem@ipsum.com');
-                  logger.d(
-                      'Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
+                      .pushNamedNative<bool>('emailValidator', arguments: 'validateEmail:lorem@ipsum.com');
+                  logger
+                      .d('Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
                 },
               ),
               ElevatedButton(
@@ -156,15 +137,14 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () {
                   // If `onGenerateRoute.routeNativeOnError` is enabled, when there is no flutter page registered,
                   // it will try to open the page in Native(Android/iOS) automatically
-                  context.maNav.pushNamed('only_native_page',
-                      arguments: 'some_arguments');
+                  context.maNav.pushNamed('only_native_page', arguments: 'some_arguments');
                 },
               ),
               ElevatedButton(
                 child: const Text('Try open Page - not exists'),
                 onPressed: () {
-                  context.maNav.pushNamed(Application1Routes()
-                      .pageExample); // There is no [pageExample] inside current MaterialApp
+                  context.maNav.pushNamed(
+                      Application1Routes().pageExample); // There is no [pageExample] inside current MaterialApp
                 },
               ),
               ElevatedButton(
@@ -181,13 +161,9 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                         .getFirstResult();
                     logger.d('Result is: $result');
                   } on TimeoutException catch (e) {
-                    logger.e(
-                        'The native platform did not respond to the request',
-                        error: e);
+                    logger.e('The native platform did not respond to the request', error: e);
                   } on PlatformException catch (e) {
-                    logger.e(
-                        'The native platform respond to the request with some error',
-                        error: e);
+                    logger.e('The native platform respond to the request with some error', error: e);
                   } on Exception {
                     logger.e('Generic Error');
                   }
@@ -225,9 +201,37 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
   }
 
   incrementCounter() {
-    MicroAppEventController().emit(MicroAppEvent<int>(
-        name: 'my_event',
-        payload: ++count,
-        channels: const ['widget_channel']));
+    MicroAppEventController()
+        .emit(MicroAppEvent<int>(name: 'my_event', payload: ++count, channels: const ['widget_channel']));
+  }
+}
+
+class _CustomButton extends StatefulWidget {
+  const _CustomButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_CustomButton> createState() => _CustomButtonState();
+}
+
+class _CustomButtonState extends State<_CustomButton> with HandlerRegisterStateMixin {
+  @override
+  void initState() {
+    registerEventHandler(MicroAppEventHandler<MicroAppConfig>(
+      (event) {},
+      channels: const ['app_config', 'config'],
+    ));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: const Text('Unregister events handler with (id=123)'),
+      onPressed: () {
+        MicroAppEventController().unregisterHandler(id: '123');
+      },
+    );
   }
 }
