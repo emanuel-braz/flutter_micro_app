@@ -4,16 +4,18 @@ import 'package:flutter_micro_app/flutter_micro_app.dart';
 abstract class GenericMicroAppEventController {
   final String? methodChannel;
 
-  late final MicroAppEventController microAppEventController;
+  late final MicroAppEventController _microAppEventController;
   GenericMicroAppEventController(
       {this.methodChannel, MicroAppEventController? eventController})
-      : microAppEventController =
+      : _microAppEventController =
             eventController ?? MicroAppEventController.instance;
 
   @mustCallSuper
   void onEvent(MicroAppEvent? event) {
-    if (event != null) microAppEventController.emit(event);
+    if (event != null) _microAppEventController.emit(event);
   }
 
   Future<Object?> emit(Object event, {Duration? timeout});
+
+  void dispose();
 }
