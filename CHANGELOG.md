@@ -1,3 +1,9 @@
+## 0.10.0
+[2022-07-21]
+
+#### Added
+- Add GenericMicroAppEventController in order to enable webview controllers
+
 ## 0.9.0
 [2022-07-10]
 
