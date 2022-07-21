@@ -19,6 +19,8 @@ class MicroAppEventController {
   late MicroAppNativeService _microAppNativeService;
   late MicroAppEventDelegate _handlerRegisterDelegate;
   final Map<String, GenericMicroAppEventController> _webviewControllers = {};
+  Map<String, GenericMicroAppEventController> get webviewControllers =>
+      _webviewControllers;
 
   /// Used to listen all micro app events
   MicroAppEventSubscription get onEvent => _controller.stream.listen;
@@ -154,6 +156,10 @@ class MicroAppEventController {
   GenericMicroAppEventController? unregisterWebviewController(
       {required String id}) {
     final controller = _webviewControllers.remove(id);
-    if (controller != null) {}
+    if (controller != null) {
+      controller.dispose();
+      return controller;
+    }
+    return null;
   }
 }

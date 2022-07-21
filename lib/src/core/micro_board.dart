@@ -8,6 +8,12 @@ import '../entities/micro_board/micro_board_route.dart';
 import '../presentation/widgets/micro_board/micro_board_page.dart';
 
 class MicroBoard {
+  late MicroAppEventController microAppEventController;
+
+  MicroBoard({MicroAppEventController? microAppEventController})
+      : microAppEventController =
+            microAppEventController ?? MicroAppEventController();
+
   List<MicroBoardApp> get getMicroBoardApps {
     if (MicroHost.microApps.isNotEmpty) {
       final microBoardApps = MicroHost.microApps.map((currentMicroApp) {
@@ -54,9 +60,7 @@ class MicroBoard {
               description: e.description);
         }).toList();
 
-        final handlers = MicroAppEventController()
-            .handlers
-            .entries
+        final handlers = microAppEventController.handlers.entries
             .where((element) => element.key.parentName == currentMicroApp.name)
             .map((entry) {
           String handlerType = entry.key.runtimeType.toString();
@@ -89,9 +93,7 @@ class MicroBoard {
   }
 
   List<MicroBoardHandler> getOrphanHandlers() {
-    return MicroAppEventController()
-        .handlers
-        .entries
+    return microAppEventController.handlers.entries
         .where((element) => element.key.parentName?.isEmpty ?? true)
         .map((entry) {
       String handlerType = entry.key.runtimeType.toString();
@@ -109,9 +111,7 @@ class MicroBoard {
   }
 
   List<MicroBoardHandler> getWidgetsHandlers() {
-    return MicroAppEventController()
-        .handlers
-        .entries
+    return microAppEventController.handlers.entries
         .where((element) => !MicroHost.microApps
             .map((e) => e.name)
             .contains(element.key.parentName))
@@ -132,6 +132,13 @@ class MicroBoard {
     }).toList();
   }
 
+  List<GenericMicroAppEventController> getWebviewControllers() {
+    return microAppEventController.webviewControllers.values.map((controller) {
+      controller.parentName ??= 'Widget';
+      return controller;
+    }).toList();
+  }
+
   void showBoard() {
     if (NavigatorInstance.navigatorKey.currentState == null) return;
 
@@ -139,6 +146,7 @@ class MicroBoard {
 
     final orphanHandlers = getOrphanHandlers();
     final widgetHandlers = getWidgetsHandlers();
+    final webviewControllers = getWebviewControllers();
 
     var conflictingChannels = <String>[];
 
@@ -163,13 +171,17 @@ class MicroBoard {
         .toSet()
         .toList();
 
-    NavigatorInstance.push(MaterialPageRoute(
+    NavigatorInstance.push(
+      MaterialPageRoute(
         builder: (context) => MicroBoardPage(
-              apps: apps,
-              orphanHandlers: orphanHandlers,
-              widgetHandlers: widgetHandlers,
-              conflictingChannels: conflictingChannels,
-            )));
+          apps: apps,
+          orphanHandlers: orphanHandlers,
+          widgetHandlers: widgetHandlers,
+          conflictingChannels: conflictingChannels,
+          webviewControllers: webviewControllers,
+        ),
+      ),
+    );
   }
 
   static Offset? _buttonOverlayOffset;

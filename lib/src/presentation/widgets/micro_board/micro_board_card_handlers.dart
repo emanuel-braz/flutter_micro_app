@@ -37,9 +37,10 @@ class MicroBoardCardHandlers extends StatelessWidget {
                 )
               ],
             ),
-            Divider(
-              thickness: 2,
-            ),
+            if (app.handlers.isNotEmpty)
+              Divider(
+                thickness: 2,
+              ),
             ...app.handlers.map((e) {
               final channels = List.from(e.channels);
               final conflicts = List.from(conflictingChannels);
