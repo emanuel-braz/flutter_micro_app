@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/src/controllers/app_event/generic_micro_app_event_controller.dart';
 
-import '../../../entities/micro_board/micro_board_handler.dart';
-import '../../../utils/constants/constants.dart';
-
-class MicroBoardHandlerCard extends StatelessWidget {
-  final List<MicroBoardHandler> widgetHandlers;
+class MicroBoardWebviewControllersCard extends StatelessWidget {
+  final List<GenericMicroAppEventController> webviewControllers;
   final String title;
   final Color? titleColor;
-  final List<String> conflictingChannels;
-  const MicroBoardHandlerCard(
-      {required this.widgetHandlers,
-      required this.title,
-      this.titleColor,
-      required this.conflictingChannels,
-      Key? key})
-      : super(key: key);
+
+  const MicroBoardWebviewControllersCard({
+    required this.webviewControllers,
+    required this.title,
+    this.titleColor,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,21 +33,16 @@ class MicroBoardHandlerCard extends StatelessWidget {
                 Spacer(),
                 Chip(
                   backgroundColor: titleColor ?? Theme.of(context).primaryColor,
-                  label: Text(widgetHandlers.length.toString(),
+                  label: Text(webviewControllers.length.toString(),
                       style: TextStyle(fontSize: 14, color: Colors.grey[200])),
                 )
               ],
             ),
-            if (widgetHandlers.isNotEmpty)
+            if (webviewControllers.isNotEmpty)
               Divider(
                 thickness: 2,
               ),
-            ...widgetHandlers
-                .map((e) => MicroBoardHandlerCardItem(
-                      e,
-                      conflictingChannels: conflictingChannels,
-                    ))
-                .toList(),
+            ...webviewControllers.map((e) => _MicroBoardCardItem(e)).toList(),
           ],
         ),
       ),
@@ -58,21 +50,21 @@ class MicroBoardHandlerCard extends StatelessWidget {
   }
 }
 
-class MicroBoardHandlerCardItem extends StatelessWidget {
-  final MicroBoardHandler _microBoardHandler;
-  final List<String> conflictingChannels;
-  const MicroBoardHandlerCardItem(
-    this._microBoardHandler, {
-    required this.conflictingChannels,
+class _MicroBoardCardItem extends StatelessWidget {
+  final GenericMicroAppEventController _webviewController;
+
+  const _MicroBoardCardItem(
+    this._webviewController, {
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
     return Container(
       margin: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: primaryColor,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(
           Radius.circular(8),
@@ -92,7 +84,7 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             child: Text(
-              _microBoardHandler.parentName,
+              _webviewController.parentName ?? '',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
@@ -109,31 +101,16 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Chip(
-                      label: Text(_microBoardHandler.type),
-                      backgroundColor:
-                          _microBoardHandler.type == Constants.notTyped
-                              ? Colors.amber
-                              : Colors.blue[200],
-                    ),
-                    Wrap(
-                      spacing: 4,
-                      runSpacing: 0,
-                      children: _microBoardHandler.channels
-                          .map((e) => Chip(
-                                label: Text(
-                                  e,
-                                  style: TextStyle(
-                                      color: conflictingChannels.contains(e)
-                                          ? Colors.white
-                                          : null),
-                                ),
-                                backgroundColor: conflictingChannels.contains(e)
-                                    ? Colors.red
-                                    : Colors.green[200],
-                              ))
-                          .toList(),
-                    )
+                    if (_webviewController.name != null)
+                      Text(
+                        _webviewController.name ?? '',
+                        style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                      ),
+                    if (_webviewController.description != null)
+                      Text(
+                        _webviewController.description ?? '',
+                        style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                      ),
                   ],
                 ),
               )),
