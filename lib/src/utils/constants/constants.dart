@@ -11,5 +11,7 @@ class Constants {
   static const String methodNavigationLog = 'navigation_log';
   static const String methodNavigationCommand = 'navigation_command';
 
+  static const flutterMicroAppEvent = 'FlutterMicroAppEvent';
+
   static const String notTyped = 'Not Typed';
 }

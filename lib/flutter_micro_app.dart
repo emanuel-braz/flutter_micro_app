@@ -1,5 +1,6 @@
 library flutter_micro_app;
 
+export 'src/controllers/app_event/generic_micro_app_event_controller.dart';
 export 'src/controllers/app_event/micro_app_event_controller.dart';
 export 'src/controllers/navigators/navigator_controller.dart';
 export 'src/controllers/navigators/navigator_event_controller.dart';
