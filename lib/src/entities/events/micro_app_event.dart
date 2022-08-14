@@ -14,7 +14,7 @@ abstract class EventChannelsEquatable extends Equatable {
 
 /// [MicroAppEvent]
 class MicroAppEvent<T> extends EventChannelsEquatable {
-  final String name;
+  final String? name;
   final T? payload;
   final bool distinct;
   final MethodCall? methodCall;
@@ -25,7 +25,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
   MicroAppEvent({
     List<String> channels = const [],
     DateTime? datetime,
-    required this.name,
+    this.name,
     this.payload,
     this.distinct = true,
     this.methodCall,

@@ -229,7 +229,7 @@ When running javascript, use `JSON.stringify({})`. see [fma_webview_flutter](htt
 
 ```json
 {
- "name": "", // Required
+ "name": "", // Optional
  "payload": {}, // Optional
  "distinct": true, // Optional
  "channels": [], // Optional
