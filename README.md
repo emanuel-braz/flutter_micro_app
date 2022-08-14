@@ -113,6 +113,11 @@ class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget o
 }
 ```
 
+### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
+
+![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
+
+
 --- 
 ### 🗺 Create all routes outside the app project
 > This is just a suggestion of routing strategy (Optional)
@@ -190,6 +195,10 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
 
 ---
 ### 🤲 Handling micro apps events
+
+<img src="https://user-images.githubusercontent.com/3827308/184520332-2e77b71e-6000-488a-8a97-b2136458fec9.png" width="320" />
+
+
 
 #### 🗣 Dispatches events to all handlers that listen to channels 'user_auth'
 ```dart
@@ -573,6 +582,8 @@ List<MicroAppPage> get pages => [
 ]
 ```
 
+
+
 ---
 
 ### 📊 Micro Board
@@ -582,6 +593,10 @@ List<MicroAppPage> get pages => [
 - Inspect the types and amount of handlers and their channels by Widget
 - Inspect orphaned handlers
 - Inspect all registered routes from the application
+
+|   |  |
+| --- | ---   |
+|![Screenshot_1660444694](https://user-images.githubusercontent.com/3827308/184520487-c77a7e09-d525-4eca-b3aa-9ee1fca6c4c2.png)  | ![Screenshot_1660444762](https://user-images.githubusercontent.com/3827308/184520492-28f204e2-3b6b-4644-856e-c11872cbd40f.png) |
 
 **Show Micro Board button (longPress hides the button, and click opens the Micro Board)**  
 This will create a draggable floating button, that enables you to open the Micro Board. By default it is not displayed in release mode.
@@ -598,6 +613,9 @@ MicroBoard().showBoard();
 
 ### 🌐 Micro Web (Webview Controllers)
 Take a look at https://pub.dev/packages/fma_webview_flutter
+
+<img src="https://user-images.githubusercontent.com/3827308/180587584-e1b4cea3-c92d-45b6-91bc-dbb5e1e74487.png" width="320" />
+
 
 ---
 
