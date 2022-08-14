@@ -59,7 +59,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () {
                   final futures = MicroAppEventController().emit(
                       MicroAppEvent(
-                        name: 'show_snackbar',
                         payload: 'Hello World!',
                         channels: const ['show_snackbar'],
                       ),
@@ -89,7 +88,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 onPressed: () async {
                   final result = await MicroAppEventController()
                       .emit(MicroAppEvent<Map<String, dynamic>>(
-                        name: 'my_event',
                         payload: const {'data': 'lorem ipsum'},
                         channels: const ['generic_events'],
                       ))
