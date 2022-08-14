@@ -1,3 +1,10 @@
+## 0.11.0
+[2022-08-13]
+#### Added
+- The property name from MicroAppEvent becomes optional
+#### Chore
+- update readme
+
 ## 0.10.0
 [2022-07-21]
 

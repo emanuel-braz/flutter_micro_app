@@ -1,6 +1,6 @@
 
 ### A package to speed up the creation of micro apps structure in Flutter applications (beta version)
-> Monolithic distribution with multiplatform independent components development, inspired in frameworks such as Single SPA and Systemjs.
+> Monolithic distribution with independent multiplatform development, inspired in frameworks such as Single SPA, using Event Driven Architecture.
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
 ![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)
@@ -10,43 +10,6 @@
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
-
-### ⛵️ Navigation between pages
-#### Use [NavigatorInstance] to navigate between pages
-```dart
-NavigatorInstance.pop();
-NavigatorInstance.pushNamed();
-NavigatorInstance.pushNamedNative();
-NavigatorInstance.pushReplacementNamed();
-NavigatorInstance ...
-```
-
-### 📲 Open native (Android/iOS) pages, in this way
-#### It needs native implementation, you can see an example inside Android directory
-Examples and new modules to Android, iOS and Web soon
-
-```dart
-// If not implemented, always return null
-final isValidEmail = await NavigatorInstance.pushNamedNative<bool>(
-    'emailValidator',
-    arguments: 'validateEmail:lorem@ipsum.com'
-);
-print('Email is valid: $isValidEmail');
-```
-
-```dart
-// Listen to all flutter navigation events
-NavigatorInstance.eventController.flutterLoggerStream.listen((event) {
-    logger.d('[flutter: navigation_log] -> $event');
-});
-
-// Listen to all native (Android/iOS) navigation events (if implemented)
-NavigatorInstance.eventController.nativeLoggerStream.listen((event) {});
-
-// Listen to all native (Android/iOS) navigation requests (if implemented)
-NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
-```
----
 ### ⚙️ Define micro app configurations and contracts
 
 #### Configure the preferences (optional)
@@ -64,56 +27,22 @@ NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
     )
   );
 ```
-
-### 🗺 Register all routes
-> This is just a suggestion of routing strategy (Optional)
-It's important that all routes are availble out of the projects, avoiding dependencies between micro apps.
-Create all routes inside a new package, and import it in any project as a dependency. This will make possible to open routes from anywhere in a easy and transparent way.  
-  
-Create the routing package: `flutter create --template=package micro_routes` 
-
-```dart 
-// Export all routes
-import 'package:flutter_micro_app/flutter_micro_app.dart';
-
-class Application1Routes implements MicroAppBaseRoute {
-  @override
-  MicroAppRoute get baseRoute => MicroAppRoute('application1');
-
-  String get pageExample => path(['example_page']);
-  String get page1 => path(['page1']);
-  String get page2 => path(['page2','segment1', 'segment2']);
-}
-```
-  
-
-#### For example, you can open a page that is inside other MicroApp, in this way:
-```dart
-NavigatorInstance.pushNamed(Application2Routes().page1);
-NavigatorInstance.pushNamed('microapp2/page1');
-```
-
-#### or you can use the context, to get the scoped Navigator [`maNav`]
-
-```dart
-context.maNav.pushNamed(Application2Routes().page2);
-context.maNav.pushNamed('microapp2/page2');
-```
-
-
+---
 
 ### 🤝 Exposing all pages through a contract `MicroApp`
 ```dart
 import 'package:micro_routes/exports.dart';
 
-class Application1MicroApp extends MicroApp with Application1Routes {
+class Application1MicroApp extends MicroApp {
+
+  final routes = Application1Routes();
 
   @override
   List<MicroAppPage> get pages => [
 
         MicroAppPage<Initial>(
           description: 'The initial page of the micro app 1',
-          route: baseRoute.route, 
+          route: routes.baseRoute.route, 
           pageBuilder: PageBuilder(
             builder: (context, settings) => const Initial(),
             transitionType: MicroPageTransitionType.slideZoomUp
@@ -122,7 +51,7 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 
         MicroAppPage<Page1>(
           description: 'Display all buttons of the showcase',
-          route: page1, 
+          route: routes.page1, 
           pageBuilder: PageBuilder(
             builder:  (context, settings) => const Page1()
           )
@@ -130,7 +59,7 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 
         MicroAppPage<Page2>(
           description: 'The page two',
-          route: page2, 
+          route: routes.page2, 
           pageBuilder: PageBuilder(
           builder: (context, settings) {
             final page2Params.fromMap(settings.arguments);
@@ -141,6 +70,8 @@ class Application1MicroApp extends MicroApp with Application1Routes {
 }
 ```
 
+---
+
 ### 🚀 Initialize the micro host, registering all micro apps
 - MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
 - The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
@@ -150,22 +81,21 @@ void main() {
     runApp(MyApp());
 }
 
-class MyApp extends MicroHostStatelessWidget {
+class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget or MicroHostStatefulWidget
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       navigatorKey: NavigatorInstance.navigatorKey, // Required
-      onGenerateRoute: onGenerateRoute, // [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
-      initialRoute:  '/host_home_page',
+      onGenerateRoute: onGenerateRoute, // Required - [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
+      initialRoute: '/host_home_page',
       navigatorObservers: [
-        NavigatorInstance // Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
+        NavigatorInstance // [Optional] Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
       ],
     );
   }
 
-  // Register all root [MicroAppPage]s here
+  // Register all Host [MicroAppPage]s here
   @override
   List<MicroAppPage> get pages => [
         MicroAppPage(
@@ -183,57 +113,132 @@ class MyApp extends MicroHostStatelessWidget {
 }
 ```
 
+### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
+
+![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
+
+
+--- 
+### 🗺 Create all routes outside the app project
+> This is just a suggestion of routing strategy (Optional)
+It's important that all routes are availble out of the projects, avoiding dependencies between micro apps.
+Create all routes inside a new package, and import it in any project as a dependency. This will make possible to open routes from anywhere in a easy and transparent way.  
+  
+Create the routing package: `flutter create --template=package micro_routes` 
+or keep the routes in common package.
+
+```dart 
+// Export all routes
+import 'package:flutter_micro_app/flutter_micro_app.dart';
+
+class Application1Routes implements MicroAppBaseRoute {
+  @override
+  MicroAppRoute get baseRoute => MicroAppRoute('application1');
+
+  String get pageExample => path(['example_page']);
+  String get page1 => path(['page1']);
+  String get page2 => path(['page2','segment1', 'segment2']);
+}
+```
+
+---
+
+### ⛵️ Navigation between pages
+#### For example, you can open a page that is inside other MicroApp, into the root `Navigator`, in this way(without context):
+```dart
+NavigatorInstance.pushNamed(Application2Routes().page1);
+NavigatorInstance.pushNamed('microapp2/page1');
+```
+
+#### or you can use the `context` extension, to get the scoped Navigator [`maNav`]
+
+```dart
+context.maNav.pushNamed(Application2Routes().page2);
+context.maNav.pushNamed('microapp2/page2');
+```
+
+#### or you can use `Navigator.of(context)`, to get scoped Navigator
+
+```dart
+Navigator.of(context).pushNamed(Application2Routes().page2);
+Navigator.of(context).pushNamed('microapp2/page2');
+```
+
+---
+
+### 📲 Open native (Android/iOS) pages, in this way
+#### It needs native implementation, you can see an example inside Android directory
+Examples and new modules to Android, iOS and Web soon
+
+```dart
+// If not implemented, always return null
+final isValidEmail = await NavigatorInstance.pushNamedNative<bool>(
+    'emailValidator',
+    arguments: 'validateEmail:lorem@ipsum.com'
+);
+print('Email is valid: $isValidEmail');
+```
+
+#### Listening to navigation events
+```dart
+// Listen to all flutter navigation events
+NavigatorInstance.eventController.flutterLoggerStream.listen((event) {
+    logger.d('[flutter: navigation_log] -> $event');
+});
+
+// Listen to all native (Android/iOS) navigation events (if implemented)
+NavigatorInstance.eventController.nativeLoggerStream.listen((event) {});
+
+// Listen to all native (Android/iOS) navigation requests (if implemented)
+NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
+```
+
 ---
 ### 🤲 Handling micro apps events
 
-#### 🗣 Dispatches events to all handlers that listen to channels 'user_auth' and 'chatbot'
-```dart
-MicroAppEventController()
-    .emit(const MicroAppEvent<Map<String, dynamic>>(
-        name: 'my_event',
-        payload: {'data': 'lorem ipsum'},
-        channels: ['user_auth', 'chatbot'])
-    );
-```
+<img src="https://user-images.githubusercontent.com/3827308/184520332-2e77b71e-6000-488a-8a97-b2136458fec9.png" width="320" />
 
-#### 🗣 Dispatches events directly to handler with id = '0001' (only)
+
+
+#### 🗣 Dispatches events to all handlers that listen to channels 'user_auth'
 ```dart
-MicroAppEventController()
-    .emit(const MicroAppEvent(
-        name: 'my_event',
-        payload: {},
-        id: '0001')
-    );
+MicroAppEventController().emit(
+  const MicroAppEvent(
+    name: 'my_event',
+    channels: ['user_auth'])
+  );
 ```
 
 #### 🗣 Dispatches events to handlers that listen to String event type
 ```dart
-MicroAppEventController()
-    .emit<String>(const MicroAppEvent(
-        name: 'my_event',
-        payload: 'some string here')
-    );
+MicroAppEventController().emit<String>(
+  const MicroAppEvent(
+    name: 'my_event',
+    payload: 'some string here')
+  );
 ```
 
-#### 🗣 Dispatches events to handlers that listen to String event type, and channels 'user_auth' and 'wellcome'
+#### 🗣 Dispatches events to handlers that listen to `MyCustomClass` event type, and channels 'user_auth' and 'wellcome'
 ```dart
-MicroAppEventController()
-    .emit<String>(const MicroAppEvent<String>(
-        name: 'my_event',
-        payload: 'some string here'),
-        channels: ['user_auth', 'wellcome']
-    );
+MicroAppEventController().emit<MyCustomClass>(
+  const MicroAppEvent(
+    name: 'my_event',
+    payload: MyCustomClass(userName: 'Emanuel Braz'),
+    channels: ['user_auth', 'wellcome']
+  );
 ```
 
 > **Note**
-> Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java
+> Use Json String for agnostic platform purposes, or HashMap for Kotlin, Dictionary for Swift or java.util.HashMap for Java.
+
+When running javascript, use `JSON.stringify({})`. see [fma_webview_flutter](https://pub.dev/packages/fma_webview_flutter)
 
 <details open>
-<summary style="font-size:14px"> Dispatching event from native, using Json</summary>
+<summary style="font-size:14px"> Dispatching event using Json.</summary>
 
 ```json
 {
- "name": "", // Required
+ "name": "", // Optional
  "payload": {}, // Optional
  "distinct": true, // Optional
  "channels": [], // Optional
@@ -354,7 +359,9 @@ futures
 logger.d('** { You do not need to wait for a TimeoutException } **');
 ```
 
-#### 🦻 Listen to events (MicroApps)
+--- 
+
+### 🦻 Listen to events (MicroApps)
 Use the mixin `HandlerRegisterMixin` in order to get the method `registerEventHandler`
 
 ```dart
@@ -464,6 +471,8 @@ void dispose() {
 }
 ```
 
+---
+
 ### 🏭 Using the pre-built widget `MicroAppWidgetBuilder` to display data on the screen
 It can be used to show visual info on the screen.
 In this example, it shows a button and the label changes when user clicks on the button
@@ -526,10 +535,13 @@ If it fails to get a page route, show a default error page
      
 ```
 
+---
+
+
 ### ⫸ Nested Navigators
 It's possible to use a `MicroAppBaseRoute` inside a nested navigator `MicroAppNavigatorWidget`
 
-**IMPORTANT:** user the `context.maNav` to navigate:
+**IMPORTANT:** use the `context.maNav` to navigate:
 ```dart
 context.maNav.push(baseRoute.page2);
 ```
@@ -548,7 +560,7 @@ final settings = MicroAppNavigator.getInitialRouteSettings(context);
 final settings = context.maNav.getInitialRouteSettings();
 
 
-//IMPORTANT: user the context to navigate
+//IMPORTANT: use the context to navigate
 context.maNav.push(baseRoute.page2);
 ```
 
@@ -570,6 +582,10 @@ List<MicroAppPage> get pages => [
 ]
 ```
 
+
+
+---
+
 ### 📊 Micro Board
 #### The Micro Board (dashboard) enables you to inspect all micro apps, routes and event handlers.
 - Inspect which handler channels are duplicated
@@ -577,6 +593,10 @@ List<MicroAppPage> get pages => [
 - Inspect the types and amount of handlers and their channels by Widget
 - Inspect orphaned handlers
 - Inspect all registered routes from the application
+
+|   |  |
+| --- | ---   |
+|![Screenshot_1660444694](https://user-images.githubusercontent.com/3827308/184520487-c77a7e09-d525-4eca-b3aa-9ee1fca6c4c2.png)  | ![Screenshot_1660444762](https://user-images.githubusercontent.com/3827308/184520492-28f204e2-3b6b-4644-856e-c11872cbd40f.png) |
 
 **Show Micro Board button (longPress hides the button, and click opens the Micro Board)**  
 This will create a draggable floating button, that enables you to open the Micro Board. By default it is not displayed in release mode.
@@ -589,9 +609,15 @@ or
 MicroBoard().showBoard();
 ```
 
+---
+
 ### 🌐 Micro Web (Webview Controllers)
 Take a look at https://pub.dev/packages/fma_webview_flutter
 
+<img src="https://user-images.githubusercontent.com/3827308/180587584-e1b4cea3-c92d-45b6-91bc-dbb5e1e74487.png" width="320" />
+
+
+---
 
 ### 📎 The following table shows how Dart values are received on the platform side and vice versa
 
@@ -612,6 +638,8 @@ Take a look at https://pub.dev/packages/fma_webview_flutter
 |Map	                    |   HashMap        |    Dictionary                              |   java.util.HashMap
   
 <br>  
+
+---
 
 ## 👨‍💻👨‍💻  Contributing
 #### Contributions of any kind are welcome!
