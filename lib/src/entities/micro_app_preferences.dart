@@ -1,15 +1,15 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_micro_app/src/entities/router/base_route.dart';
 
-import '../../flutter_micro_app.dart';
+import '../utils/constants/path_separator.dart';
+import '../utils/enums/micro_page_transition_type.dart';
+import '../utils/typedefs.dart';
 
 final maAppBaseRoute = MicroAppPreferences.config.appBaseRoute.baseRoute.route;
 
 class MicroAppPreferences {
-  static final ValueNotifier<MicroAppConfig> _config = ValueNotifier(
-      MicroAppConfig(
-          nativeEventsEnabled: false,
-          pathSeparator: MicroAppPathSeparator.slash,
-          appBaseRoute: _DefaultBaseRoute()));
+  static final ValueNotifier<MicroAppConfig> _config =
+      ValueNotifier(MicroAppConfig());
 
   static MicroAppConfig get config => _config.value;
   static ValueNotifier<MicroAppConfig> get configListenable => _config;
@@ -39,26 +39,33 @@ class MicroAppConfig {
   /// Default page transition
   final MicroPageTransitionType pageTransitionType;
 
-  MicroAppConfig(
-      {this.nativeEventsEnabled = false,
-      this.nativeNavigationCommandEnabled = false,
-      this.nativeNavigationLogEnabled = false,
-      this.pathSeparator = MicroAppPathSeparator.slash,
-      this.consoleLogsEnabled = false,
-      MicroAppBaseRoute? appBaseRoute,
-      this.pageTransitionType = MicroPageTransitionType.platform})
-      : appBaseRoute = appBaseRoute ?? _DefaultBaseRoute();
+  /// When the route is not registered, and this is not null, then it will be
+  /// called, instead of try to open a route or native route
+  /// Prefer to use [context.maNav] or [NavigatorInstance] instead of [Navigator.of(context)]
+  /// If using [Navigator.of(context)], override onGenerateRoute
+  final OnRouteNotRegistered? onRouteNotRegistered;
+
+  MicroAppConfig({
+    this.nativeEventsEnabled = false,
+    this.nativeNavigationCommandEnabled = false,
+    this.nativeNavigationLogEnabled = false,
+    this.pathSeparator = MicroAppPathSeparator.slash,
+    this.consoleLogsEnabled = false,
+    MicroAppBaseRoute? appBaseRoute,
+    this.pageTransitionType = MicroPageTransitionType.platform,
+    this.onRouteNotRegistered,
+  }) : appBaseRoute = appBaseRoute ?? _DefaultBaseRoute();
 
   /// Protype [MicroAppConfig]
-  MicroAppConfig copyWith({
-    bool? nativeEventsEnabled,
-    String? pathSeparator,
-    MicroAppBaseRoute? appBaseRoute,
-    bool? consoleLogsEnabled,
-    MicroPageTransitionType? pageTransitionType,
-    bool? nativeNavigationCommandEnabled,
-    bool? nativeNavigationLogEnabled,
-  }) =>
+  MicroAppConfig copyWith(
+          {bool? nativeEventsEnabled,
+          String? pathSeparator,
+          MicroAppBaseRoute? appBaseRoute,
+          bool? consoleLogsEnabled,
+          MicroPageTransitionType? pageTransitionType,
+          bool? nativeNavigationCommandEnabled,
+          bool? nativeNavigationLogEnabled,
+          OnRouteNotRegistered? onRouteNotRegistered}) =>
       MicroAppConfig(
         nativeEventsEnabled: nativeEventsEnabled ?? this.nativeEventsEnabled,
         pathSeparator: pathSeparator ?? this.pathSeparator,
@@ -69,6 +76,7 @@ class MicroAppConfig {
             this.nativeNavigationCommandEnabled,
         nativeNavigationLogEnabled:
             nativeNavigationLogEnabled ?? this.nativeNavigationLogEnabled,
+        onRouteNotRegistered: onRouteNotRegistered ?? this.onRouteNotRegistered,
       );
 }
 

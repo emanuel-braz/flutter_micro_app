@@ -22,3 +22,5 @@ typedef MicroAppBuilder = Widget Function(
     BuildContext context, AsyncSnapshot<MicroAppEvent> microAppEventSnapshot);
 typedef MicroAppFloatPageBuilder = Widget Function(
     Widget microPage, MicroAppOverlayController controller);
+typedef OnRouteNotRegistered = void Function(String route,
+    {Object? arguments, String? type, BuildContext? context});

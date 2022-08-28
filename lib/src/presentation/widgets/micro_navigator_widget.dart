@@ -39,6 +39,12 @@ class MicroAppNavigatorWidget extends StatefulWidget {
       this.transitionDelegate})
       : super(key: key);
 
+  static MicroAppNavigatorWidget? of(BuildContext context) {
+    final microAppNavigatorWidget =
+        context.findAncestorWidgetOfExactType<MicroAppNavigatorWidget>();
+    return microAppNavigatorWidget;
+  }
+
   @override
   _MicroAppNavigatorWidgetState createState() =>
       _MicroAppNavigatorWidgetState();
@@ -85,6 +91,9 @@ class MicroAppNavigator extends Navigator {
   static RouteSettings? getInitialRouteSettings(BuildContext context) => context
       .findAncestorStateOfType<_MicroAppNavigatorWidgetState>()
       ?.initialSettings;
+
+  static MicroAppNavigator? of(BuildContext context) =>
+      context.findAncestorWidgetOfExactType<MicroAppNavigator>();
 
   final MicroAppBaseRoute microBaseRoute;
   final bool closeOnPopFirstPage;
