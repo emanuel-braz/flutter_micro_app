@@ -14,11 +14,19 @@ import 'example_micro_app.dart';
 void main() {
   // Define micro app configurations here
   final isAndroid = Platform.isAndroid;
-  MicroAppPreferences.update(MicroAppConfig(
+  MicroAppPreferences.update(
+    MicroAppConfig(
       nativeEventsEnabled: isAndroid,
       nativeNavigationCommandEnabled: isAndroid,
       nativeNavigationLogEnabled: isAndroid,
-      pageTransitionType: MicroPageTransitionType.platform));
+      pageTransitionType: MicroPageTransitionType.platform,
+      onRouteNotRegistered: (route, {arguments, type, context}) {
+        // ignore: avoid_print
+        print(
+            'CALLBACK:[OnRouteNotRegistered] Route not found: $route, $arguments, $type');
+      },
+    ),
+  );
 
   // Listen to navigation events
   final internalNavigationSubs =
