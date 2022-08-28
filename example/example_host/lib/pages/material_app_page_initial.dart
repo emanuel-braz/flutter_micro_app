@@ -142,19 +142,23 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 },
               ),
               ElevatedButton(
-                child: const Text('Try open a page that only exists in Native'),
+                child: const Text(
+                    'Try to open a page that is not registered, OnRouteNotRegistered will be called'),
                 onPressed: () {
-                  // If `onGenerateRoute.routeNativeOnError` is enabled, when there is no flutter page registered,
+                  // If this route is not registered, and OnRouteNotRegistered is not null, it will be called, and finish the execution here
+
+                  // If `onGenerateRoute.routeNativeOnError` is enabled, and the route is not registered,
                   // it will try to open the page in Native(Android/iOS) automatically
                   context.maNav.pushNamed('only_native_page',
                       arguments: 'some_arguments');
                 },
               ),
               ElevatedButton(
-                child: const Text('Try open Page - not exists'),
+                child: const Text(
+                    'There is no route on current Navigator, but there is a route on the root Navigator'),
                 onPressed: () {
                   context.maNav.pushNamed(Application1Routes()
-                      .pageExample); // There is no [pageExample] inside current MaterialApp
+                      .pageExample); // There is no [pageExample] inside current MaterialApp, but it exists in global MicroPage
                 },
               ),
               ElevatedButton(

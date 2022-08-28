@@ -23,4 +23,5 @@ export 'src/utils/enums/micro_page_transition_type.dart';
 export 'src/utils/extensions/context_extension.dart';
 export 'src/utils/extensions/list_extension.dart';
 export 'src/utils/mixins/handler_register_mixin.dart';
+export 'src/utils/mixins/router_generator_mixin.dart';
 export 'src/utils/typedefs.dart';

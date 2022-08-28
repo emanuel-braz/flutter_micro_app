@@ -1,4 +1,5 @@
 // ignore_for_file: non_constant_identifier_names
+import 'package:dart_log/dart_log.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -69,6 +70,11 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   /// [pushNamed]
   Future<T?> pushNamed<T extends Object?>(String routeName,
       {Object? arguments, String? type, BuildContext? context}) {
+    if (!shouldTryOpenRoute(routeName,
+        context: context, type: type, arguments: arguments)) {
+      return Future.value(null);
+    }
+
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushNamed.name);
@@ -86,6 +92,11 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       Object? arguments,
       String? type,
       BuildContext? context}) {
+    if (!shouldTryOpenRoute(routeName,
+        context: context, type: type, arguments: arguments)) {
+      return Future.value(null);
+    }
+
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushReplacementNamed.name);
@@ -134,6 +145,11 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       Object? arguments,
       String? type,
       BuildContext? context}) {
+    if (!shouldTryOpenRoute(routeName,
+        context: context, type: type, arguments: arguments)) {
+      return Future.value(null);
+    }
+
     eventController.logNavigationEvent(routeName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.popAndPushNamed.name);
@@ -150,6 +166,11 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   Future<T?> pushNamedAndRemoveUntil<T extends Object?>(
       String newRouteName, RoutePredicate predicate,
       {Object? arguments, String? type, BuildContext? context}) {
+    if (!shouldTryOpenRoute(newRouteName,
+        context: context, type: type, arguments: arguments)) {
+      return Future.value(null);
+    }
+
     eventController.logNavigationEvent(newRouteName,
         arguments: arguments,
         type: type ?? MicroAppNavigationType.pushNamedAndRemoveUntil.name);
@@ -255,5 +276,28 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
     super.didPop(route, previousRoute);
     eventController.logNavigationEvent(previousRoute?.settings.name,
         type: MicroAppNavigationType.didPop.name);
+  }
+
+  /// Verify if the route can be opened
+  /// Route is registered results true, if onRouteNotRegistered is not null and Route is not registered, it triggers the callback
+  /// and aborts the navigation
+  ///
+  /// Prefer to use [context.maNav] or [NavigatorInstance] instead of [Navigator.of(context)]
+  /// if using [Navigator.of(context)], so override onGenerateRoute
+  bool shouldTryOpenRoute(String route,
+      {Object? arguments, String? type, BuildContext? context}) {
+    final onRouteNotRegistered =
+        MicroAppPreferences.config.onRouteNotRegistered;
+
+    if (!hasRoute(route) && onRouteNotRegistered != null) {
+      logger
+          .w('Route not registered: $route, onRouteNotRegistered dispatched!');
+      Future(() {
+        onRouteNotRegistered(route,
+            arguments: arguments, type: type, context: context);
+      });
+      return false;
+    }
+    return true;
   }
 }

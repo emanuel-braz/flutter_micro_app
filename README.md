@@ -21,9 +21,22 @@
       nativeNavigationLogEnabled: true,
       pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
 
-      // the [MicroPageTransitionType.platform] is a dynamic transition type, 
+      // The [MicroPageTransitionType.platform] is a dynamic transition type, 
       // for iOS it will use Cupertino, and for others it will use Material.
-      pageTransitionType: MicroPageTransitionType.platform 
+      pageTransitionType: MicroPageTransitionType.platform,
+
+      // When pushing routes, if the route is not registered, this will be triggered,
+      // and it will abort the navigation
+      // 
+      // [onUnknownRoute] will not be dispatched, since the navigation was aborted.
+      //
+      // To makes this works, do:
+      // - Use root navigator(from MaterialApp) call NavigatorInstance.push...() without context
+      // - Use MicroAppNavigatorWidget as your nested navigators
+      // - Use RouterGenerator.onGenerateRoute mixin in your custom navigators
+      onRouteNotRegistered: (route, {arguments, type, context}) {
+        print('[OnRouteNotRegistered] Route not found: $route, $arguments, $type');
+      },
     )
   );
 ```
