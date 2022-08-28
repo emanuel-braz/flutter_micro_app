@@ -1,3 +1,8 @@
+## 0.12.0
+[2022-08-28]
+#### Added
+- Add OnRouteNotRegistered callback
+
 ## 0.11.0
 [2022-08-13]
 #### Added
