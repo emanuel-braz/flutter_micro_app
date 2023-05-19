@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:async';
 
 import '../../../dependencies.dart';
@@ -14,10 +16,21 @@ class MicroAppEventDelegate {
         .where((event) => handlerHasSameEventTypeOrDynamic(handler, event))
         .where((event) => containsSomeChannelsOrHandlerHasNoChannels(
             handler.channels, event.channels))
-        .listen(handler.onEvent,
-            onDone: handler.onDone,
-            onError: handler.onError,
-            cancelOnError: handler.cancelOnError);
+        .listen(
+      ((event) {
+        if (handler.onlyDistinctEvents == true && handler.lastEvent == event) {
+          return;
+        }
+
+        final onEvent = handler.onEvent(event);
+        if (onEvent is Future) {
+          onEvent.whenComplete(() => handler.setPrevious(event));
+        }
+      }),
+      onDone: handler.onDone,
+      onError: handler.onError,
+      cancelOnError: handler.cancelOnError,
+    );
   }
 
   /// pauseAllSubscriptions
@@ -112,8 +125,8 @@ class MicroAppEventDelegate {
 
   bool handleDistinct(MicroAppEventHandler handler, MicroAppEvent previousEvent,
       MicroAppEvent currentEvent) {
-    if (handler.distinct == false) return false;
-    return !(handler.distinct && previousEvent != currentEvent);
+    if (handler.onlyDistinctEvents == false) return false;
+    return !(handler.onlyDistinctEvents && previousEvent != currentEvent);
   }
 
   bool handlerHasSameEventTypeOrDynamic(

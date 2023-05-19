@@ -9,7 +9,7 @@ import '../entities/events/micro_app_event.dart';
 typedef WidgetPageBuilder<T extends Widget> = T Function(
     BuildContext context, RouteSettings settings);
 typedef MethodCallHandler = Future<dynamic> Function(MethodCall);
-typedef MicroAppEventOnEvent = void Function(MicroAppEvent);
+typedef MicroAppEventOnEvent = FutureOr<void> Function(MicroAppEvent);
 typedef MicroAppEventOnDone = void Function();
 typedef MicroAppEventOnError = Function;
 typedef MicroAppEventSubscription = StreamSubscription<MicroAppEvent> Function(
