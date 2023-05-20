@@ -437,6 +437,45 @@ void main() {
       // act
       controller.emit(event);
     });
+
+    test(
+        'Não deve manter histórico maior que 10 itens quando o [maxEventsHistory] for igual a 10',
+        () async {
+      // arrange
+      late final MicroAppEventHandler handler;
+
+      handler = MicroAppEventHandler<String>((event) async {
+        // assert
+        expect(handler.history.length > 10, equals(false));
+      }, maxEventsHistory: 10);
+
+      MicroAppEventController.instance.registerHandler(handler);
+
+      // act
+      for (var i = 0; i < 13; i++) {
+        MicroAppEventController.instance
+            .emit(MicroAppEvent<String>(payload: '$i'));
+      }
+    });
+
+    test('Não deve manter histórico quando o [maxEventsHistory] for igual a 0',
+        () async {
+      // arrange
+      late final MicroAppEventHandler handler;
+
+      handler = MicroAppEventHandler<String>((event) async {
+        // assert
+        expect(handler.history.isNotEmpty, equals(false));
+      }, maxEventsHistory: 0);
+
+      MicroAppEventController.instance.registerHandler(handler);
+
+      // act
+      for (var i = 0; i < 2; i++) {
+        MicroAppEventController.instance
+            .emit(MicroAppEvent<String>(payload: '$i'));
+      }
+    });
   });
 
   group('[MicroAppEventController.stream]', () {
@@ -573,7 +612,7 @@ void main() {
       int count = 0;
       controller.registerHandler(MicroAppEventHandler<int>((event) {
         ++count;
-      }, distinct: true));
+      }, onlyDistinctEvents: true));
 
       // act
       controller.emit(evento1);
@@ -595,7 +634,7 @@ void main() {
       int count = 0;
       controller.registerHandler(MicroAppEventHandler<int>((event) {
         ++count;
-      }, distinct: true));
+      }, onlyDistinctEvents: true));
 
       // act
       controller.emit(evento1);
@@ -617,7 +656,7 @@ void main() {
       int count = 0;
       controller.registerHandler(MicroAppEventHandler<int>((event) {
         ++count;
-      }, distinct: false));
+      }, onlyDistinctEvents: false));
 
       // act
       controller.emit(evento1);
@@ -639,7 +678,7 @@ void main() {
       int count = 0;
       controller.registerHandler(MicroAppEventHandler<int>((event) {
         ++count;
-      }, distinct: false));
+      }, onlyDistinctEvents: false));
 
       // act
       controller.emit(evento1);

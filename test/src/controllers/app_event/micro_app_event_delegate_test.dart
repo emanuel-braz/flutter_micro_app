@@ -337,28 +337,20 @@ void main() {
 
   group('[MicroAppEventDelegate.isChannelsIntersection]', () {
     test(
-        'asdasdasdsad asd Deve retornar true quando o handler asdasdsanão tiver channels registrados e evento também não',
+        'Deve retornar true quando o handler tiver um channel em comum com o evento dentro de uma lista de channels',
         () {
       // arrange
       final c1 = [
-        'asd',
-        'qwsqweqw',
-        'idbfsd',
-        'ajnd asd',
-        '12sasdads',
-        'dnwe3iuwe',
-        'endiue',
-        ' 23wdfsdcsdsdsdfsdf'
+        '123',
+        'comun',
+        'algo',
+        'teste1',
       ];
       final c2 = [
-        '7h87ah8dh',
-        'qwsqweqw',
-        'adjkabskdjbkas',
-        'asdsasd asd',
-        'asdasdqwqweqweqw',
-        'vmmcnv',
-        '99bjjfgbj9fg',
-        ' -'
+        '456',
+        'channel1',
+        'comun',
+        ' -',
       ];
       final handler = MicroAppEventHandler<String>((event) {}, channels: c1);
       final event = MicroAppEvent<String>(name: 'my_event', channels: c2);
@@ -435,9 +427,6 @@ void main() {
       controller.registerHandler(handler2);
 
       final handler = await controller.unregisterHandler(handler: handler1);
-      // controller
-      //     .emit(MicroAppEvent(name: 'name', channels: const ['channel1']));
-      // await Future.delayed(Duration.zero);
 
       expect(controller.handlers.length, 1);
       expect(handler, equals(handler1));

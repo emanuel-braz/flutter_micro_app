@@ -27,7 +27,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
         content: Text(message ?? 'Unknown'),
       ));
       event.resultSuccess(true);
-    }, channels: const ['show_snackbar'], distinct: false));
+    }, channels: const ['show_snackbar'], onlyDistinctEvents: false));
 
     super.initState();
   }
