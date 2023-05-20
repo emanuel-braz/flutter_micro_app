@@ -22,10 +22,8 @@ class MicroAppEventDelegate {
           return;
         }
 
-        final onEvent = handler.onEvent(event);
-        if (onEvent is Future) {
-          onEvent.whenComplete(() => handler.setPrevious(event));
-        }
+        handler.onEvent(event);
+        handler.setPrevious(event);
       }),
       onDone: handler.onDone,
       onError: handler.onError,
