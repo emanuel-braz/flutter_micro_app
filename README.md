@@ -31,8 +31,8 @@
       // [onUnknownRoute] will not be dispatched, since the navigation was aborted.
       //
       // To makes this works, do:
-      // - Use root navigator(from MaterialApp) call NavigatorInstance.push...() without context
-      // - Use MicroAppNavigatorWidget as your nested navigators
+      // - Use root navigator(from MaterialApp) call NavigatorInstance.push...() without context, or
+      // - Use MicroAppNavigatorWidget as your nested navigators, or
       // - Use RouterGenerator.onGenerateRoute mixin in your custom navigators
       onRouteNotRegistered: (route, {arguments, type, context}) {
         print('[OnRouteNotRegistered] Route not found: $route, $arguments, $type');
