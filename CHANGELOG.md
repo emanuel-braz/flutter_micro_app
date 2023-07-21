@@ -1,3 +1,8 @@
+## 0.12.1
+[2023-07-20]
+#### Fixed
+- change overlay color to transparent
+
 ## 0.12.0
 [2022-08-28]
 #### Added
