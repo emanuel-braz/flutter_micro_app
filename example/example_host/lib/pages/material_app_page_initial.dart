@@ -194,9 +194,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                     if (eventSnapshot.hasError) return const Text('Error');
                     return ElevatedButton(
                       child: Text(
-                        'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
+                          'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload}'),
                       onPressed: incrementCounter,
                     );
                   }),
@@ -204,9 +202,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                 if (eventSnapshot.hasError) return const Text('Error');
                 return ElevatedButton(
                   child: Text(
-                    'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload ?? 0}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                      'This is a MicroAppWidgetBuilder / count = ${eventSnapshot.data?.payload ?? 0}'),
                   onPressed: incrementCounter,
                 );
               }),
