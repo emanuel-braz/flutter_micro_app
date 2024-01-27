@@ -53,8 +53,7 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
 class _MicroBoardCardItem extends StatelessWidget {
   final GenericMicroAppEventController _webviewController;
 
-  const _MicroBoardCardItem(
-    this._webviewController);
+  const _MicroBoardCardItem(this._webviewController);
 
   @override
   Widget build(BuildContext context) {

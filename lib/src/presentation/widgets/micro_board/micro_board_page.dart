@@ -56,12 +56,10 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
         child: ListView(
           padding: EdgeInsets.all(8),
           children: [
-            ...widget.apps
-                .map((e) => MicroBoardItemWidget(
-                      e,
-                      conflictingChannels: widget.conflictingChannels,
-                    ))
-                ,
+            ...widget.apps.map((e) => MicroBoardItemWidget(
+                  e,
+                  conflictingChannels: widget.conflictingChannels,
+                )),
             MicroBoardHandlerCard(
                 widgetHandlers: widget.widgetHandlers,
                 title: 'Widget Handlers',

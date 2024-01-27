@@ -44,12 +44,10 @@ class MicroBoardHandlerCard extends StatelessWidget {
               Divider(
                 thickness: 2,
               ),
-            ...widgetHandlers
-                .map((e) => MicroBoardHandlerCardItem(
-                      e,
-                      conflictingChannels: conflictingChannels,
-                    ))
-                ,
+            ...widgetHandlers.map((e) => MicroBoardHandlerCardItem(
+                  e,
+                  conflictingChannels: conflictingChannels,
+                )),
           ],
         ),
       ),

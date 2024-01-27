@@ -7,7 +7,8 @@ class MicroAppList extends StatefulWidget {
   final List<MicroBoardApp> microApps;
   final void Function()? updateView;
 
-  const MicroAppList({super.key, required this.microApps, required this.updateView});
+  const MicroAppList(
+      {super.key, required this.microApps, required this.updateView});
 
   @override
   State<MicroAppList> createState() => _MicroAppListState();
@@ -73,14 +74,17 @@ class _MicroAppListState extends State<MicroAppList> {
                     final page = pages[index];
                     return Card(
                       child: ListTile(
-                        title: Text(page.route, style: Theme.of(context).textTheme.titleLarge),
+                        title: Text(page.route,
+                            style: Theme.of(context).textTheme.titleLarge),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (page.description.isNotEmpty) Text(page.description),
+                            if (page.description.isNotEmpty)
+                              Text(page.description),
                             if (page.widget.isNotEmpty)
                               Text(page.widget,
-                                  textAlign: TextAlign.right, style: Theme.of(context).textTheme.bodySmall),
+                                  textAlign: TextAlign.right,
+                                  style: Theme.of(context).textTheme.bodySmall),
                           ],
                         ),
                       ),

@@ -35,8 +35,10 @@ class MicroBoardApp {
       name: map['name'],
       description: map['description'],
       route: map['route'],
-      pages: List<MicroBoardRoute>.from(map['pages']?.map((x) => MicroBoardRoute.fromMap(x))),
-      handlers: List<MicroBoardHandler>.from(map['handlers']?.map((x) => MicroBoardHandler.fromMap(x))),
+      pages: List<MicroBoardRoute>.from(
+          map['pages']?.map((x) => MicroBoardRoute.fromMap(x))),
+      handlers: List<MicroBoardHandler>.from(
+          map['handlers']?.map((x) => MicroBoardHandler.fromMap(x))),
     );
   }
 }
