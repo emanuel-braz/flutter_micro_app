@@ -7,13 +7,13 @@ class ExamplePageFragment extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       color: Colors.green,
-      child: SingleChildScrollView(
+      child: const SingleChildScrollView(
         child: DefaultTextStyle(
-          style: const TextStyle(color: Colors.white, fontSize: 32),
+          style: TextStyle(color: Colors.white, fontSize: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
-            children: const [
+            children: [
               SizedBox(height: 8),
               Text('This is a fragment ↑↓'),
               SizedBox(height: 8),

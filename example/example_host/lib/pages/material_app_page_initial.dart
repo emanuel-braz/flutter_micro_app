@@ -20,7 +20,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
 
   @override
   void initState() {
-    registerEventHandler<String>(MicroAppEventHandler<String>((event) {
+    registerEventHandler(MicroAppEventHandler((event) {
       String? message = event.cast();
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -28,7 +28,6 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
       ));
       event.resultSuccess(true);
     }, channels: const ['show_snackbar'], distinct: false));
-
     super.initState();
   }
 
@@ -44,8 +43,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
             },
             icon: const Icon(Icons.arrow_back)),
       ),
-      body: Container(
-        color: Colors.green,
+      body: SizedBox(
         height: double.infinity,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

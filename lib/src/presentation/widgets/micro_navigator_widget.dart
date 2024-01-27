@@ -22,7 +22,7 @@ class MicroAppNavigatorWidget extends StatefulWidget {
   final TransitionDelegate<dynamic>? transitionDelegate;
 
   const MicroAppNavigatorWidget(
-      {Key? key,
+      {super.key,
       required this.microBaseRoute,
       this.initialRoute,
       this.closeOnPopFirstPage,
@@ -36,8 +36,7 @@ class MicroAppNavigatorWidget extends StatefulWidget {
       this.reportsRouteUpdateToEngine,
       this.requestFocus,
       this.restorationScopeId,
-      this.transitionDelegate})
-      : super(key: key);
+      this.transitionDelegate});
 
   static MicroAppNavigatorWidget? of(BuildContext context) {
     final microAppNavigatorWidget =
@@ -46,7 +45,7 @@ class MicroAppNavigatorWidget extends StatefulWidget {
   }
 
   @override
-  _MicroAppNavigatorWidgetState createState() =>
+  State<MicroAppNavigatorWidget> createState() =>
       _MicroAppNavigatorWidgetState();
 }
 
@@ -99,35 +98,29 @@ class MicroAppNavigator extends Navigator {
   final bool closeOnPopFirstPage;
 
   const MicroAppNavigator(
-      {Key? key,
+      {super.key,
       required this.microBaseRoute,
-      String? initialRoute,
+      super.initialRoute,
       this.closeOnPopFirstPage = true,
-      Route<dynamic>? Function(RouteSettings)? onGenerateRoute,
+      super.onGenerateRoute,
       bool? routeNativeOnError,
       List<Page<dynamic>>? pages,
       List<NavigatorObserver>? observers,
       List<Route<dynamic>> Function(NavigatorState, String)?
           onGenerateInitialRoutes,
-      bool Function(Route<dynamic>, dynamic)? onPopPage,
-      Route<dynamic>? Function(RouteSettings)? onUnknownRoute,
+      super.onPopPage,
+      super.onUnknownRoute,
       bool? reportsRouteUpdateToEngine,
       bool? requestFocus,
-      String? restorationScopeId,
+      super.restorationScopeId,
       TransitionDelegate<dynamic>? transitionDelegate})
       : super(
-          key: key,
-          initialRoute: initialRoute,
-          onGenerateRoute: onGenerateRoute,
           pages: pages ?? const <Page<dynamic>>[],
           observers: observers ?? const <NavigatorObserver>[],
           onGenerateInitialRoutes:
               onGenerateInitialRoutes ?? Navigator.defaultGenerateInitialRoutes,
-          onPopPage: onPopPage,
-          onUnknownRoute: onUnknownRoute,
           reportsRouteUpdateToEngine: reportsRouteUpdateToEngine ?? true,
           requestFocus: requestFocus ?? true,
-          restorationScopeId: restorationScopeId,
           transitionDelegate:
               transitionDelegate ?? const DefaultTransitionDelegate<dynamic>(),
         );

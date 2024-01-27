@@ -32,4 +32,13 @@ abstract class GenericMicroAppEventController {
 
   /// dispose controller
   void dispose();
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'parentName': parentName,
+      'methodChannel': methodChannel
+    };
+  }
 }

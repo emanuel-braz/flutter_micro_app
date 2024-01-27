@@ -8,4 +8,12 @@ class MicroBoardHandler {
     required this.parentName,
     required this.channels,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type,
+      'parentName': parentName,
+      'channels': channels,
+    };
+  }
 }

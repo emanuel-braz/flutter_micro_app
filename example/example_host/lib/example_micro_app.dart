@@ -11,12 +11,35 @@ import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class ColorController extends ValueNotifier<MaterialColor> {
   ColorController([MaterialColor color = Colors.amber]) : super(color);
-  void changeColor(MaterialColor color) => value = color;
+  void changeColor({MaterialColor? color, String? hexaColor}) {
+    assert(color != null || hexaColor != null);
+
+    if (color != null) {
+      value = color;
+      return;
+    }
+
+    final c = Color(int.parse(hexaColor!, radix: 16) + 0xFF000000);
+    final mc = MaterialColor(c.value, <int, Color>{
+      50: c.withOpacity(0.1),
+      100: c.withOpacity(0.2),
+      200: c.withOpacity(0.3),
+      300: c.withOpacity(0.4),
+      400: c.withOpacity(0.5),
+      500: c.withOpacity(0.6),
+      600: c.withOpacity(0.7),
+      700: c.withOpacity(0.8),
+      800: c.withOpacity(0.9),
+      900: c.withOpacity(1.0),
+    });
+
+    value = mc;
+  }
 }
 
 // Global instances, just for example purposes
 final backgroundColorController = ColorController();
-final buttonsColorController = ColorController(Colors.green);
+final buttonsColorController = ColorController(Colors.lightGreen);
 
 class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
   MicroApplication1() {
@@ -54,16 +77,24 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
     // and unregister them on dispose method.
     // Or... you can use the mixin HandlerRegisterMixin on StatefulWidgets, in order to
     // help you don't forget to unregister them
-    registerEventHandler<MaterialColor>(MicroAppEventHandler(
+    registerEventHandler(MicroAppEventHandler(
       (event) {
         // You can use freezed here if you prefer more safety in cover possibilities
-        if (event.type == MaterialColor) {
-          if (event.name == 'change_background_color') {
-            backgroundColorController.changeColor(event.cast());
-          } else if (event.name == 'change_buttons_color') {
-            buttonsColorController.changeColor(event.cast());
+        if (event.name == 'change_background_color') {
+          if (event.type == MaterialColor) {
+            backgroundColorController.changeColor(color: event.cast());
+          } else if (event.type == String) {
+            backgroundColorController.changeColor(hexaColor: event.cast());
           }
         }
+        if (event.name == 'change_buttons_color') {
+          if (event.type == MaterialColor) {
+            buttonsColorController.changeColor(color: event.cast());
+          } else if (event.type == String) {
+            buttonsColorController.changeColor(hexaColor: event.cast());
+          }
+        }
+
         logger.d([
           '(MicroAppExample - channel(colors) event received:',
           event.name,
@@ -73,11 +104,6 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
         event.resultSuccess('success!!!');
       },
       channels: const ['lorem', 'ipsum', 'colors'],
-    ));
-
-    registerEventHandler<String>(MicroAppEventHandler(
-      (event) {},
-      channels: const ['config'],
     ));
   }
 }

@@ -9,7 +9,7 @@ import 'micro_host.dart';
 /// [MicroHostStatelessWidget]
 abstract class MicroHostStatelessWidget extends StatelessWidget
     with MicroHost, RouterGenerator, IMicroAppBaseRoute {
-  MicroHostStatelessWidget({Key? key}) : super(key: key) {
+  MicroHostStatelessWidget({super.key}) {
     registerRoutes();
   }
 
@@ -23,7 +23,7 @@ abstract class MicroHostStatelessWidget extends StatelessWidget
 /// [MicroHostStatefulWidget]
 abstract class MicroHostStatefulWidget extends StatefulWidget
     with MicroHost, RouterGenerator, IMicroAppBaseRoute {
-  MicroHostStatefulWidget({Key? key}) : super(key: key) {
+  MicroHostStatefulWidget({super.key}) {
     registerRoutes();
   }
 

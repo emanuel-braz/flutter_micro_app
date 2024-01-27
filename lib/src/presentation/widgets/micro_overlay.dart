@@ -5,8 +5,7 @@ import '../../../../flutter_micro_app.dart';
 class MicroAppOverlay extends StatefulWidget {
   final MicroAppOverlayController controller;
   final MicroAppFloatPageBuilder? builder;
-  const MicroAppOverlay({required this.controller, this.builder, Key? key})
-      : super(key: key);
+  const MicroAppOverlay({required this.controller, this.builder, super.key});
 
   @override
   State<MicroAppOverlay> createState() => _MicroAppOverlayState();

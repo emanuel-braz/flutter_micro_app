@@ -19,8 +19,7 @@ class MicroBoardPage extends StatefulWidget {
       required this.widgetHandlers,
       required this.webviewControllers,
       this.conflictingChannels = const <String>[],
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   State<MicroBoardPage> createState() => _MicroBoardPageState();
@@ -62,7 +61,7 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
                       e,
                       conflictingChannels: widget.conflictingChannels,
                     ))
-                .toList(),
+                ,
             MicroBoardHandlerCard(
                 widgetHandlers: widget.widgetHandlers,
                 title: 'Widget Handlers',

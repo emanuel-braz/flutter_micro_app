@@ -13,8 +13,7 @@ class MicroBoardHandlerCard extends StatelessWidget {
       required this.title,
       this.titleColor,
       required this.conflictingChannels,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +49,7 @@ class MicroBoardHandlerCard extends StatelessWidget {
                       e,
                       conflictingChannels: conflictingChannels,
                     ))
-                .toList(),
+                ,
           ],
         ),
       ),
@@ -64,8 +63,8 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
   const MicroBoardHandlerCardItem(
     this._microBoardHandler, {
     required this.conflictingChannels,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,15 +8,15 @@ class MicroAppWidgetBuilder<T> extends StatefulWidget {
     required this.builder,
     this.channels = const [],
     this.initialData,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MicroAppBuilder builder;
   final List<String> channels;
   final MicroAppEvent<T>? initialData;
 
   @override
-  _MicroAppWidgetBuilderState<T> createState() =>
+  State<MicroAppWidgetBuilder> createState() =>
       _MicroAppWidgetBuilderState<T>();
 }
 

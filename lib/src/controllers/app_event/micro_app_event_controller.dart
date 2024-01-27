@@ -1,5 +1,7 @@
 // ignore_for_file: cancel_subscriptions
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -42,8 +44,9 @@ class MicroAppEventController {
 
   /// MicroAppController instance
   static MicroAppEventController instance = MicroAppEventController._();
-  MicroAppEventController._() {
+  MicroAppEventController._({bool isTest = false}) {
     _handlerRegisterDelegate = MicroAppEventDelegate();
+
     _microAppNativeService = MicroAppNativeService(_channel,
         methodCallHandler: (MethodCall call) async {
       MicroAppEventAdapter adapter = MicroAppEventJsonAdapter();
@@ -60,12 +63,82 @@ class MicroAppEventController {
             error: e);
       }
     });
+
+    if (!isTest) {
+      // Receive micro app events from devtools
+      registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
+          (method, parameters) async {
+        try {
+          _handleEvent(method, parameters);
+          return ServiceExtensionResponse.result(jsonEncode({'success': true}));
+        } catch (e) {
+          logger.e('An error occurred while dispatching events to webviews',
+              error: e);
+
+          return ServiceExtensionResponse.result(
+              jsonEncode({'success': false, 'error': e}));
+        }
+      });
+
+      // It receives requests to return MicroBoardData to devtools
+      registerExtension(Constants.devtoolsToExtensionUpdate,
+          (method, parameters) async {
+        return ServiceExtensionResponse.result(getMicroBoardData());
+      });
+    }
+  }
+
+  String getMicroBoardData() {
+    final microBoard = MicroBoard();
+
+    final microApps = microBoard.getMicroBoardApps;
+    final orphanHandlers = microBoard.getOrphanHandlers();
+    final widgetHandlers = microBoard.getWidgetsHandlers();
+    final webviewControllers = microBoard.getWebviewControllers();
+
+    final microAppsMap = microApps.map((e) => e.toMap()).toList();
+    final orphanHandlersMap = orphanHandlers.map((e) => e.toMap()).toList();
+    final widgetHandlersMap = widgetHandlers.map((e) => e.toMap()).toList();
+    final webviewControllersMap =
+        webviewControllers.map((e) => e.toMap()).toList();
+
+    final mapData = {
+      'micro_apps': microAppsMap,
+      'orphan_event_handlers': orphanHandlersMap,
+      'widget_event_handlers': widgetHandlersMap,
+      'webview_controllers': webviewControllersMap,
+    };
+
+    final jsonData = jsonEncode(mapData);
+    return jsonData;
+  }
+
+  notifyDevtoolsMicroBoardChanged() {
+    try {
+      // TODO: Not compatible with flutter stable version yet
+      // serviceManager.callServiceExtensionOnMainIsolate(
+      //   Constants.extensionToDevtoolsMicroBoardChanged,
+      //   {
+      //     'data': getMicroBoardData(),
+      //   },
+      // );
+    } catch (e) {
+      logger.e('An error occurred while dispatching events to Devtools',
+          error: e);
+    }
+  }
+
+  bool _handleEvent(String method, Map<String, String> parameters) {
+    final eventMap = jsonDecode(parameters['event']!);
+    final event = MicroAppEvent.fromMap(eventMap);
+    MicroAppEventController().emit(event, timeout: const Duration(seconds: 3));
+    return true;
   }
 
   /// ⚠️ It is used only for unit tests purposes
   @visibleForTesting
   factory MicroAppEventController.$testOnlyPurpose() =>
-      MicroAppEventController._();
+      MicroAppEventController._(isTest: true);
 
   /// [MicroAppEvent] the event that is emitted to the micro apps (Managed by event broker)
   List<Future> emit<T>(MicroAppEvent<T> event, {Duration? timeout}) {
@@ -106,6 +179,8 @@ class MicroAppEventController {
     final subscription =
         _handlerRegisterDelegate.registerHandler(stream, handler);
     _handlers.putIfAbsent(handler, () => subscription);
+
+    notifyDevtoolsMicroBoardChanged();
     return subscription;
   }
 
@@ -118,8 +193,10 @@ class MicroAppEventController {
       _handlerRegisterDelegate.resumeAllSubscriptions(_handlers);
 
   /// unregisterAllHandlers
-  Future<void> unregisterAllHandlers() =>
-      _handlerRegisterDelegate.unregisterAllSubscriptions(_handlers);
+  Future<void> unregisterAllHandlers() async {
+    await _handlerRegisterDelegate.unregisterAllSubscriptions(_handlers);
+    notifyDevtoolsMicroBoardChanged();
+  }
 
   /// unregisterHandler
   Future<MicroAppEventHandler?> unregisterHandler(
@@ -131,6 +208,8 @@ class MicroAppEventController {
     }
     await _handlerRegisterDelegate.unregisterSubscription(_handlers,
         id: id, channels: channels);
+
+    notifyDevtoolsMicroBoardChanged();
     return null;
   }
 
@@ -149,6 +228,7 @@ class MicroAppEventController {
   GenericMicroAppEventController registerWebviewController(
       {required String id,
       required GenericMicroAppEventController controller}) {
+    notifyDevtoolsMicroBoardChanged();
     return _webviewControllers[id] = controller;
   }
 
@@ -160,6 +240,8 @@ class MicroAppEventController {
       controller.dispose();
       return controller;
     }
+
+    notifyDevtoolsMicroBoardChanged();
     return null;
   }
 }

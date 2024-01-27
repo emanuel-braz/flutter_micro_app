@@ -11,7 +11,6 @@ class ExamplePage extends StatelessWidget {
       ),
       body: Container(
         alignment: Alignment.center,
-        color: Colors.green,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -17,4 +17,15 @@ class MicroBoardApp {
     required this.pages,
     required this.handlers,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type,
+      'name': name,
+      'description': description,
+      'route': route,
+      'pages': pages.map((x) => x.toMap()).toList(),
+      'handlers': handlers.map((x) => x.toMap()).toList(),
+    };
+  }
 }
