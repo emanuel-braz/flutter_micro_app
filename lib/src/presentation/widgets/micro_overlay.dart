@@ -42,7 +42,10 @@ class _MicroAppOverlayState extends State<MicroAppOverlay> {
                   controller.y += tapInfo.delta.dy;
                 }
               },
-              child: Material(child: child)),
+              child: Material(
+                child: child,
+                color: Colors.transparent,
+              )),
         );
       },
       animation: controller,
