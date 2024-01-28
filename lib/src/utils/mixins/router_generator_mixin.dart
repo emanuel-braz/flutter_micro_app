@@ -14,10 +14,10 @@ mixin RouterGenerator {
       return null;
     }
 
-    PageRoute<dynamic>? pageRoute = NavigatorInstance.getPageRoute(settings,
+    Route<dynamic>? pageRoute = NavigatorInstance.getPageRoute(settings,
         routeNativeOnError: routeNativeOnError, baseRoute: baseRoute);
     if (pageRoute == null) {
-      logger.e('Error: [onGenerateRoute] PageRoute is null',
+      logger.e('Error: [onGenerateRoute] Route is null',
           error: 'Route "${settings.name}" not found!');
     }
 

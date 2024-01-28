@@ -110,7 +110,8 @@ class MyApp extends MicroHostStatelessWidget with HandlerRegisterMixin {
         MicroAppPage<BaseHomePage>(
             route:
                 maAppBaseRoute, // or MicroAppPreferences.config.appBaseRoute.baseRoute.route
-            pageBuilder: PageBuilder(builder: (_, __) => const BaseHomePage()))
+            pageBuilder:
+                PageBuilder(widgetBuilder: (_, __) => const BaseHomePage()))
       ];
 
   // Register all [MicroApp]s in app host
@@ -208,6 +209,30 @@ class _BaseHomePageState extends State<BaseHomePage>
                                     child: child,
                                     controller: controller,
                                   ));
+                        },
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        child: const Text(
+                            'Modal (widgetBuilder + widgetRouteBuilder)'),
+                        onPressed: () {
+                          context.maNav.pushNamed(
+                              Application1Routes().popupExample,
+                              arguments:
+                                  'Using widgetBuilder + widgetRouteBuilder');
+                        },
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        child: const Text('Modal (type: PopupRoute)'),
+                        onPressed: () {
+                          context.maNav.pushNamed(
+                              Application1Routes().modalExample,
+                              arguments: 'Using [PopupRoute] as Page');
                         },
                       ),
                       const SizedBox(

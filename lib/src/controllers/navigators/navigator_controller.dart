@@ -52,8 +52,8 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   Widget getPageWidget(String route, BuildContext context,
           {Object? arguments, String? type, Widget? orElse}) =>
       getPageBuilder(route)
-          ?.builder
-          .call(context, RouteSettings(arguments: arguments, name: route)) ??
+          ?.widgetBuilder
+          ?.call(context, RouteSettings(arguments: arguments, name: route)) ??
       orElse ??
       const SizedBox.shrink();
 
@@ -199,7 +199,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
   }
 
   /// [getPageRoute]
-  PageRoute? getPageRoute(RouteSettings settings,
+  Route? getPageRoute(RouteSettings settings,
       {MicroAppBaseRoute? baseRoute, bool? routeNativeOnError}) {
     final routeName = settings.name;
     final routeArguments = settings.arguments;
@@ -212,26 +212,41 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
       return null;
     }
 
-    final transitionType = pageBuilder.transitionType ??
-        MicroAppPreferences.config.pageTransitionType;
-
-    if (transitionType != MicroPageTransitionType.platform) {
-      return MicroPageTransition(
-          settings: RouteSettings(arguments: routeArguments, name: routeName),
-          pageBuilder: pageBuilder.builder,
-          type: transitionType);
-    } else {
-      if (isIOS) {
-        return CupertinoPageRoute(
-          builder: (context) => pageBuilder.builder(context,
-              RouteSettings(arguments: routeArguments, name: routeName)),
+    if (pageBuilder.hasModalBuilder) {
+      return pageBuilder.modalBuilder!(settings);
+    } else if (pageBuilder.hasWidgetBuilder) {
+      if (pageBuilder.hasWidgetRouteBuilder) {
+        return pageBuilder.widgetRouteBuilder!(
+          Builder(
+              builder: (context) =>
+                  pageBuilder.widgetBuilder!(context, settings)),
         );
       } else {
-        return MaterialPageRoute(
-          builder: (context) => pageBuilder.builder(context,
-              RouteSettings(arguments: routeArguments, name: routeName)),
-        );
+        final transitionType = pageBuilder.transitionType ??
+            MicroAppPreferences.config.pageTransitionType;
+
+        if (transitionType != MicroPageTransitionType.platform) {
+          return MicroPageTransition(
+              settings:
+                  RouteSettings(arguments: routeArguments, name: routeName),
+              pageBuilder: pageBuilder.widgetBuilder!,
+              type: transitionType);
+        } else {
+          if (isIOS) {
+            return CupertinoPageRoute(
+              builder: (context) => pageBuilder.widgetBuilder!(context,
+                  RouteSettings(arguments: routeArguments, name: routeName)),
+            );
+          } else {
+            return MaterialPageRoute(
+              builder: (context) => pageBuilder.widgetBuilder!(context,
+                  RouteSettings(arguments: routeArguments, name: routeName)),
+            );
+          }
+        }
       }
+    } else {
+      return null;
     }
   }
 

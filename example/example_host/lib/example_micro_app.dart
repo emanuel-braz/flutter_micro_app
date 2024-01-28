@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
+import 'pages/route_builder_page.dart';
+
 class ColorController extends ValueNotifier<MaterialColor> {
   ColorController([MaterialColor color = Colors.amber]) : super(color);
   void changeColor({MaterialColor? color, String? hexaColor}) {
@@ -54,17 +56,52 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
             description: 'This is the example page',
             route: routes.pageExample,
             pageBuilder: PageBuilder(
-                builder: (context, arguments) => const ExamplePage())),
+                widgetBuilder: (context, arguments) => const ExamplePage())),
         MicroAppPage(
             route: routes.pageExampleMaterialApp,
             pageBuilder: PageBuilder(
-                builder: (context, arguments) => const MaterialAppPage(),
+                widgetBuilder: (context, arguments) => const MaterialAppPage(),
                 transitionType: MicroPageTransitionType.slideZoomUp)),
         MicroAppPage<ExamplePageFragment>(
             description: 'Fragment can be used as a simple Widget',
             route: routes.pageExampleFragment,
             pageBuilder: PageBuilder(
-                builder: (context, arguments) => const ExamplePageFragment())),
+                widgetBuilder: (context, arguments) =>
+                    const ExamplePageFragment())),
+        MicroAppPage<PopupExamplePage>(
+          description: 'Popups can be used through WidgetRouteBuilder',
+          route: routes.popupExample,
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) =>
+                PopupExamplePage(title: settings.arguments as String),
+            widgetRouteBuilder: (page) => PageRouteBuilder(
+                barrierColor: Colors.black.withOpacity(0.2),
+                barrierDismissible: false,
+                opaque:
+                    false, // IMPORTANT to remove the black background when using modals with transparent background
+                transitionsBuilder: (BuildContext context,
+                    Animation<double> animation,
+                    Animation<double> secondaryAnimation,
+                    Widget child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 500),
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                        Animation<double> secondaryAnimation) =>
+                    page),
+          ),
+        ),
+        MicroAppPage(
+          description: 'ModalBuilder can be used to show [PopupRoute]',
+          route: routes.modalExample,
+          pageBuilder: PageBuilder(
+            modalBuilder: (settings) => ModalExamplePage(
+                title: '${settings.arguments}'), // extendes PopupRoute
+          ),
+        ),
       ];
 
   @override
