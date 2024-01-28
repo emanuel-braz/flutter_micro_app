@@ -91,6 +91,7 @@ class _ColorsFloatFrameState extends State<ColorsFloatFrame> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.white,
       padding: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
       child: Column(
         mainAxisSize: MainAxisSize.min,
