@@ -29,4 +29,3 @@
 build/
 .vscode/dart.code-snippets
 !extension/devtools/**
-.vscode/settings.json
