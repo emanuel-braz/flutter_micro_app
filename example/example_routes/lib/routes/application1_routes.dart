@@ -8,4 +8,6 @@ class Application1Routes extends MicroAppBaseRoute {
   String get pageExampleMaterialApp =>
       path(['material_app_page', 'all', 'examples']);
   String get pageExampleFragment => path(['fragment']);
+  String get popupExample => path(['popup']);
+  String get modalExample => path(['modal']);
 }

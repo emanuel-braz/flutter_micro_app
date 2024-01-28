@@ -26,29 +26,30 @@ class MicroApplication2 extends MicroAppWithBaseRoute
                 'This route is responsible to expose internal routes. Using the the custom navigator [MicroAppNavigatorWidget] is possible to nest navigators.',
             route: baseRoute.microAppNavigator,
             pageBuilder: PageBuilder(
-              builder: (_, __) => MicroAppNavigatorWidget(
+              widgetBuilder: (_, __) => MicroAppNavigatorWidget(
                   microBaseRoute: baseRoute,
                   initialRoute: Application2Routes().page1),
               transitionType: MicroPageTransitionType.rippleLeftDown,
             )),
         MicroAppPage<Page1>(
             route: baseRoute.page1,
-            pageBuilder: PageBuilder(builder: (_, settings) => const Page1())),
+            pageBuilder:
+                PageBuilder(widgetBuilder: (_, settings) => const Page1())),
         MicroAppPage(
           route: baseRoute.page2,
           pageBuilder: PageBuilder(
-              builder: (_, settings) =>
+              widgetBuilder: (_, settings) =>
                   Page2(title: settings.arguments as String?)),
         ),
         MicroAppPage<Page3>(
             route: baseRoute.page3,
-            pageBuilder: PageBuilder(builder: (_, __) => const Page3())),
+            pageBuilder: PageBuilder(widgetBuilder: (_, __) => const Page3())),
         MicroAppPage<ColorsFloatPage>(
             description:
                 'This page is responsible to change buttons and background colors',
             route: baseRoute.pageColors,
             pageBuilder:
-                PageBuilder(builder: (_, __) => const ColorsFloatPage())),
+                PageBuilder(widgetBuilder: (_, __) => const ColorsFloatPage())),
       ];
 
   @override
