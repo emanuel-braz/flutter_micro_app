@@ -57,7 +57,7 @@ class Application1MicroApp extends MicroApp {
           description: 'The initial page of the micro app 1',
           route: routes.baseRoute.route, 
           pageBuilder: PageBuilder(
-            builder: (context, settings) => const Initial(),
+            widgetBuilder: (context, settings) => const Initial(),
             transitionType: MicroPageTransitionType.slideZoomUp
           ),
         ),
@@ -66,7 +66,7 @@ class Application1MicroApp extends MicroApp {
           description: 'Display all buttons of the showcase',
           route: routes.page1, 
           pageBuilder: PageBuilder(
-            builder:  (context, settings) => const Page1()
+            modalBuilder: (settings) => Page1(), // if Page1 extends PopupRoute, use `modalBuilder`
           )
         ),
 
@@ -74,7 +74,7 @@ class Application1MicroApp extends MicroApp {
           description: 'The page two',
           route: routes.page2, 
           pageBuilder: PageBuilder(
-          builder: (context, settings) {
+          widgetBuilder: (context, settings) {
             final page2Params.fromMap(settings.arguments);
             return Page2(params: page2Params);
           }
@@ -114,9 +114,17 @@ class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget o
         MicroAppPage(
           route:  '/host_home_page', 
           pageBuilder: PageBuilder(
-            builder: (_, __) => const HostHomePage()
+            widgetBuilder: (_, __) => const HostHomePage()
           ),
           description: 'The initial page of the application',
+        ),
+         MicroAppPage(
+          route: '/modal_page',
+          pageBuilder: PageBuilder(
+            modalBuilder: (settings) => ModalExamplePage(
+                title: '${settings.arguments}'), // extends PopupRoute
+          ),
+          description: 'ModalBuilder can be used to show [PopupRoute]',
         )
       ];
 
@@ -586,7 +594,7 @@ List<MicroAppPage> get pages => [
       route: routes.baseRoute.route,
       description: 'The nested navigator',
       pageBuilder: PageBuilder(
-        builder: (context, arguments) => 
+        widgetBuilder: (context, arguments) => 
           MicroAppNavigatorWidget(
             microBaseRoute: baseRoute,
             initialRoute: Application2Routes().page1)
