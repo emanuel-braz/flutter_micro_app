@@ -1,3 +1,15 @@
+## 0.14.0
+[2024-01-28]
+#### Break
+- `PageBuilder.builder` removed!
+``` diff
+- PageBuilder.builder
++ PageBuilder.widgetBuilder
+```
+
+#### Feat
+- Add `WidgetRouteBuilder` and `ModalBuilder`. Now it's possible to route pre-built modals (ex. `PopupRoute`) or customize them.
+
 ## 0.13.0
 [2024-01-27]
 #### Chore
