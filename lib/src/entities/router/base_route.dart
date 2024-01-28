@@ -1,6 +1,6 @@
 import '../micro_app_preferences.dart';
 
-abstract class IMicroAppBaseRoute {
+abstract mixin class IMicroAppBaseRoute {
   MicroAppRoute get baseRoute;
 }
 

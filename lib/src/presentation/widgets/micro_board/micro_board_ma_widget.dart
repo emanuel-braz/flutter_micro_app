@@ -8,8 +8,7 @@ class MicroBoardItemWidget extends StatelessWidget {
   final MicroBoardApp app;
   final List<String> conflictingChannels;
   const MicroBoardItemWidget(this.app,
-      {required this.conflictingChannels, Key? key})
-      : super(key: key);
+      {required this.conflictingChannels, super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -14,4 +14,12 @@ class Constants {
   static const flutterMicroAppEvent = 'FlutterMicroAppEvent';
 
   static const String notTyped = 'Not Typed';
+
+  static const String devtoolsExtensionChannel = 'ext.dev.emanuelbraz.fma';
+  static const String devtoolsToExtensionUpdate =
+      '$devtoolsExtensionChannel.devtoolsToExtensionUpdate';
+  static const String devtoolsToExtensionMicroAppEvent =
+      '$devtoolsExtensionChannel.devtoolsToExtensionMicroAppEvent';
+  static const String extensionToDevtoolsMicroBoardChanged =
+      '$devtoolsExtensionChannel.extensionToDevtoolsMicroBoardChanged';
 }

@@ -7,9 +7,9 @@ class MicroBoardCardHandlers extends StatelessWidget {
   final List<String> conflictingChannels;
   const MicroBoardCardHandlers({
     required this.conflictingChannels,
-    Key? key,
+    super.key,
     required this.app,
-  }) : super(key: key);
+  });
 
   final MicroBoardApp app;
 
@@ -89,7 +89,7 @@ class MicroBoardCardHandlers extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

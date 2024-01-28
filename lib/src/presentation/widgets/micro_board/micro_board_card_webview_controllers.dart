@@ -10,8 +10,8 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
     required this.webviewControllers,
     required this.title,
     this.titleColor,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
               Divider(
                 thickness: 2,
               ),
-            ...webviewControllers.map((e) => _MicroBoardCardItem(e)).toList(),
+            ...webviewControllers.map((e) => _MicroBoardCardItem(e)),
           ],
         ),
       ),
@@ -53,10 +53,7 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
 class _MicroBoardCardItem extends StatelessWidget {
   final GenericMicroAppEventController _webviewController;
 
-  const _MicroBoardCardItem(
-    this._webviewController, {
-    Key? key,
-  }) : super(key: key);
+  const _MicroBoardCardItem(this._webviewController);
 
   @override
   Widget build(BuildContext context) {

@@ -161,7 +161,7 @@ void main() {
 
 // fixtures
 class MyWidget extends StatefulWidget {
-  const MyWidget({Key? key}) : super(key: key);
+  const MyWidget({super.key});
 
   @override
   MyWidgetState createState() => MyWidgetState();
@@ -187,7 +187,7 @@ class MyWidgetState extends State<MyWidget> with HandlerRegisterStateMixin {
 }
 
 class MyWidget2 extends StatefulWidget {
-  const MyWidget2({Key? key}) : super(key: key);
+  const MyWidget2({super.key});
 
   @override
   MyWidgetState2 createState() => MyWidgetState2();
@@ -215,7 +215,7 @@ class MyWidgetState2 extends State<MyWidget2> with HandlerRegisterStateMixin {
 }
 
 class MyWidget3 extends StatefulWidget {
-  const MyWidget3({Key? key}) : super(key: key);
+  const MyWidget3({super.key});
 
   @override
   MyWidgetState3 createState() => MyWidgetState3();

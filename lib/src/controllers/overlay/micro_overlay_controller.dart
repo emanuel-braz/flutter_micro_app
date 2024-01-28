@@ -73,7 +73,7 @@ class MicroAppOverlayController extends ChangeNotifier {
       },
     );
     if (context != null) {
-      Overlay.of(context)?.insert(entry!);
+      Overlay.of(context).insert(entry!);
     } else {
       NavigatorInstance.navigatorKey.currentState?.overlay?.insert(entry!);
     }

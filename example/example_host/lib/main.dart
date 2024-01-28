@@ -127,89 +127,105 @@ class BaseHomePage extends StatefulWidget {
   State<BaseHomePage> createState() => _BaseHomePageState();
 }
 
-class _BaseHomePageState extends State<BaseHomePage> {
+class _BaseHomePageState extends State<BaseHomePage>
+    with HandlerRegisterStateMixin {
   @override
   void initState() {
     super.initState();
     MicroBoard.showButton();
+
+    // Created this handler just to example purpose
+    // This handler will be called when fma_extension sends a message to Flutter
+    registerEventHandler(MicroAppEventHandler((event) {
+      String? message = event.cast();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(message ?? 'Unknown'),
+      ));
+      event.resultSuccess(true);
+    }, channels: const ['show_snackbar'], distinct: false));
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-        animation: Listenable.merge(<Listenable>[
-          backgroundColorController,
-          buttonsColorController,
-        ]),
-        builder: (context, child) {
-          return Container(
-              padding: const EdgeInsets.all(16),
-              color: backgroundColorController.value,
-              alignment: Alignment.center,
-              child: ElevatedButtonTheme(
-                data: ElevatedButtonThemeData(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          buttonsColorController.value)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ElevatedButton(
-                      child: const Text('Open Example MaterialApp'),
-                      onPressed: () {
-                        context.maNav.pushNamed(
-                            Application1Routes().pageExampleMaterialApp);
-                      },
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    ElevatedButton(
-                      child: const Text('Open Nested MicroAppNavigator'),
-                      onPressed: () {
-                        context.maNav.pushNamed(
-                            Application2Routes().microAppNavigator,
-                            arguments: 'microAppNavigator argument');
-                      },
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    ElevatedButton(
-                      child: const Text('Open a float page'),
-                      onPressed: () {
-                        final controller = MicroAppOverlayController(
-                          isDraggable: true,
-                          position: Offset(
-                              (MediaQuery.of(context).size.width * .05), 100),
-                          size:
-                              Size(MediaQuery.of(context).size.width * .9, 160),
-                          route: Application2Routes().pageColors,
-                        );
-                        controller.open(
-                            builder: (child, controller) => ColorsFloatFrame(
-                                  child: child,
-                                  controller: controller,
-                                ));
-                      },
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    SizedBox(
-                        height: 50,
-                        child: context.maNav.getPageWidget(
-                            Application1Routes().pageExampleFragment,
-                            orElse: Container(
-                              height: 200,
-                              width: 200,
-                              color: Colors.red,
-                            )))
-                  ],
-                ),
-              ));
-        });
+    return Scaffold(
+      body: AnimatedBuilder(
+          animation: Listenable.merge(<Listenable>[
+            backgroundColorController,
+            buttonsColorController,
+          ]),
+          builder: (context, child) {
+            return Container(
+                padding: const EdgeInsets.all(16),
+                color: backgroundColorController.value,
+                alignment: Alignment.center,
+                child: ElevatedButtonTheme(
+                  data: ElevatedButtonThemeData(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            buttonsColorController.value),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton(
+                        child: const Text('Open Example MaterialApp'),
+                        onPressed: () {
+                          context.maNav.pushNamed(
+                              Application1Routes().pageExampleMaterialApp);
+                        },
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        child: const Text('Open Nested MicroAppNavigator'),
+                        onPressed: () {
+                          context.maNav.pushNamed(
+                              Application2Routes().microAppNavigator,
+                              arguments: 'microAppNavigator argument');
+                        },
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      ElevatedButton(
+                        child: const Text('Open a float page'),
+                        onPressed: () {
+                          final controller = MicroAppOverlayController(
+                            isDraggable: true,
+                            position: Offset(
+                                (MediaQuery.of(context).size.width * .05), 100),
+                            size: Size(
+                                MediaQuery.of(context).size.width * .9, 160),
+                            route: Application2Routes().pageColors,
+                          );
+                          controller.open(
+                              builder: (child, controller) => ColorsFloatFrame(
+                                    child: child,
+                                    controller: controller,
+                                  ));
+                        },
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      SizedBox(
+                          height: 50,
+                          child: context.maNav.getPageWidget(
+                              Application1Routes().pageExampleFragment,
+                              orElse: Container(
+                                height: 200,
+                                width: 200,
+                                color: Colors.red,
+                              )))
+                    ],
+                  ),
+                ));
+          }),
+    );
   }
 }

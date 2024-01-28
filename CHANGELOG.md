@@ -1,3 +1,9 @@
+## 0.13.0
+[2024-01-27]
+#### Chore
+- Bump Flutter version '>=3.0.0'
+- Add DevTools Extension
+
 ## 0.12.1
 [2023-07-20]
 #### Fixed

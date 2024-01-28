@@ -1,6 +1,6 @@
 analyze:
-	@flutter format . \
-	&& flutter analyze \
+	@dart format . \
+	&& dart analyze \
 	&& flutter test \
 	&& dart pub global activate pana \
 	&& dart pub global run pana .

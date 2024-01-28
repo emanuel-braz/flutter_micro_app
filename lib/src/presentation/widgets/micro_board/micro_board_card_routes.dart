@@ -4,9 +4,9 @@ import '../../../entities/micro_board/micro_board_app.dart';
 
 class MicroBoardCardRoutes extends StatelessWidget {
   const MicroBoardCardRoutes({
-    Key? key,
+    super.key,
     required this.app,
-  }) : super(key: key);
+  });
 
   final MicroBoardApp app;
 

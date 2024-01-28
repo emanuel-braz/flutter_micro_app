@@ -8,4 +8,12 @@ class MicroBoardRoute {
     required this.widget,
     required this.description,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'route': route,
+      'widget': widget,
+      'description': description,
+    };
+  }
 }

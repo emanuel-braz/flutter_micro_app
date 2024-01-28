@@ -1,7 +1,7 @@
 import '../../flutter_micro_app.dart';
 
 /// [MicroHost] contract
-abstract class MicroHost implements MicroApp {
+abstract mixin class MicroHost implements MicroApp {
   static bool _microAppsRegistered = false;
 
   static List<MicroApp> microApps = [];
