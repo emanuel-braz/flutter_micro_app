@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:example_external/pages/colors_float_page.dart';
 import 'package:example_external/pages/page1.dart';
 import 'package:example_external/pages/page3.dart';
@@ -16,6 +18,8 @@ class MicroApplication2 extends MicroAppWithBaseRoute
         data.name,
         data.payload
       ]);
+      final Map<String, dynamic> payload = jsonDecode(data.payload);
+      return;
     }, id: '123'));
   }
 

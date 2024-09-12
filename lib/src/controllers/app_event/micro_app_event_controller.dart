@@ -70,7 +70,7 @@ class MicroAppEventController {
       registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
           (method, parameters) async {
         try {
-          _handleEvent(method, parameters);
+          _handleDevToolsEvent(method, parameters);
           return ServiceExtensionResponse.result(jsonEncode({'success': true}));
         } catch (e) {
           logger.e('An error occurred while dispatching events to webviews',
@@ -129,10 +129,10 @@ class MicroAppEventController {
     }
   }
 
-  bool _handleEvent(String method, Map<String, String> parameters) {
+  bool _handleDevToolsEvent(String method, Map<String, String> parameters) {
     final eventMap = jsonDecode(parameters['event']!);
     final event = MicroAppEvent.fromMap(eventMap);
-    MicroAppEventController().emit(event, timeout: const Duration(seconds: 3));
+    MicroAppEventController().emit(event);
     return true;
   }
 

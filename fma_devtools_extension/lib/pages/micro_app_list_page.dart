@@ -59,7 +59,7 @@ class _MicroAppListState extends State<MicroAppList> {
                     return ListTile(
                       onTap: () {
                         setState(() {
-                          pages = microApp.pages;
+                          pages = microApp.pages ?? [];
                         });
                       },
                       title: Text(microApp.name),
