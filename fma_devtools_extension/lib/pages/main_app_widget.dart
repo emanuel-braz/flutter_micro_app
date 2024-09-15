@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fma_devtools_extension/main.dart';
 
-import '../src/models/micro_board_app.dart';
 import 'event_dispatcher_page.dart';
 import 'micro_app_list_page.dart';
+import 'micro_board/micro_board_page.dart';
 
 class MainAppWidget extends StatefulWidget {
-  final List<MicroBoardApp> microApps;
+  final MicroBoardData microBoardData;
   final void Function()? updateView;
 
   const MainAppWidget(
-      {super.key, required this.microApps, required this.updateView});
+      {super.key, required this.microBoardData, required this.updateView});
 
   @override
   State createState() => _MainAppWidgetState();
@@ -23,11 +24,18 @@ class _MainAppWidgetState extends State<MainAppWidget> {
   @override
   void initState() {
     _bars = [
+      MicroBoardPage(
+        apps: widget.microBoardData.microApps,
+        orphanHandlers: widget.microBoardData.orphanHandlers,
+        widgetHandlers: widget.microBoardData.widgetHandlers,
+        webviewControllers: widget.microBoardData.webviewControllers,
+        conflictingChannels: widget.microBoardData.conflictingChannels,
+      ),
       MicroAppList(
-        microApps: widget.microApps,
+        microApps: widget.microBoardData.microApps,
         updateView: widget.updateView,
       ),
-      const EventDispatcher(),
+      EventDispatcher(microBoardData: widget.microBoardData),
     ];
 
     // TODO: Not compatible with Flutter stable version yet
@@ -58,6 +66,10 @@ class _MainAppWidgetState extends State<MainAppWidget> {
           });
         },
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Micro Board',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.import_contacts),
             label: 'Micro Pages',

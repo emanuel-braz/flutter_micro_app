@@ -140,7 +140,7 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
 
         event.resultSuccess('success!!!');
       },
-      channels: const ['lorem', 'ipsum', 'colors'],
+      channels: const ['my_channel_with_conflict', 'ipsum', 'colors'],
     ));
   }
 }

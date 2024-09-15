@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:fma_devtools_extension/main.dart';
 
 class EventDispatcher extends StatefulWidget {
-  const EventDispatcher({super.key});
+  final MicroBoardData microBoardData;
+  const EventDispatcher({required this.microBoardData, super.key});
 
   @override
   State<EventDispatcher> createState() => _EventDispatcherState();
@@ -17,6 +19,23 @@ class _EventDispatcherState extends State<EventDispatcher> {
 
   @override
   Widget build(BuildContext context) {
+    final allChannels = <String>{};
+
+    for (var app in widget.microBoardData.microApps) {
+      final handlers = app.handlers ?? [];
+      for (var handler in handlers) {
+        allChannels.addAll(handler.channels);
+      }
+    }
+
+    for (var handler in widget.microBoardData.orphanHandlers) {
+      allChannels.addAll(handler.channels);
+    }
+
+    for (var handler in widget.microBoardData.widgetHandlers) {
+      allChannels.addAll(handler.channels);
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Micro App Event Dispatcher'),
@@ -25,14 +44,37 @@ class _EventDispatcherState extends State<EventDispatcher> {
           children: [
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: _txtChannels,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Channels*',
-                  hintText: 'Comma separated channels',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                ),
+              child: Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<String>.empty();
+                  }
+                  return allChannels.where((String option) {
+                    return option
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                fieldViewBuilder:
+                    (context, controller, focusNode, onFieldSubmitted) {
+                  controller.addListener(() {
+                    _txtChannels.text = controller.value.text;
+                  });
+
+                  return TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Channel',
+                      hintText: 'Comma separated channels',
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                    ),
+                    onFieldSubmitted: (value) {
+                      onFieldSubmitted();
+                    },
+                  );
+                },
               ),
             ),
             Padding(

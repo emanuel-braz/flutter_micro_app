@@ -19,6 +19,8 @@ class _MicroAppListState extends State<MicroAppList> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         Column(
@@ -59,7 +61,7 @@ class _MicroAppListState extends State<MicroAppList> {
                     return ListTile(
                       onTap: () {
                         setState(() {
-                          pages = microApp.pages;
+                          pages = microApp.pages ?? [];
                         });
                       },
                       title: Text(microApp.name),
@@ -73,6 +75,9 @@ class _MicroAppListState extends State<MicroAppList> {
                   itemBuilder: (context, index) {
                     final page = pages[index];
                     return Card(
+                      color: isDark
+                          ? Colors.black
+                          : Theme.of(context).secondaryHeaderColor,
                       child: ListTile(
                         title: Text(page.route,
                             style: Theme.of(context).textTheme.titleLarge),
