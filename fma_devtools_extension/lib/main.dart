@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:fma_devtools_extension/src/models/micro_board_webview.dart';
 
 import 'pages/main_app_widget.dart';
+import 'pages/micro_board/micro_board_util.dart';
+import 'src/helpers/excel_helper.dart';
 import 'src/models/micro_board_app.dart';
 import 'src/models/micro_board_handler.dart';
 
@@ -60,6 +62,15 @@ class _FmaDevtoolsExtensionState extends State<FmaDevtoolsExtension> {
                     icon: const Icon(Icons.refresh),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: () {
+                      ExcelHelper().create(microBoard);
+                    },
+                    icon: const Icon(Icons.file_download_rounded),
+                  ),
+                ),
               ],
             ),
             body: microBoardData == null
@@ -97,22 +108,32 @@ class MicroBoardData {
       );
     }
 
+    final apps = (map['micro_apps'] as List? ?? [])
+        .map((e) => MicroBoardApp.fromMap(e))
+        .toList();
+
+    final orphans = (map['orphan_event_handlers'] as List? ?? [])
+        .map((e) => MicroBoardHandler.fromMap(e))
+        .toList();
+
+    final widgets = (map['widget_event_handlers'] as List? ?? [])
+        .map((e) => MicroBoardHandler.fromMap(e))
+        .toList();
+
+    final webviews = (map['webview_controllers'] as List? ?? [])
+        .map((e) => MicroBoardWebview.fromMap(e))
+        .toList();
+
     return MicroBoardData(
-      microApps: (map['micro_apps'] as List? ?? [])
-          .map((e) => MicroBoardApp.fromMap(e))
-          .toList(),
-      orphanHandlers: (map['orphan_event_handlers'] as List? ?? [])
-          .map((e) => MicroBoardHandler.fromMap(e))
-          .toList(),
-      widgetHandlers: (map['widget_event_handlers'] as List? ?? [])
-          .map((e) => MicroBoardHandler.fromMap(e))
-          .toList(),
-      conflictingChannels: (map['conflicting_channels'] as List? ?? [])
-          .map((e) => e as String)
-          .toList(),
-      webviewControllers: (map['webview_controllers'] as List? ?? [])
-          .map((e) => MicroBoardWebview.fromMap(e))
-          .toList(),
+      microApps: apps,
+      orphanHandlers: orphans,
+      widgetHandlers: widgets,
+      webviewControllers: webviews,
+      conflictingChannels: MicroBoardUtil.getConflictChannels(
+        apps,
+        orphans,
+        widgets,
+      ),
     );
   }
 }

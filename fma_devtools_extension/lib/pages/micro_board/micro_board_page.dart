@@ -93,8 +93,8 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
               controller: _filterInput,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Search',
-                hintText: 'Search for a route',
+                labelText: 'Search for a route',
+                hintText: 'route path or description',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (value) {

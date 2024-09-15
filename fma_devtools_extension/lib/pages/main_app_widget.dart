@@ -24,11 +24,6 @@ class _MainAppWidgetState extends State<MainAppWidget> {
   @override
   void initState() {
     _bars = [
-      MicroAppList(
-        microApps: widget.microBoardData.microApps,
-        updateView: widget.updateView,
-      ),
-      EventDispatcher(microBoardData: widget.microBoardData),
       MicroBoardPage(
         apps: widget.microBoardData.microApps,
         orphanHandlers: widget.microBoardData.orphanHandlers,
@@ -36,6 +31,11 @@ class _MainAppWidgetState extends State<MainAppWidget> {
         webviewControllers: widget.microBoardData.webviewControllers,
         conflictingChannels: widget.microBoardData.conflictingChannels,
       ),
+      MicroAppList(
+        microApps: widget.microBoardData.microApps,
+        updateView: widget.updateView,
+      ),
+      EventDispatcher(microBoardData: widget.microBoardData),
     ];
 
     // TODO: Not compatible with Flutter stable version yet
@@ -67,16 +67,16 @@ class _MainAppWidgetState extends State<MainAppWidget> {
         },
         items: const [
           BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Micro Board',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.import_contacts),
             label: 'Micro Pages',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Event Dispatcher',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Micro Board',
           ),
         ],
       ),

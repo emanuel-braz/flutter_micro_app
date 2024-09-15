@@ -17,6 +17,10 @@ class MicroApplication2 extends MicroAppWithBaseRoute
         data.payload
       ]);
     }, id: '123'));
+
+    registerEventHandler(MicroAppEventHandler((data) {
+      logger.d('(MicroAppExampleExternal - Lorem Channel) received here!');
+    }, channels: const ['my_channel_with_conflict']));
   }
 
   @override

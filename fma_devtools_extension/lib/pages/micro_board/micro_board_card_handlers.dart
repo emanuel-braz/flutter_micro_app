@@ -52,7 +52,6 @@ class MicroBoardCardHandlers extends StatelessWidget {
               final channels = List.from(e.channels);
               final conflicts = List.from(conflictingChannels);
               channels.removeWhere((item) => !conflicts.contains(item));
-              final containsConflict = channels.isNotEmpty;
 
               return Card(
                 shape: RoundedRectangleBorder(
@@ -85,11 +84,11 @@ class MicroBoardCardHandlers extends StatelessWidget {
                                 label: Text(
                                   e,
                                   style: TextStyle(
-                                      color: containsConflict
+                                      color: conflicts.contains(e)
                                           ? Colors.white
                                           : Colors.black),
                                 ),
-                                backgroundColor: containsConflict
+                                backgroundColor: conflicts.contains(e)
                                     ? Colors.red
                                     : Colors.green[200]))
                             .toList(),
