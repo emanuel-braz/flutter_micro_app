@@ -13,11 +13,16 @@ class MicroBoardCardRoutes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pages = app.pages ?? [];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor =
+        isDark ? Colors.grey[800] : Theme.of(context).secondaryHeaderColor;
+    final textColor = isDark ? Colors.grey[100] : Colors.grey[900];
+
     return Card(
-      margin: EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4),
       color: Colors.grey[100],
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -25,7 +30,8 @@ class MicroBoardCardRoutes extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Text('Routes', style: TextStyle(fontSize: 18)),
+                  child: Text('Routes',
+                      style: TextStyle(fontSize: 18, color: Colors.grey[900])),
                 ),
                 Spacer(),
                 Chip(
@@ -82,12 +88,12 @@ class MicroBoardCardRoutes extends StatelessWidget {
                               ),
                             ),
                           Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: cardColor,
                               shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(8),
                                 bottomRight: Radius.circular(8),
                               ),
@@ -99,9 +105,11 @@ class MicroBoardCardRoutes extends StatelessWidget {
                                   'route: ',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.grey[700]),
+                                      color: textColor),
                                 ),
-                                Expanded(child: Text(e.route)),
+                                Expanded(
+                                    child: Text(e.route,
+                                        style: TextStyle(color: textColor))),
                               ],
                             ),
                           )

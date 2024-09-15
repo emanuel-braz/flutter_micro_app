@@ -107,12 +107,16 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Chip(
-                      label: Text(_microBoardHandler.type),
+                      label: Text(_microBoardHandler.type,
+                          style: TextStyle(
+                            color: Colors.black,
+                          )),
                       backgroundColor:
                           _microBoardHandler.type == Constants.notTyped
                               ? Colors.amber
                               : Colors.blue[200],
                     ),
+                    const SizedBox(height: 4),
                     Wrap(
                       spacing: 4,
                       runSpacing: 0,
@@ -123,7 +127,7 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
                                   style: TextStyle(
                                       color: conflictingChannels.contains(e)
                                           ? Colors.white
-                                          : null),
+                                          : Colors.black),
                                 ),
                                 backgroundColor: conflictingChannels.contains(e)
                                     ? Colors.red

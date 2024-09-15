@@ -15,10 +15,11 @@ class MicroBoardCardHandlers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final handlers = app.handlers ?? [];
 
     return Card(
-      margin: EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4),
       color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -29,9 +30,13 @@ class MicroBoardCardHandlers extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Text('Handlers', style: TextStyle(fontSize: 18)),
+                  child: Text('Handlers',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[900],
+                      )),
                 ),
-                Spacer(),
+                const Spacer(),
                 Chip(
                   backgroundColor: Theme.of(context).primaryColor,
                   label: Text(handlers.length.toString(),
@@ -40,7 +45,7 @@ class MicroBoardCardHandlers extends StatelessWidget {
               ],
             ),
             if (handlers.isNotEmpty)
-              Divider(
+              const Divider(
                 thickness: 2,
               ),
             ...handlers.map((e) {
@@ -58,18 +63,20 @@ class MicroBoardCardHandlers extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
                   ),
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Chip(
-                        label: Text(e.type),
+                        label: Text(e.type,
+                            style: const TextStyle(color: Colors.black)),
                         backgroundColor: e.type == Constants.notTyped
                             ? Colors.amber
                             : Colors.blue[200],
                       ),
+                      const SizedBox(height: 4),
                       Wrap(
                         spacing: 4,
                         runSpacing: 0,
@@ -80,7 +87,7 @@ class MicroBoardCardHandlers extends StatelessWidget {
                                   style: TextStyle(
                                       color: containsConflict
                                           ? Colors.white
-                                          : null),
+                                          : Colors.black),
                                 ),
                                 backgroundColor: containsConflict
                                     ? Colors.red

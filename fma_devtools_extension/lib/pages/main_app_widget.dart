@@ -3,6 +3,7 @@ import 'package:fma_devtools_extension/main.dart';
 
 import 'event_dispatcher_page.dart';
 import 'micro_app_list_page.dart';
+import 'micro_board/micro_board_page.dart';
 
 class MainAppWidget extends StatefulWidget {
   final MicroBoardData microBoardData;
@@ -27,7 +28,14 @@ class _MainAppWidgetState extends State<MainAppWidget> {
         microApps: widget.microBoardData.microApps,
         updateView: widget.updateView,
       ),
-      const EventDispatcher(),
+      EventDispatcher(microBoardData: widget.microBoardData),
+      MicroBoardPage(
+        apps: widget.microBoardData.microApps,
+        orphanHandlers: widget.microBoardData.orphanHandlers,
+        widgetHandlers: widget.microBoardData.widgetHandlers,
+        webviewControllers: widget.microBoardData.webviewControllers,
+        conflictingChannels: widget.microBoardData.conflictingChannels,
+      ),
     ];
 
     // TODO: Not compatible with Flutter stable version yet
@@ -65,6 +73,10 @@ class _MainAppWidgetState extends State<MainAppWidget> {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Event Dispatcher',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Micro Board',
           ),
         ],
       ),

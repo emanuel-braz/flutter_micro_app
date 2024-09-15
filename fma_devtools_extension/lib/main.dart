@@ -44,20 +44,22 @@ class _FmaDevtoolsExtensionState extends State<FmaDevtoolsExtension> {
 
   @override
   Widget build(BuildContext context) {
-    // final microApps = (microBoardData?['micro_apps'] as List? ?? [])
-    //     .map((e) => MicroBoardApp.fromMap(e))
-    //     .toList();
-
     final MicroBoardData microBoard = MicroBoardData.fromMap(microBoardData);
 
     return DevToolsExtension(
         child: Scaffold(
             appBar: AppBar(
+              backgroundColor: Colors.transparent,
               title: const Text('Flutter Micro App'),
               elevation: 0.9,
               actions: [
-                IconButton(
-                    onPressed: _updateView, icon: const Icon(Icons.refresh)),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: _updateView,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ),
               ],
             ),
             body: microBoardData == null
@@ -99,10 +101,10 @@ class MicroBoardData {
       microApps: (map['micro_apps'] as List? ?? [])
           .map((e) => MicroBoardApp.fromMap(e))
           .toList(),
-      orphanHandlers: (map['orphan_handlers'] as List? ?? [])
+      orphanHandlers: (map['orphan_event_handlers'] as List? ?? [])
           .map((e) => MicroBoardHandler.fromMap(e))
           .toList(),
-      widgetHandlers: (map['widget_handlers'] as List? ?? [])
+      widgetHandlers: (map['widget_event_handlers'] as List? ?? [])
           .map((e) => MicroBoardHandler.fromMap(e))
           .toList(),
       conflictingChannels: (map['conflicting_channels'] as List? ?? [])

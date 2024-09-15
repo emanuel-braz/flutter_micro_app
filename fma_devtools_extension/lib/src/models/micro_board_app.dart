@@ -50,4 +50,24 @@ class MicroBoardApp {
           .toList(),
     );
   }
+
+  MicroBoardApp copyWith({
+    String? type,
+    String? name,
+    String? route,
+    String? description,
+    List<MicroBoardRoute>? pages,
+    List<MicroBoardHandler>? handlers,
+    List<MicroBoardWebview>? webviews,
+  }) {
+    return MicroBoardApp(
+      type: type ?? this.type,
+      name: name ?? this.name,
+      route: route ?? this.route,
+      description: description ?? this.description,
+      pages: pages ?? this.pages,
+      handlers: handlers ?? this.handlers,
+      webviews: webviews ?? this.webviews,
+    );
+  }
 }

@@ -13,9 +13,11 @@ class MicroBoardItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final description = app.description ?? '';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.grey[100] : Colors.grey[800];
 
     return Card(
-      color: Theme.of(context).primaryColor,
+      color: isDark ? Colors.grey[800] : Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Column(
@@ -25,7 +27,7 @@ class MicroBoardItemWidget extends StatelessWidget {
               '<${app.type}>',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white,
+                color: textColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -33,7 +35,7 @@ class MicroBoardItemWidget extends StatelessWidget {
               padding: EdgeInsets.only(left: 4, right: 4, top: 0),
               child: Text(
                 app.name,
-                style: TextStyle(fontSize: 24, color: Colors.white),
+                style: TextStyle(fontSize: 24, color: textColor),
               ),
             ),
             if (description.isNotEmpty)
@@ -41,7 +43,7 @@ class MicroBoardItemWidget extends StatelessWidget {
                 padding: EdgeInsets.only(left: 4, right: 4, top: 0, bottom: 4),
                 child: Text(
                   description,
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: TextStyle(fontSize: 14, color: textColor),
                 ),
               ),
             MicroBoardCardRoutes(app: app),

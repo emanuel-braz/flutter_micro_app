@@ -15,9 +15,12 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardColor = Theme.of(context).cardTheme.color;
+    final textColor = Theme.of(context).textTheme.bodyMedium!.color;
+
     return Card(
       margin: EdgeInsets.all(4),
-      color: Colors.grey[100],
+      color: cardColor,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -34,7 +37,7 @@ class MicroBoardWebviewControllersCard extends StatelessWidget {
                 Chip(
                   backgroundColor: titleColor ?? Theme.of(context).primaryColor,
                   label: Text(webviewControllers.length.toString(),
-                      style: TextStyle(fontSize: 14, color: Colors.grey[200])),
+                      style: TextStyle(fontSize: 14, color: textColor)),
                 )
               ],
             ),
@@ -88,7 +91,7 @@ class _MicroBoardCardItem extends StatelessWidget {
           Container(
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(8),
                   bottomRight: Radius.circular(8),
                 ),
@@ -101,12 +104,12 @@ class _MicroBoardCardItem extends StatelessWidget {
                     if (_webviewController.name != null)
                       Text(
                         _webviewController.name ?? '',
-                        style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                        style: TextStyle(color: Colors.grey[800], fontSize: 16),
                       ),
                     if (_webviewController.description != null)
                       Text(
                         _webviewController.description ?? '',
-                        style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                        style: TextStyle(color: Colors.grey[800], fontSize: 14),
                       ),
                   ],
                 ),
