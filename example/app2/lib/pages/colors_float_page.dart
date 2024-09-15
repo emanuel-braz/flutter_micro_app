@@ -28,7 +28,7 @@ class _ColorsFloatStatePlage extends State<ColorsFloatPage> {
                 child: const Text('Background'),
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.blue)),
+                        WidgetStateProperty.all<Color>(Colors.blue)),
                 onPressed: () {
                   MicroAppEventController().emit(MicroAppEvent(
                       name: 'change_background_color',
@@ -40,7 +40,7 @@ class _ColorsFloatStatePlage extends State<ColorsFloatPage> {
                 child: const Text('Buttons'),
                 style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.pink)),
+                        WidgetStateProperty.all<Color>(Colors.pink)),
                 onPressed: () {
                   MicroAppEventController().emit(MicroAppEvent(
                       name: 'change_buttons_color',

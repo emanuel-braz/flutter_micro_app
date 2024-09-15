@@ -32,7 +32,7 @@ class MicroBoardItemWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Padding(
-              padding: EdgeInsets.only(left: 4, right: 4, top: 0),
+              padding: const EdgeInsets.only(left: 4, right: 4, top: 0),
               child: Text(
                 app.name,
                 style: TextStyle(fontSize: 24, color: textColor),
@@ -40,7 +40,8 @@ class MicroBoardItemWidget extends StatelessWidget {
             ),
             if (description.isNotEmpty)
               Padding(
-                padding: EdgeInsets.only(left: 4, right: 4, top: 0, bottom: 4),
+                padding:
+                    const EdgeInsets.only(left: 4, right: 4, top: 0, bottom: 4),
                 child: Text(
                   description,
                   style: TextStyle(fontSize: 14, color: textColor),

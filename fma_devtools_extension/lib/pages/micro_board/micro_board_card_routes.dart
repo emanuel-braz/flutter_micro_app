@@ -33,7 +33,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
                   child: Text('Routes',
                       style: TextStyle(fontSize: 18, color: Colors.grey[900])),
                 ),
-                Spacer(),
+                const Spacer(),
                 Chip(
                   backgroundColor: Theme.of(context).primaryColor,
                   label: Text(pages.length.toString(),
@@ -41,7 +41,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
                 )
               ],
             ),
-            Divider(
+            const Divider(
               thickness: 2,
             ),
             Column(
@@ -51,7 +51,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(8),
                         ),
                         boxShadow: [
@@ -59,12 +59,12 @@ class MicroBoardCardRoutes extends StatelessWidget {
                             color: Colors.black.withOpacity(.2),
                             spreadRadius: 2,
                             blurRadius: 4,
-                            offset: Offset(3, 3),
+                            offset: const Offset(3, 3),
                           ),
                         ],
                       ),
-                      margin:
-                          EdgeInsets.only(left: 4, right: 4, top: 6, bottom: 6),
+                      margin: const EdgeInsets.only(
+                          left: 4, right: 4, top: 6, bottom: 6),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -73,8 +73,8 @@ class MicroBoardCardRoutes extends StatelessWidget {
                                 horizontal: 8, vertical: 4),
                             child: Text(
                               e.widget.isNotEmpty ? e.widget : "Widget",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white),
                             ),
                           ),
                           if (e.description.isNotEmpty)
@@ -117,7 +117,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
                       )))
                   .toList(),
             ),
-            SizedBox(
+            const SizedBox(
               height: 6,
             )
           ],

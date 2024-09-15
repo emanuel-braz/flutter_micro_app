@@ -163,10 +163,10 @@ class _BaseHomePageState extends State<BaseHomePage>
                 child: ElevatedButtonTheme(
                   data: ElevatedButtonThemeData(
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
+                        backgroundColor: WidgetStateProperty.all<Color>(
                             buttonsColorController.value),
                         foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white)),
+                            WidgetStateProperty.all<Color>(Colors.white)),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -18,7 +18,7 @@ class MicroBoardHandlerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4),
       color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -32,7 +32,7 @@ class MicroBoardHandlerCard extends StatelessWidget {
                   child: Text(title,
                       style: TextStyle(fontSize: 18, color: titleColor)),
                 ),
-                Spacer(),
+                const Spacer(),
                 Chip(
                   backgroundColor: titleColor ?? Theme.of(context).primaryColor,
                   label: Text(widgetHandlers.length.toString(),
@@ -41,7 +41,7 @@ class MicroBoardHandlerCard extends StatelessWidget {
               ],
             ),
             if (widgetHandlers.isNotEmpty)
-              Divider(
+              const Divider(
                 thickness: 2,
               ),
             ...widgetHandlers.map((e) => MicroBoardHandlerCardItem(
@@ -71,7 +71,7 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(
+        borderRadius: const BorderRadius.all(
           Radius.circular(8),
         ),
         boxShadow: [
@@ -79,7 +79,7 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
             color: Colors.black.withOpacity(.2),
             spreadRadius: 2,
             blurRadius: 4,
-            offset: Offset(3, 3),
+            offset: const Offset(3, 3),
           ),
         ],
       ),
@@ -90,13 +90,13 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             child: Text(
               _microBoardHandler.parentName,
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           Container(
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(8),
                   bottomRight: Radius.circular(8),
                 ),
@@ -108,7 +108,7 @@ class MicroBoardHandlerCardItem extends StatelessWidget {
                   children: [
                     Chip(
                       label: Text(_microBoardHandler.type,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                           )),
                       backgroundColor:
