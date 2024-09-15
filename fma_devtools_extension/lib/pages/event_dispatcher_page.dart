@@ -136,7 +136,7 @@ class _EventDispatcherState extends State<EventDispatcher> {
     }
 
     final channels = _txtChannels.text.trim().split(',');
-    final payload = _txtPayload.text;
+    final payload = _jsonTryDecode(_txtPayload.text);
     final eventName = _txtEventName.text.trim();
 
     final event = {
@@ -156,5 +156,13 @@ class _EventDispatcherState extends State<EventDispatcher> {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Event dispatched!'),
     ));
+  }
+
+  _jsonTryDecode(String payload) {
+    try {
+      return jsonDecode(payload);
+    } catch (_) {
+      return payload;
+    }
   }
 }

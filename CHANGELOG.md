@@ -1,3 +1,8 @@
+## 0.15.1
+[2024-09-16]
+#### Fixed
+- [Extension] Automatically convert payload to json when sending event on Dispatcher screen
+
 ## 0.15.0
 [2024-09-15]
 #### Features
