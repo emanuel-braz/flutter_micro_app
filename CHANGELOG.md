@@ -1,3 +1,11 @@
+## 0.15.0
+[2024-09-15]
+#### Features
+- Add `MicroBoard` to show all micro applications, routes and event handlers
+- Add possibility to export all routes to a .xlsx file from `MicroBoard` (Excel Sheet)
+#### Fixed
+- Fixing issue with DevTools Extension not able to open
+
 ## 0.14.1
 [2024-01-28]
 #### Break

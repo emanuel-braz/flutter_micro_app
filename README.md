@@ -42,6 +42,10 @@
 ```
 ---
 
+### 💾 Flutter DevTools: Inspect the app and export all routes to an Excel file (.xlsx)
+- Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
+
+---
 ### 🤝 Exposing all pages through a contract `MicroApp`
 ```dart
 import 'package:micro_routes/exports.dart';
