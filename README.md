@@ -1,5 +1,5 @@
 
-### A package to speed up the creation of micro apps structure in Flutter applications (beta version)
+### A package to speed up the creation of micro apps structure in Flutter applications
 > Monolithic distribution with independent multiplatform development, inspired in frameworks such as Single SPA, using Event Driven Architecture.
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
@@ -10,50 +10,22 @@
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
 
-### ⚙️ Define micro app configurations and contracts
-
-#### Configure the preferences (optional)
-```dart
-  MicroAppPreferences.update(
-    MicroAppConfig(
-      nativeEventsEnabled: true, // If you want to dispatch and listen to events between native(Android/iOS) [default = false]
-      nativeNavigationCommandEnabled: true,
-      nativeNavigationLogEnabled: true,
-      pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
-
-      // The [MicroPageTransitionType.platform] is a dynamic transition type, 
-      // for iOS it will use Cupertino, and for others it will use Material.
-      pageTransitionType: MicroPageTransitionType.platform,
-
-      // When pushing routes, if the route is not registered, this will be triggered,
-      // and it will abort the navigation
-      // 
-      // [onUnknownRoute] will not be dispatched, since the navigation was aborted.
-      //
-      // To makes this works, do:
-      // - Use root navigator(from MaterialApp) call NavigatorInstance.push...() without context, or
-      // - Use MicroAppNavigatorWidget as your nested navigators, or
-      // - Use RouterGenerator.onGenerateRoute mixin in your custom navigators
-      onRouteNotRegistered: (route, {arguments, type, context}) {
-        print('[OnRouteNotRegistered] Route not found: $route, $arguments, $type');
-      },
-    )
-  );
-```
 ---
 
 ### 💾 Flutter DevTools: Inspect the app and export all routes to an Excel file (.xlsx)
 - Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
 
+![image](https://github.com/user-attachments/assets/15fd3962-01d5-47e2-8200-0996d850f5aa)
+
 ---
 ### 🤝 Exposing all pages through a contract `MicroApp` or use Go Router(go_router) package with fma_go_router
 
-https://pub.dev/packages/fma_go_router
+https://pub.dev/packages/fma_go_router  
 https://pub.dev/packages/go_router
 
 ```dart
 // Using Go Router (Advanced and flexible)
-final FmaGoRouter fmaGoRouter = FmaGoRouter(
+final fmaGoRouter = FmaGoRouter(
   name: 'GoRouter Example',
   description: 'This is an example of GoRouter',
   goRouter: GoRouter(
@@ -127,6 +99,39 @@ class Application1MicroApp extends MicroApp {
         )),
       ];
 }
+```
+
+---
+
+### ⚙️ Define micro app configurations and contracts
+
+#### Configure the preferences (optional)
+```dart
+  MicroAppPreferences.update(
+    MicroAppConfig(
+      nativeEventsEnabled: true, // If you want to dispatch and listen to events between native(Android/iOS) [default = false]
+      nativeNavigationCommandEnabled: true,
+      nativeNavigationLogEnabled: true,
+      pathSeparator: MicroAppPathSeparator.slash // It joins the routes segments using slash "/" automatically
+
+      // The [MicroPageTransitionType.platform] is a dynamic transition type, 
+      // for iOS it will use Cupertino, and for others it will use Material.
+      pageTransitionType: MicroPageTransitionType.platform,
+
+      // When pushing routes, if the route is not registered, this will be triggered,
+      // and it will abort the navigation
+      // 
+      // [onUnknownRoute] will not be dispatched, since the navigation was aborted.
+      //
+      // To makes this works, do:
+      // - Use root navigator(from MaterialApp) call NavigatorInstance.push...() without context, or
+      // - Use MicroAppNavigatorWidget as your nested navigators, or
+      // - Use RouterGenerator.onGenerateRoute mixin in your custom navigators
+      onRouteNotRegistered: (route, {arguments, type, context}) {
+        print('[OnRouteNotRegistered] Route not found: $route, $arguments, $type');
+      },
+    )
+  );
 ```
 
 ---
