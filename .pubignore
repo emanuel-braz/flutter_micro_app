@@ -1,1 +1,3 @@
 .vscode/settings.json
+packages/
+fma_devtools_extension/
