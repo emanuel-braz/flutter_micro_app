@@ -2,7 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "example Android",
+            "name": "GoRouter Routing",
+            "request": "launch",
+            "type": "dart",
+            "program": "example/example_host/lib/main_go_router.dart",
+            "args": [
+                "-d",
+                "emulator-5554"
+            ]
+        },
+        {
+            "name": "Classic Routing",
             "request": "launch",
             "type": "dart",
             "program": "example/example_host/lib/main.dart",
@@ -12,7 +22,7 @@
             ]
         },
         {
-            "name": "fma_devtools_extension(simulated environment)",
+            "name": "Web - Flutter Devtools",
             "cwd": "fma_devtools_extension",
             "request": "launch",
             "type": "dart",

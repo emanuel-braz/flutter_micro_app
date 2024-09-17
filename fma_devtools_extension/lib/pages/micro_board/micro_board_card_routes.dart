@@ -46,76 +46,80 @@ class MicroBoardCardRoutes extends StatelessWidget {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: pages
-                  .map((e) => Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        shape: BoxShape.rectangle,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(8),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(.2),
-                            spreadRadius: 2,
-                            blurRadius: 4,
-                            offset: const Offset(3, 3),
-                          ),
-                        ],
+              children: pages.map((page) {
+                return Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      shape: BoxShape.rectangle,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(8),
                       ),
-                      margin: const EdgeInsets.only(
-                          left: 4, right: 4, top: 6, bottom: 6),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.2),
+                          spreadRadius: 2,
+                          blurRadius: 4,
+                          offset: const Offset(3, 3),
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.only(
+                        left: 4, right: 4, top: 6, bottom: 6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          child: Text(
+                            page.name.isNotEmpty
+                                ? page.name
+                                : page.widget.isNotEmpty
+                                    ? page.widget
+                                    : "Widget",
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                        if (page.description.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.only(
+                                left: 8, right: 8, bottom: 4),
                             child: Text(
-                              e.widget.isNotEmpty ? e.widget : "Widget",
-                              style: const TextStyle(
-                                  fontSize: 18, color: Colors.white),
+                              page.description,
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey[100]),
                             ),
                           ),
-                          if (e.description.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8, right: 8, bottom: 4),
-                              child: Text(
-                                e.description,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: cardColor,
+                            shape: BoxShape.rectangle,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(8),
+                              bottomRight: Radius.circular(8),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'route: ',
                                 style: TextStyle(
-                                    fontSize: 12, color: Colors.grey[100]),
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor),
                               ),
-                            ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: cardColor,
-                              shape: BoxShape.rectangle,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'route: ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: textColor),
-                                ),
-                                Expanded(
-                                    child: Text(e.route,
-                                        style: TextStyle(color: textColor))),
-                              ],
-                            ),
-                          )
-                        ],
-                      )))
-                  .toList(),
+                              Expanded(
+                                  child: Text(page.route,
+                                      style: TextStyle(color: textColor))),
+                            ],
+                          ),
+                        )
+                      ],
+                    ));
+              }).toList(),
             ),
             const SizedBox(
               height: 6,

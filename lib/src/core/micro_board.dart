@@ -55,9 +55,11 @@ class MicroBoard {
           }
 
           return MicroBoardRoute(
-              route: microPageRoute,
-              widget: parentName,
-              description: e.description);
+            route: microPageRoute,
+            widget: parentName,
+            description: e.description,
+            name: e.name,
+          );
         }).toList();
 
         final handlers = microAppEventController.handlers.entries

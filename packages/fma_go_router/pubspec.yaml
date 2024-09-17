@@ -1,0 +1,19 @@
+name: fma_go_router
+description: "A new Flutter package project."
+version: 0.1.0
+homepage: https://github.com/emanuel-braz/flutter_micro_app
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_micro_app: '>=1.0.0 <2.0.0'
+  go_router: ^14.2.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
