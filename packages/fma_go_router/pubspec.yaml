@@ -1,5 +1,5 @@
 name: fma_go_router
-description: "Plugin for Flutter Micro App with Go Router"
+description: "Plugin for Flutter Micro App with Go Router integration"
 version: 0.1.0
 homepage: https://github.com/emanuel-braz/flutter_micro_app/packages/fma_go_router
 
@@ -17,5 +17,4 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-
-flutter:
+  
