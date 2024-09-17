@@ -4,7 +4,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.15.1 <4.0.0"
+  sdk: ">=2.17.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -20,6 +20,10 @@ dependencies:
     path: ../app2/
 
   cupertino_icons: ^1.0.2
+  go_router: ^14.2.7
+
+  fma_go_router:
+    path: ../../packages/fma_go_router
 
 dev_dependencies:
   flutter_test:
