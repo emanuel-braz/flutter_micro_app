@@ -25082,9 +25082,11 @@ return new A.jz(s.h(a,"type"),s.h(a,"parentName"),A.aD(s.h(a,"channels"),!0,t.N)
 jz:function jz(a,b,c){this.a=a
 this.b=b
 this.c=c},
-jA:function jA(a,b,c){this.a=a
-this.b=b
-this.c=c},
+jA:function jA(a,b,c,d){var _=this
+_.a=a
+_.b=b
+_.c=c
+_.d=d},
 aBK(a){var s=J.Z(a)
 s.h(a,"name")
 s.h(a,"description")
@@ -86537,13 +86539,15 @@ A.N6.prototype={
 R(a){var s=null,r=this.c.e,q=A.a3(a).ax.a===B.a5,p=q?B.bG:A.a3(a).id,o=q?B.cG:B.fl,n=t.p,m=A.D(r).i("w<1,lH>")
 return A.zw(new A.bL(B.FB,A.f9(A.b([A.iI(A.b([new A.bL(B.bH,A.bX("Routes",s,s,s,A.bR(s,s,B.fl,s,s,s,s,s,s,s,s,18,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s),s),B.l0,A.u9(A.a3(a).fr,A.bX(B.f.j(r.length),s,s,s,A.bR(s,s,B.jd,s,s,s,s,s,s,s,s,14,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s))],n),B.ap,B.a2,B.a8),B.ju,A.f9(A.O(new A.w(r,new A.a9N(a,p,o),m),!0,m.i("a1.E")),B.cH,B.a2,B.a8),B.Ue],n),B.cH,B.a2,B.a8),s),B.cG,B.bH,s,s)}}
 A.a9N.prototype={
-$1(a){var s,r=null,q=A.a3(this.a),p=A.b([new A.dS(2,B.cD,A.a6(51,0,0,0),B.ux,4)],t.sq),o=a.b,n=t.p
-o=A.b([new A.bL(B.jy,A.bX(o.length!==0?o:"Widget",r,r,r,B.VX,r,r),r)],n)
-s=a.c
-if(s.length!==0)o.push(new A.bL(B.Fz,A.bX(s,r,r,r,A.bR(r,r,B.cG,r,r,r,r,r,r,r,r,12,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r),r))
-s=this.c
-o.push(A.fb(r,A.iI(A.b([A.bX("route: ",r,r,r,A.bR(r,r,s,r,r,r,r,r,r,r,r,r,r,r,B.c6,r,r,!0,r,r,r,r,r,r,r,r),r,r),A.lT(A.bX(a.a,r,r,r,A.bR(r,r,s,r,r,r,r,r,r,r,r,r,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r),1)],n),B.ap,B.a2,B.a8),B.y,r,r,new A.dR(this.b,r,r,B.lY,r,r,B.aN),r,r,r,B.bD,1/0))
-return A.fb(r,A.f9(o,B.ed,B.a2,B.a8),B.y,r,r,new A.dR(q.fr,r,r,B.dc,p,r,B.aN),r,r,B.Fx,r,r)},
+$1(a){var s,r,q=null,p=A.a3(this.a),o=A.b([new A.dS(2,B.cD,A.a6(51,0,0,0),B.ux,4)],t.sq),n=a.d
+if(!(n.length!==0)){n=a.b
+n=n.length!==0?n:"Widget"}s=t.p
+n=A.b([new A.bL(B.jy,A.bX(n,q,q,q,B.VX,q,q),q)],s)
+r=a.c
+if(r.length!==0)n.push(new A.bL(B.Fz,A.bX(r,q,q,q,A.bR(q,q,B.cG,q,q,q,q,q,q,q,q,12,q,q,q,q,q,!0,q,q,q,q,q,q,q,q),q,q),q))
+r=this.c
+n.push(A.fb(q,A.iI(A.b([A.bX("route: ",q,q,q,A.bR(q,q,r,q,q,q,q,q,q,q,q,q,q,q,B.c6,q,q,!0,q,q,q,q,q,q,q,q),q,q),A.lT(A.bX(a.a,q,q,q,A.bR(q,q,r,q,q,q,q,q,q,q,q,q,q,q,q,q,q,!0,q,q,q,q,q,q,q,q),q,q),1)],s),B.ap,B.a2,B.a8),B.y,q,q,new A.dR(this.b,q,q,B.lY,q,q,B.aN),q,q,q,B.bD,1/0))
+return A.fb(q,A.f9(n,B.ed,B.a2,B.a8),B.y,q,q,new A.dR(p.fr,q,q,B.dc,o,q,B.aN),q,q,B.Fx,q,q)},
 $S:521}
 A.vq.prototype={
 R(a){var s,r,q,p,o=null,n=this.c,m=n.d
@@ -86663,7 +86667,7 @@ A.aSd(p,o)}(self.URL||self.webkitURL).revokeObjectURL(s)}}
 A.iC.prototype={}
 A.a9H.prototype={
 $1(a){var s=J.Z(a)
-return new A.jA(s.h(a,"route"),s.h(a,"widget"),s.h(a,"description"))},
+return new A.jA(s.h(a,"route"),s.h(a,"widget"),s.h(a,"description"),s.h(a,"name"))},
 $S:525}
 A.a9I.prototype={
 $1(a){return A.awd(a)},

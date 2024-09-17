@@ -46,8 +46,50 @@
 - Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
 
 ---
-### 🤝 Exposing all pages through a contract `MicroApp`
+### 🤝 Exposing all pages through a contract `MicroApp` or use Go Router(go_router) package with fma_go_router
+
+https://pub.dev/packages/fma_go_router
+https://pub.dev/packages/go_router
+
 ```dart
+// Using Go Router (Advanced and flexible)
+final FmaGoRouter fmaGoRouter = FmaGoRouter(
+  name: 'GoRouter Example',
+  description: 'This is an example of GoRouter',
+  goRouter: GoRouter(
+    navigatorKey: NavigatorInstance.navigatorKey,
+    routes: <RouteBase>[
+      FmaGoRoute(
+        description: 'This is the boot page',
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) {
+          return const BaseHomePage();
+        },
+        routes: <RouteBase>[
+          FmaGoRoute(
+            description: 'This page has path parameter',
+            path: 'page_with_id/:id',
+            builder: (context, state) {
+              return ExamplePageA(
+                  'page with id = ' + (state.pathParameters['id'] ?? ''));
+            },
+          ),
+          FmaGoRoute(
+            description: 'This is the first page',
+            path: 'page1',
+            builder: (context, state) {
+              return const ExamplePageA('page1');
+            },
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+```
+
+```dart
+// Using MicroApp defaults (Simple and easy to use)
 import 'package:micro_routes/exports.dart';
 
 class Application1MicroApp extends MicroApp {
