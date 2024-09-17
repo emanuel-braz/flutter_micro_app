@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:go_router/go_router.dart';
 
+/// A wrapper class for [GoRoute]
 class FmaGoRoute extends GoRoute {
   final String description;
   FmaGoRoute({
@@ -36,6 +37,7 @@ class FmaGoRoute extends GoRoute {
   }
 }
 
+/// A wrapper class for [ShellRoute]
 class FmaShellRoute extends ShellRoute {
   final String description;
   final String name;
@@ -65,6 +67,7 @@ class FmaShellRoute extends ShellRoute {
   }
 }
 
+/// A wrapper class for [StatefulShellRoute]
 class FmaStatefulShellRoute extends StatefulShellRoute {
   final String name;
   final String description;
@@ -93,6 +96,7 @@ class FmaStatefulShellRoute extends StatefulShellRoute {
   }
 }
 
+/// A wrapper class for [StatefulShellBranch]
 class FmaStatefulShellBranch extends StatefulShellBranch {
   final String name;
   final String description;

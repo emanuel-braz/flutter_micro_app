@@ -3,9 +3,15 @@ import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:fma_go_router/src/index.dart';
 import 'package:go_router/go_router.dart';
 
+/// A wrapper class for [GoRouter] that contains a list of [MicroAppPage]s.
 class FmaGoRouter {
+  /// The [GoRouter] instance.
   final GoRouter goRouter;
+
+  /// The name of the [FmaGoRouter].
   final String name;
+
+  /// The description of the [FmaGoRouter].
   final String? description;
 
   final _microPages = <MicroAppPage<Widget>>[];
