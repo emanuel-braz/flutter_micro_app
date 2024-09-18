@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../src/models/micro_board_handler.dart';
-import 'constants.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class MicroBoardHandlerCard extends StatelessWidget {
   final List<MicroBoardHandler> widgetHandlers;

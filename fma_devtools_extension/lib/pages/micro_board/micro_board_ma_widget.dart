@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-import '../../src/models/micro_board_app.dart';
 import 'micro_board_card_handlers.dart';
 import 'micro_board_card_routes.dart';
 
 class MicroBoardItemWidget extends StatelessWidget {
   final MicroBoardApp app;
   final List<String> conflictingChannels;
+
   const MicroBoardItemWidget(this.app,
       {required this.conflictingChannels, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final description = app.description ?? '';
+    final description = app.description;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.grey[100] : Colors.grey[800];
 

@@ -2,13 +2,12 @@ import 'dart:developer';
 
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:fma_devtools_extension/src/models/micro_board_webview.dart';
 
 import 'pages/main_app_widget.dart';
 import 'pages/micro_board/micro_board_util.dart';
 import 'src/helpers/excel_helper.dart';
-import 'src/models/micro_board_app.dart';
-import 'src/models/micro_board_handler.dart';
 
 void main() {
   runApp(const FmaDevtoolsExtension());

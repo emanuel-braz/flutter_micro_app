@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../src/models/micro_board_app.dart';
-import 'constants.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class MicroBoardCardHandlers extends StatelessWidget {
   final List<String> conflictingChannels;
@@ -15,7 +13,7 @@ class MicroBoardCardHandlers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final handlers = app.handlers ?? [];
+    final handlers = app.handlers;
 
     return Card(
       margin: const EdgeInsets.all(4),

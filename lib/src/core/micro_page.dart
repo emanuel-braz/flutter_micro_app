@@ -8,11 +8,14 @@ class MicroAppPage<T extends Widget> {
   final PageBuilder<T> pageBuilder;
   final String description;
   final String name;
+  final dynamic parameters;
+
   MicroAppPage({
     required this.route,
     required this.pageBuilder,
     String? description,
     String? name,
+    this.parameters,
   })  : description = description ?? '',
         name = name ?? '';
 }

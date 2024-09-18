@@ -2,9 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../flutter_micro_app.dart';
-import '../entities/micro_board/micro_board_app.dart';
-import '../entities/micro_board/micro_board_handler.dart';
-import '../entities/micro_board/micro_board_route.dart';
 import '../presentation/widgets/micro_board/micro_board_page.dart';
 
 class MicroBoard {
@@ -47,18 +44,33 @@ class MicroBoard {
 
           parentName = e.pageBuilder.runtimeType.toString();
           if (parentName == 'PageBuilder<Widget>') {
-            parentName = '';
+            final type = e.pageBuilder.widgetBuilder.runtimeType.toString();
+            parentName = type != 'Null'
+                ? e.pageBuilder.widgetBuilder.runtimeType
+                        .toString()
+                        .split(' => ')
+                        .lastOrNull ??
+                    ''
+                : '';
           } else {
             parentName = parentName.replaceFirst('PageBuilder<', '');
             parentName =
                 parentName.replaceFirst('>', '', parentName.lastIndexOf('>'));
           }
 
+          String? innerType;
+
+          if (e.parameters != null && e.parameters is Function) {
+            innerType =
+                e.parameters.runtimeType.toString().split(' => ').lastOrNull;
+          }
+
           return MicroBoardRoute(
             route: microPageRoute,
-            widget: parentName,
+            widget: innerType ?? parentName,
             description: e.description,
             name: e.name,
+            parameters: e.parameters,
           );
         }).toList();
 
@@ -73,9 +85,10 @@ class MicroBoard {
           }
 
           return MicroBoardHandler(
-              type: handlerType,
-              channels: entry.key.channels,
-              parentName: parentName);
+            type: handlerType,
+            channels: entry.key.channels,
+            parentName: parentName,
+          );
         }).toList();
 
         return MicroBoardApp(
@@ -85,6 +98,7 @@ class MicroBoard {
           route: microAppRoute,
           pages: routes,
           handlers: handlers,
+          webviews: [],
         );
       }).toList();
 

@@ -1,5 +1,4 @@
-import '../../src/models/micro_board_app.dart';
-import '../../src/models/micro_board_handler.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class MicroBoardUtil {
   static List<String> getConflictChannels(
@@ -10,7 +9,7 @@ class MicroBoardUtil {
     var conflictingChannels = <String>[];
 
     for (var app in microApps) {
-      for (MicroBoardHandler handler in app.handlers ?? []) {
+      for (MicroBoardHandler handler in app.handlers) {
         conflictingChannels.addAll(handler.channels);
       }
     }

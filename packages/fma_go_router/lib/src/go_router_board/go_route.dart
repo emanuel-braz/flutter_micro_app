@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 /// A wrapper class for [GoRoute]
 class FmaGoRoute extends GoRoute {
   final String description;
+  final dynamic parameters;
+
   FmaGoRoute({
     required this.description,
     required super.path,
@@ -15,6 +17,7 @@ class FmaGoRoute extends GoRoute {
     super.redirect,
     super.onExit,
     super.routes = const <RouteBase>[],
+    this.parameters,
   });
 
   MicroAppPage<Widget> toMicroAppPage({String parentPath = ''}) {
@@ -26,10 +29,20 @@ class FmaGoRoute extends GoRoute {
             ? pathSegment
             : '/$pathSegment');
 
+    String nameWithType = name ?? 'GoRoute';
+
+    if (parameters != null && parameters is Function) {
+      final type = parameters.runtimeType.toString().split(' => ').lastOrNull;
+      if (type != null) {
+        nameWithType += '<$type>';
+      }
+    }
+
     return MicroAppPage<Widget>(
       route: route,
-      name: name ?? 'GoRoute',
+      name: nameWithType,
       description: description,
+      parameters: parameters,
       pageBuilder: PageBuilder(
         widgetBuilder: (context, arguments) => const SizedBox.shrink(),
       ),

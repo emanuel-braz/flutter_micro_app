@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../src/models/micro_board_app.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class MicroBoardCardRoutes extends StatelessWidget {
   const MicroBoardCardRoutes({
@@ -12,7 +11,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pages = app.pages ?? [];
+    final pages = app.pages;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor =
         isDark ? Colors.grey[800] : Theme.of(context).secondaryHeaderColor;
@@ -47,6 +46,12 @@ class MicroBoardCardRoutes extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: pages.map((page) {
+                final String pageName = page.name.isNotEmpty
+                    ? '${page.name}${page.parameters.toString().isNotEmpty ? '(${page.parameters})' : ''}'
+                    : page.widget.isNotEmpty
+                        ? '${page.widget}${page.parameters.toString().isNotEmpty ? '(${page.parameters})' : ''}'
+                        : 'Widget${page.parameters.toString().isNotEmpty ? '(${page.parameters})' : ''}';
+
                 return Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor,
@@ -72,11 +77,7 @@ class MicroBoardCardRoutes extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           child: Text(
-                            page.name.isNotEmpty
-                                ? page.name
-                                : page.widget.isNotEmpty
-                                    ? page.widget
-                                    : "Widget",
+                            pageName,
                             style: const TextStyle(
                                 fontSize: 18, color: Colors.white),
                           ),

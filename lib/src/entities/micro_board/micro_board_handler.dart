@@ -16,4 +16,12 @@ class MicroBoardHandler {
       'channels': channels,
     };
   }
+
+  factory MicroBoardHandler.fromMap(Map<String, dynamic> map) {
+    return MicroBoardHandler(
+      type: map['type'],
+      parentName: map['parentName'],
+      channels: List<String>.from(map['channels']),
+    );
+  }
 }

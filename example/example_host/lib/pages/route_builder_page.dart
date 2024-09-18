@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class ModalExamplePage extends PopupRoute {
   final String title;
+  final String subTitle;
 
-  ModalExamplePage({required this.title});
+  ModalExamplePage(String description, this.subTitle, {required this.title});
 
   @override
   Widget buildPage(
