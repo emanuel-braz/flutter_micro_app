@@ -1,3 +1,5 @@
+import '../../utils/parameters_util/parameters_util.dart';
+
 class MicroBoardRoute {
   final String route;
   final String widget;
@@ -5,7 +7,8 @@ class MicroBoardRoute {
   final String name;
   final dynamic parameters;
 
-  String get parametersAsString => _getParametersAsString();
+  String get parametersAsString =>
+      ParametersUtil.getParametersAsString(parameters);
 
   MicroBoardRoute({
     required this.route,
@@ -21,7 +24,7 @@ class MicroBoardRoute {
       'widget': widget,
       'description': description,
       'name': name,
-      'parameters': _getParametersAsString(),
+      'parameters': ParametersUtil.getParametersAsString(parameters),
     };
   }
 
@@ -33,42 +36,5 @@ class MicroBoardRoute {
       name: map['name'],
       parameters: map['parameters'],
     );
-  }
-
-  String _getParametersAsString() {
-    if (parameters == null) return '';
-
-    if (parameters is String) return parameters;
-
-    String parametersAsString = parameters.runtimeType.toString();
-
-    if (parametersAsString.contains(' => ')) {
-      parametersAsString = parametersAsString.split(' => ').first;
-    }
-
-    // Remove os parênteses do início e do fim
-    String cleanedSignature =
-        parametersAsString.replaceAll(RegExp(r'^\(|\)$'), '');
-
-    // Remove Key? key e _Location
-    cleanedSignature = cleanedSignature.replaceAll(
-        RegExp(r'(Key\?\s*key\s*,?\s*|\w*_Location\?.*?(,|(?=\})))'), '');
-
-    cleanedSignature = cleanedSignature.trim().replaceAll('{}', '');
-
-    // Remove espaços extras e vírgulas no final
-    cleanedSignature = cleanedSignature.replaceAll(RegExp(r',\s*$'), '');
-
-    // se existir virgula ou espaço antes ou depois de uma chave, remove
-    cleanedSignature =
-        cleanedSignature.replaceAll(RegExp(r',\s*}'), '}').trim();
-    cleanedSignature =
-        cleanedSignature.replaceAll(RegExp(r'{\s*,'), '{').trim();
-
-    // Se a string final for apenas chaves vazias, remove as chaves também
-    cleanedSignature =
-        cleanedSignature.trim() == '{}' ? '' : cleanedSignature.trim();
-
-    return cleanedSignature;
   }
 }

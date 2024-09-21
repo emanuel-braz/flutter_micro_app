@@ -27,4 +27,5 @@ export 'src/utils/extensions/context_extension.dart';
 export 'src/utils/extensions/list_extension.dart';
 export 'src/utils/mixins/handler_register_mixin.dart';
 export 'src/utils/mixins/router_generator_mixin.dart';
+export 'src/utils/parameters_util/parameters_util.dart';
 export 'src/utils/typedefs.dart';
