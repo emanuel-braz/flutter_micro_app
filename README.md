@@ -46,7 +46,8 @@
 ### 💾 Flutter DevTools: Inspect the app, search for routes and export all routes to an Excel file (.xlsx)
 - Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
 
-![image](https://github.com/user-attachments/assets/15fd3962-01d5-47e2-8200-0996d850f5aa)
+<img width="1674" alt="image" src="https://github.com/user-attachments/assets/7f9dcca9-1085-401c-9096-fc03e7ed5563">
+
 
 ```dart
 
