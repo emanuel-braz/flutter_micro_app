@@ -106,7 +106,7 @@ packages:
       path: "../.."
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -123,7 +123,7 @@ packages:
       path: "../../packages/fma_go_router"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.2.0"
   go_router:
     dependency: "direct main"
     description:
