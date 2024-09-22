@@ -42,225 +42,36 @@
 ```
 ---
 
-### 💾 Flutter DevTools: Inspect the app and export all routes to an Excel file (.xlsx)
+### 💾 Flutter DevTools: Inspect the app, search for routes and export all routes to an Excel file (.xlsx)
 - Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
 
----
-### 🤝 Exposing all pages through a contract `MicroApp` or use Go Router(go_router) package with fma_go_router
 
-https://pub.dev/packages/fma_go_router
-https://pub.dev/packages/go_router
 
 ```dart
-// Using Go Router (Advanced and flexible)
-final FmaGoRouter fmaGoRouter = FmaGoRouter(
-  name: 'GoRouter Example',
-  description: 'This is an example of GoRouter',
-  goRouter: GoRouter(
-    navigatorKey: NavigatorInstance.navigatorKey,
-    routes: <RouteBase>[
-      FmaGoRoute(
-        description: 'This is the boot page',
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) {
-          return const BaseHomePage();
-        },
-        routes: <RouteBase>[
-          FmaGoRoute(
-            description: 'This page has path parameter',
-            path: 'page_with_id/:id',
-            builder: (context, state) {
-              return ExamplePageA(
-                  'page with id = ' + (state.pathParameters['id'] ?? ''));
-            },
-          ),
-          FmaGoRoute(
-            description: 'This is the first page',
-            path: 'page1',
-            builder: (context, state) {
-              return const ExamplePageA('page1');
-            },
-          ),
-        ],
-      ),
-    ],
-  ),
-);
-```
 
-```dart
-// Using MicroApp defaults (Simple and easy to use)
-import 'package:micro_routes/exports.dart';
+// In order to use GoRouter, you need to add package https://pub.dev/packages/fma_go_router  
+ FmaGoRoute(
+  description: 'This is a example of GoRouter page',
+  path: 'page_with_id/:id',
+  parameters: ExamplePageA.new, // If using `.new`, the parameters will be passed automatically, but you can use a String if you want to pass manually
+  builder: (context, state) {
+    return ExamplePageA(state.pathParameters['id']);
+  },
+),
 
-class Application1MicroApp extends MicroApp {
+or 
 
-  final routes = Application1Routes();
-
-  @override
-  List<MicroAppPage> get pages => [
-
-        MicroAppPage<Initial>(
-          description: 'The initial page of the micro app 1',
-          route: routes.baseRoute.route, 
-          pageBuilder: PageBuilder(
-            widgetBuilder: (context, settings) => const Initial(),
-            transitionType: MicroPageTransitionType.slideZoomUp
-          ),
-        ),
-
-        MicroAppPage<Page1>(
-          description: 'Display all buttons of the showcase',
-          route: routes.page1, 
-          pageBuilder: PageBuilder(
-            modalBuilder: (settings) => Page1(), // if Page1 extends PopupRoute, use `modalBuilder`
-          )
-        ),
-
-        MicroAppPage<Page2>(
-          description: 'The page two',
-          route: routes.page2, 
-          pageBuilder: PageBuilder(
-          widgetBuilder: (context, settings) {
-            final page2Params.fromMap(settings.arguments);
-            return Page2(params: page2Params);
-          }
-        )),
-      ];
-}
+MicroAppPage(
+  route: '/page2',
+  parameters: Page2.new,
+  pageBuilder: PageBuilder(
+      widgetBuilder: (_, settings) =>
+          Page2(title: settings.arguments as String?)),
+),
 ```
 
 ---
 
-### 🚀 Initialize the micro host, registering all micro apps
-- MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
-- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
-
-```dart
-void main() {
-    runApp(MyApp());
-}
-
-class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget or MicroHostStatefulWidget
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: NavigatorInstance.navigatorKey, // Required
-      onGenerateRoute: onGenerateRoute, // Required - [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
-      initialRoute: '/host_home_page',
-      navigatorObservers: [
-        NavigatorInstance // [Optional] Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
-      ],
-    );
-  }
-
-  // Register all Host [MicroAppPage]s here
-  @override
-  List<MicroAppPage> get pages => [
-        MicroAppPage(
-          route:  '/host_home_page', 
-          pageBuilder: PageBuilder(
-            widgetBuilder: (_, __) => const HostHomePage()
-          ),
-          description: 'The initial page of the application',
-        ),
-         MicroAppPage(
-          route: '/modal_page',
-          pageBuilder: PageBuilder(
-            modalBuilder: (settings) => ModalExamplePage(
-                title: '${settings.arguments}'), // extends PopupRoute
-          ),
-          description: 'ModalBuilder can be used to show [PopupRoute]',
-        )
-      ];
-
-  // Register all [MicroApp]s here
-  @override
-  List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
-}
-```
-
-### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
-
-![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
-
-
---- 
-### 🗺 Create all routes outside the app project
-> This is just a suggestion of routing strategy (Optional)
-It's important that all routes are availble out of the projects, avoiding dependencies between micro apps.
-Create all routes inside a new package, and import it in any project as a dependency. This will make possible to open routes from anywhere in a easy and transparent way.  
-  
-Create the routing package: `flutter create --template=package micro_routes` 
-or keep the routes in common package.
-
-```dart 
-// Export all routes
-import 'package:flutter_micro_app/flutter_micro_app.dart';
-
-class Application1Routes implements MicroAppBaseRoute {
-  @override
-  MicroAppRoute get baseRoute => MicroAppRoute('application1');
-
-  String get pageExample => path(['example_page']);
-  String get page1 => path(['page1']);
-  String get page2 => path(['page2','segment1', 'segment2']);
-}
-```
-
----
-
-### ⛵️ Navigation between pages
-#### For example, you can open a page that is inside other MicroApp, into the root `Navigator`, in this way(without context):
-```dart
-NavigatorInstance.pushNamed(Application2Routes().page1);
-NavigatorInstance.pushNamed('microapp2/page1');
-```
-
-#### or you can use the `context` extension, to get the scoped Navigator [`maNav`]
-
-```dart
-context.maNav.pushNamed(Application2Routes().page2);
-context.maNav.pushNamed('microapp2/page2');
-```
-
-#### or you can use `Navigator.of(context)`, to get scoped Navigator
-
-```dart
-Navigator.of(context).pushNamed(Application2Routes().page2);
-Navigator.of(context).pushNamed('microapp2/page2');
-```
-
----
-
-### 📲 Open native (Android/iOS) pages, in this way
-#### It needs native implementation, you can see an example inside Android directory
-Examples and new modules to Android, iOS and Web soon
-
-```dart
-// If not implemented, always return null
-final isValidEmail = await NavigatorInstance.pushNamedNative<bool>(
-    'emailValidator',
-    arguments: 'validateEmail:lorem@ipsum.com'
-);
-print('Email is valid: $isValidEmail');
-```
-
-#### Listening to navigation events
-```dart
-// Listen to all flutter navigation events
-NavigatorInstance.eventController.flutterLoggerStream.listen((event) {
-    logger.d('[flutter: navigation_log] -> $event');
-});
-
-// Listen to all native (Android/iOS) navigation events (if implemented)
-NavigatorInstance.eventController.nativeLoggerStream.listen((event) {});
-
-// Listen to all native (Android/iOS) navigation requests (if implemented)
-NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
-```
-
----
 ### 🤲 Handling micro apps events
 
 <img src="https://user-images.githubusercontent.com/3827308/184520332-2e77b71e-6000-488a-8a97-b2136458fec9.png" width="320" />
@@ -565,6 +376,225 @@ MicroAppWidgetBuilder(
 )
 ```
 
+---
+### 🤝 Exposing all pages through a contract `MicroApp` or use Go Router(go_router) package with fma_go_router
+
+https://pub.dev/packages/fma_go_router  
+https://pub.dev/packages/go_router
+
+```dart
+// Using Go Router (Advanced and flexible)
+final FmaGoRouter fmaGoRouter = FmaGoRouter(
+  name: 'GoRouter Example',
+  description: 'This is an example of GoRouter',
+  goRouter: GoRouter(
+    navigatorKey: NavigatorInstance.navigatorKey,
+    routes: <RouteBase>[
+      FmaGoRoute(
+        description: 'This is the boot page',
+        path: '/',
+        parameters: BaseHomePage.new,
+        builder: (BuildContext context, GoRouterState state) {
+          return const BaseHomePage();
+        },
+        routes: <RouteBase>[
+          FmaGoRoute(
+            description: 'This page has path parameter',
+            parameters: ExamplePageA.new,
+            path: 'page_with_id/:id',
+            builder: (context, state) {
+              return ExamplePageA(
+                  'page with id = ' + (state.pathParameters['id'] ?? ''));
+            },
+          ),
+          FmaGoRoute(
+            description: 'This is the first page',
+            path: 'page1',
+            parameters: ExamplePageA.new,
+            builder: (context, state) {
+              return const ExamplePageA('page1');
+            },
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+```
+
+```dart
+// Using MicroApp defaults (Simple and easy to use)
+import 'package:micro_routes/exports.dart';
+
+class Application1MicroApp extends MicroApp {
+
+  final routes = Application1Routes();
+
+  @override
+  List<MicroAppPage> get pages => [
+
+        MicroAppPage<Initial>(
+          description: 'The initial page of the micro app 1',
+          route: routes.baseRoute.route, 
+          parameters: Initial.new,
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) => const Initial(),
+            transitionType: MicroPageTransitionType.slideZoomUp
+          ),
+        ),
+
+        MicroAppPage<Page1>(
+          description: 'Display all buttons of the showcase',
+          route: routes.page1, 
+          parameters: Page1.new,
+          pageBuilder: PageBuilder(
+            modalBuilder: (settings) => Page1(), // if Page1 extends PopupRoute, use `modalBuilder`
+          )
+        ),
+
+        MicroAppPage<Page2>(
+          description: 'The page two',
+          route: routes.page2, 
+          pageBuilder: PageBuilder(
+          widgetBuilder: (context, settings) {
+            final page2Params.fromMap(settings.arguments);
+            return Page2(params: page2Params);
+          }
+        )),
+      ];
+}
+```
+
+---
+
+### 🚀 Initialize the micro host, registering all micro apps
+- MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
+- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
+
+```dart
+void main() {
+    runApp(MyApp());
+}
+
+class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget or MicroHostStatefulWidget
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: NavigatorInstance.navigatorKey, // Required
+      onGenerateRoute: onGenerateRoute, // Required - [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
+      initialRoute: '/host_home_page',
+      navigatorObservers: [
+        NavigatorInstance // [Optional] Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
+      ],
+    );
+  }
+
+  // Register all Host [MicroAppPage]s here
+  @override
+  List<MicroAppPage> get pages => [
+        MicroAppPage(
+          route:  '/host_home_page', 
+          pageBuilder: PageBuilder(
+            widgetBuilder: (_, __) => const HostHomePage()
+          ),
+          description: 'The initial page of the application',
+        ),
+         MicroAppPage(
+          route: '/modal_page',
+          pageBuilder: PageBuilder(
+            modalBuilder: (settings) => ModalExamplePage(
+                title: '${settings.arguments}'), // extends PopupRoute
+          ),
+          description: 'ModalBuilder can be used to show [PopupRoute]',
+        )
+      ];
+
+  // Register all [MicroApp]s here
+  @override
+  List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
+}
+```
+
+### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
+
+![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
+
+
+--- 
+### 🗺 Create all routes outside the app project
+> This is just a suggestion of routing strategy (Optional)
+It's important that all routes are availble out of the projects, avoiding dependencies between micro apps.
+Create all routes inside a new package, and import it in any project as a dependency. This will make possible to open routes from anywhere in a easy and transparent way.  
+  
+Create the routing package: `flutter create --template=package micro_routes` 
+or keep the routes in common package.
+
+```dart 
+// Export all routes
+import 'package:flutter_micro_app/flutter_micro_app.dart';
+
+class Application1Routes implements MicroAppBaseRoute {
+  @override
+  MicroAppRoute get baseRoute => MicroAppRoute('application1');
+
+  String get pageExample => path(['example_page']);
+  String get page1 => path(['page1']);
+  String get page2 => path(['page2','segment1', 'segment2']);
+}
+```
+
+---
+
+### ⛵️ Navigation between pages
+#### For example, you can open a page that is inside other MicroApp, into the root `Navigator`, in this way(without context):
+```dart
+NavigatorInstance.pushNamed(Application2Routes().page1);
+NavigatorInstance.pushNamed('microapp2/page1');
+```
+
+#### or you can use the `context` extension, to get the scoped Navigator [`maNav`]
+
+```dart
+context.maNav.pushNamed(Application2Routes().page2);
+context.maNav.pushNamed('microapp2/page2');
+```
+
+#### or you can use `Navigator.of(context)`, to get scoped Navigator
+
+```dart
+Navigator.of(context).pushNamed(Application2Routes().page2);
+Navigator.of(context).pushNamed('microapp2/page2');
+```
+
+---
+
+### 📲 Open native (Android/iOS) pages, in this way
+#### It needs native implementation, you can see an example inside Android directory
+Examples and new modules to Android, iOS and Web soon
+
+```dart
+// If not implemented, always return null
+final isValidEmail = await NavigatorInstance.pushNamedNative<bool>(
+    'emailValidator',
+    arguments: 'validateEmail:lorem@ipsum.com'
+);
+print('Email is valid: $isValidEmail');
+```
+
+#### Listening to navigation events
+```dart
+// Listen to all flutter navigation events
+NavigatorInstance.eventController.flutterLoggerStream.listen((event) {
+    logger.d('[flutter: navigation_log] -> $event');
+});
+
+// Listen to all native (Android/iOS) navigation events (if implemented)
+NavigatorInstance.eventController.nativeLoggerStream.listen((event) {});
+
+// Listen to all native (Android/iOS) navigation requests (if implemented)
+NavigatorInstance.eventController.nativeCommandStream.listen((event) {});
+```
 
 ---
 
