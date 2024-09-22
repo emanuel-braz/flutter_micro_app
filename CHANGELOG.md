@@ -1,3 +1,4 @@
+## 1.1.1
 ## 1.1.0
 #### Features
 - Add `parameters` property to `MicroAppPage` and `FmaGoRoute`
