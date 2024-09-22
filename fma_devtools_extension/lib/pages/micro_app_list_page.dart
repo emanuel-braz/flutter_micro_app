@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../src/models/micro_board_app.dart';
-import '../src/models/micro_board_route.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 class MicroAppList extends StatefulWidget {
   final List<MicroBoardApp> microApps;
@@ -61,7 +59,7 @@ class _MicroAppListState extends State<MicroAppList> {
                     return ListTile(
                       onTap: () {
                         setState(() {
-                          pages = microApp.pages ?? [];
+                          pages = microApp.pages;
                         });
                       },
                       title: Text(microApp.name),

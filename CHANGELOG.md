@@ -1,3 +1,7 @@
+## 1.1.0
+#### Features
+- Add `parameters` property to `MicroAppPage` and `FmaGoRoute`
+
 ## 1.0.0
 #### Features
 - Add GoRouter compatibility through fma_go_router package (https://pub.dev/packages/fma_go_router)

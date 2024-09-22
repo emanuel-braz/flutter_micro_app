@@ -22,7 +22,7 @@ class _EventDispatcherState extends State<EventDispatcher> {
     final allChannels = <String>{};
 
     for (var app in widget.microBoardData.microApps) {
-      final handlers = app.handlers ?? [];
+      final handlers = app.handlers;
       for (var handler in handlers) {
         allChannels.addAll(handler.channels);
       }

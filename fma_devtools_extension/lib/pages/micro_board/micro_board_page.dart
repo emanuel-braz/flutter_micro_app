@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-import '../../src/models/micro_board_app.dart';
-import '../../src/models/micro_board_handler.dart';
-import '../../src/models/micro_board_route.dart';
 import '../../src/models/micro_board_webview.dart';
 import 'micro_board_card_handler.dart';
 import 'micro_board_ma_widget.dart';
@@ -36,9 +34,9 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
       final pages = app.pages;
       final handlers = app.handlers;
 
-      if (pages != null) routesCount += pages.length;
+      routesCount += pages.length;
 
-      if (handlers != null) microAppHandlerCount += handlers.length;
+      microAppHandlerCount += handlers.length;
     }
 
     return Scaffold(
@@ -107,7 +105,7 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
               padding: const EdgeInsets.all(8),
               children: [
                 ...(List<MicroBoardApp>.from(widget.apps)).where((e) {
-                  return e.pages!.any((p) {
+                  return e.pages.any((p) {
                     return p.route
                             .toLowerCase()
                             .contains(_filterInput.text.toLowerCase()) ||
@@ -116,8 +114,7 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
                             .contains(_filterInput.text.toLowerCase());
                   });
                 }).map((e) {
-                  final filteredPages =
-                      List<MicroBoardRoute>.from(e.pages ?? []);
+                  final filteredPages = List<MicroBoardRoute>.from(e.pages);
 
                   filteredPages.removeWhere((p) =>
                       !p.route

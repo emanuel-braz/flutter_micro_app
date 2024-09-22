@@ -1,21 +1,63 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:go_router/go_router.dart';
 
+class FmaGoRouterWrapper extends StatelessWidget {
+  final Widget child;
+  final String route;
+  final dynamic parameters;
+  final String? description;
+
+  const FmaGoRouterWrapper({
+    super.key,
+    required this.child,
+    required this.route,
+    this.description,
+    this.parameters,
+  });
+
+  @override
+  Widget build(BuildContext context) => child;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(StringProperty('description', description));
+    properties.add(MessageProperty('route', route));
+    properties.add(DiagnosticsProperty('parameters', parameters));
+  }
+}
+
 /// A wrapper class for [GoRoute]
 class FmaGoRoute extends GoRoute {
   final String description;
+  final dynamic parameters;
+
   FmaGoRoute({
     required this.description,
     required super.path,
     super.name,
-    super.builder,
     super.pageBuilder,
     super.parentNavigatorKey,
     super.redirect,
     super.onExit,
     super.routes = const <RouteBase>[],
-  });
+    this.parameters,
+    GoRouterWidgetBuilder? builder,
+    Key? key,
+  }) : super(
+            builder: builder == null
+                ? null
+                : (context, state) => FmaGoRouterWrapper(
+                      key: key,
+                      description: description,
+                      route: path,
+                      parameters:
+                          ParametersUtil.getParametersAsString(parameters),
+                      child: builder(context, state),
+                    ));
 
   MicroAppPage<Widget> toMicroAppPage({String parentPath = ''}) {
     String pathSegment = path;
@@ -26,10 +68,20 @@ class FmaGoRoute extends GoRoute {
             ? pathSegment
             : '/$pathSegment');
 
+    String nameWithType = name ?? 'GoRoute';
+
+    if (parameters != null && parameters is Function) {
+      final type = parameters.runtimeType.toString().split(' => ').lastOrNull;
+      if (type != null) {
+        nameWithType += '<$type>';
+      }
+    }
+
     return MicroAppPage<Widget>(
       route: route,
-      name: name ?? 'GoRoute',
+      name: nameWithType,
       description: description,
+      parameters: parameters,
       pageBuilder: PageBuilder(
         widgetBuilder: (context, arguments) => const SizedBox.shrink(),
       ),
@@ -93,6 +145,13 @@ class FmaStatefulShellRoute extends StatefulShellRoute {
         widgetBuilder: (context, arguments) => const SizedBox.shrink(),
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(StringProperty('name', name));
+    properties.add(StringProperty('description', description));
   }
 }
 

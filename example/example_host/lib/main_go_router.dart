@@ -4,6 +4,8 @@ import 'package:fma_go_router/fma_go_router.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
+  MicroBoard().getMicroBoardApps;
+
   runApp(MyApp());
 }
 
@@ -16,6 +18,7 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
       FmaGoRoute(
         description: 'This is the boot page',
         path: '/',
+        parameters: BaseHomePage.new,
         builder: (BuildContext context, GoRouterState state) {
           return const BaseHomePage();
         },
@@ -23,6 +26,7 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
           FmaGoRoute(
             description: 'This page has path parameter',
             path: 'page_with_id/:id',
+            parameters: ExamplePageA.new,
             builder: (context, state) {
               return ExamplePageA(
                   'page with id = ' + (state.pathParameters['id'] ?? ''));
@@ -31,14 +35,16 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
           FmaGoRoute(
             description: 'This is the first page',
             path: 'page1',
+            parameters: ExamplePageC.new,
             builder: (context, state) {
-              return const ExamplePageA('page1');
+              return const ExamplePageC('page1');
             },
           ),
           FmaGoRoute(
               description: 'This is the seconds page',
               path: 'page2',
               name: 'Page 2',
+              parameters: 'String name, int age',
               builder: (context, state) {
                 return const ExamplePageA('page2');
               },
@@ -59,8 +65,11 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
                     FmaGoRoute(
                       description: 'This is one GoRoute from ShellRoute',
                       path: 'page3',
+                      parameters: ExamplePageD.new,
                       builder: (BuildContext context, GoRouterState state) {
-                        return const ExamplePageB('page3');
+                        return const ExamplePageD(
+                          pageName: 'page3',
+                        );
                       },
                       routes: [
                         FmaStatefulShellRoute(
@@ -250,7 +259,41 @@ class ExamplePageA extends StatelessWidget {
 class ExamplePageB extends StatelessWidget {
   final String pageName;
 
-  const ExamplePageB(this.pageName, {super.key});
+  const ExamplePageB(this.pageName, {super.key, String? name2});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(pageName)),
+      body: Center(
+        child: Text(pageName),
+      ),
+    );
+  }
+}
+
+class ExamplePageC extends StatelessWidget {
+  final String pageName;
+
+  const ExamplePageC(this.pageName, [String? name2, Key? key])
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(pageName)),
+      body: Center(
+        child: Text(pageName),
+      ),
+    );
+  }
+}
+
+class ExamplePageD extends StatelessWidget {
+  final String pageName;
+
+  const ExamplePageD({required this.pageName, String? name2, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

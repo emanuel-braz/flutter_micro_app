@@ -37,10 +37,12 @@ class MicroApplication2 extends MicroAppWithBaseRoute
             )),
         MicroAppPage<Page1>(
             route: baseRoute.page1,
+            parameters: 'parametro em string',
             pageBuilder:
                 PageBuilder(widgetBuilder: (_, settings) => const Page1())),
         MicroAppPage(
           route: baseRoute.page2,
+          parameters: Page2.new,
           pageBuilder: PageBuilder(
               widgetBuilder: (_, settings) =>
                   Page2(title: settings.arguments as String?)),
@@ -52,6 +54,7 @@ class MicroApplication2 extends MicroAppWithBaseRoute
             description:
                 'This page is responsible to change buttons and background colors',
             route: baseRoute.pageColors,
+            parameters: ColorsFloatPage.new,
             pageBuilder:
                 PageBuilder(widgetBuilder: (_, __) => const ColorsFloatPage())),
       ];

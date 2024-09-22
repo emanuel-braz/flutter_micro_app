@@ -1,0 +1,3 @@
+dependency_overrides:
+  flutter_micro_app: 
+    path: ../

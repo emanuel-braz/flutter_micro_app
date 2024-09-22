@@ -55,6 +55,7 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
         MicroAppPage<ExamplePage>(
             description: 'This is the example page',
             route: routes.pageExample,
+            parameters: ExamplePage.new,
             pageBuilder: PageBuilder(
                 widgetBuilder: (context, arguments) => const ExamplePage())),
         MicroAppPage(
@@ -65,12 +66,14 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
         MicroAppPage<ExamplePageFragment>(
             description: 'Fragment can be used as a simple Widget',
             route: routes.pageExampleFragment,
+            parameters: ExamplePageFragment.new,
             pageBuilder: PageBuilder(
                 widgetBuilder: (context, arguments) =>
                     const ExamplePageFragment())),
         MicroAppPage<PopupExamplePage>(
           description: 'Popups can be used through WidgetRouteBuilder',
           route: routes.popupExample,
+          parameters: PopupExamplePage.new,
           pageBuilder: PageBuilder(
             widgetBuilder: (context, settings) =>
                 PopupExamplePage(title: settings.arguments as String),
@@ -97,8 +100,10 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
         MicroAppPage(
           description: 'ModalBuilder can be used to show [PopupRoute]',
           route: routes.modalExample,
+          parameters: ModalExamplePage.new,
           pageBuilder: PageBuilder(
             modalBuilder: (settings) => ModalExamplePage(
+                'description', 'subtitle',
                 title: '${settings.arguments}'), // extendes PopupRoute
           ),
         ),
