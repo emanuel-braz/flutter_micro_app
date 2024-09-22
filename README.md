@@ -1,5 +1,5 @@
 
-### A package to speed up the creation of micro apps structure in Flutter applications (beta version)
+### A package to speed up the creation of micro apps structure in Flutter applications
 > Monolithic distribution with independent multiplatform development, inspired in frameworks such as Single SPA, using Event Driven Architecture.
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
@@ -9,6 +9,8 @@
 <br>
 
 ![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
+
+---
 
 ### ⚙️ Define micro app configurations and contracts
 
@@ -40,12 +42,11 @@
     )
   );
 ```
----
 
 ### 💾 Flutter DevTools: Inspect the app, search for routes and export all routes to an Excel file (.xlsx)
 - Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
 
-
+![image](https://github.com/user-attachments/assets/15fd3962-01d5-47e2-8200-0996d850f5aa)
 
 ```dart
 
@@ -69,6 +70,62 @@ MicroAppPage(
           Page2(title: settings.arguments as String?)),
 ),
 ```
+
+---
+
+### 🚀 Initialize the micro host, registering all micro apps
+- MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
+- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
+
+```dart
+void main() {
+    runApp(MyApp());
+}
+
+class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget or MicroHostStatefulWidget
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: NavigatorInstance.navigatorKey, // Required
+      onGenerateRoute: onGenerateRoute, // Required - [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
+      initialRoute: '/host_home_page',
+      navigatorObservers: [
+        NavigatorInstance // [Optional] Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
+      ],
+    );
+  }
+
+  // Register all Host [MicroAppPage]s here
+  @override
+  List<MicroAppPage> get pages => [
+        MicroAppPage(
+          route:  '/host_home_page', 
+          pageBuilder: PageBuilder(
+            widgetBuilder: (_, __) => const HostHomePage()
+          ),
+          description: 'The initial page of the application',
+        ),
+         MicroAppPage(
+          route: '/modal_page',
+          pageBuilder: PageBuilder(
+            modalBuilder: (settings) => ModalExamplePage(
+                title: '${settings.arguments}'), // extends PopupRoute
+          ),
+          description: 'ModalBuilder can be used to show [PopupRoute]',
+        )
+      ];
+
+  // Register all [MicroApp]s here
+  @override
+  List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
+}
+```
+
+### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
+
+![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
+
 
 ---
 
@@ -464,62 +521,6 @@ class Application1MicroApp extends MicroApp {
       ];
 }
 ```
-
----
-
-### 🚀 Initialize the micro host, registering all micro apps
-- MyApp(Widget) needs to extends MicroHostStatelessWidget or MicroHostStatefulWidget
-- The MicroHost is the root widget, and it has all MicroApps, and the MicroApps has all Micro Pages and associated MicroRoutes.
-
-```dart
-void main() {
-    runApp(MyApp());
-}
-
-class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget or MicroHostStatefulWidget
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: NavigatorInstance.navigatorKey, // Required
-      onGenerateRoute: onGenerateRoute, // Required - [onGenerateRoute] this is created automatically, so just use it, or override it, if needed.
-      initialRoute: '/host_home_page',
-      navigatorObservers: [
-        NavigatorInstance // [Optional] Add NavigatorInstance here, if you want to get didPop, didReplace and didPush events
-      ],
-    );
-  }
-
-  // Register all Host [MicroAppPage]s here
-  @override
-  List<MicroAppPage> get pages => [
-        MicroAppPage(
-          route:  '/host_home_page', 
-          pageBuilder: PageBuilder(
-            widgetBuilder: (_, __) => const HostHomePage()
-          ),
-          description: 'The initial page of the application',
-        ),
-         MicroAppPage(
-          route: '/modal_page',
-          pageBuilder: PageBuilder(
-            modalBuilder: (settings) => ModalExamplePage(
-                title: '${settings.arguments}'), // extends PopupRoute
-          ),
-          description: 'ModalBuilder can be used to show [PopupRoute]',
-        )
-      ];
-
-  // Register all [MicroApp]s here
-  @override
-  List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
-}
-```
-
-### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
-
-![supperapp](https://user-images.githubusercontent.com/3827308/184520011-f1ca6d87-0451-46a2-94b8-53ed8cb2b58a.png)
-
 
 --- 
 ### 🗺 Create all routes outside the app project
