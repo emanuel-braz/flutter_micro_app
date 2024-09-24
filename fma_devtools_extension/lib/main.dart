@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:fma_devtools_extension/src/models/micro_board_webview.dart';
 
-import 'pages/main_app_widget.dart';
-import 'pages/micro_board/micro_board_util.dart';
 import 'src/helpers/excel_helper.dart';
+import 'src/ui/pages/main_app_widget.dart';
+import 'src/ui/pages/micro_board/micro_board_util.dart';
 
 void main() {
   runApp(const FmaDevtoolsExtension());

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-import '../../src/models/micro_board_webview.dart';
+import '../../../models/micro_board_webview.dart';
+import '../../widgets/circular_widget.dart';
 import 'micro_board_card_handler.dart';
 import 'micro_board_ma_widget.dart';
 
@@ -41,48 +42,35 @@ class _MicroBoardPageState extends State<MicroBoardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        forceMaterialTransparency: true,
-        backgroundColor: Theme.of(context).secondaryHeaderColor,
-        title: Table(
-          columnWidths: const {
-            0: FlexColumnWidth(1),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(1),
-          },
-          children: [
-            TableRow(
+          elevation: 0,
+          forceMaterialTransparency: true,
+          backgroundColor: Theme.of(context).secondaryHeaderColor,
+          toolbarHeight: 120,
+          title: SizedBox(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                TableCell(
-                  child: Text('${widget.apps.length} Micro App(s)'),
-                ),
-                TableCell(
-                  child: Text(
-                      '${widget.conflictingChannels.length} Conflicting Channel(s)'),
-                ),
-                TableCell(
-                  child: Text('$routesCount Micro Route(s)'),
-                ),
+                CircularWidget(
+                    title: '${widget.apps.length}',
+                    description: 'Micro App(s)'),
+                CircularWidget(
+                    title: '$routesCount', description: 'Micro Route(s)'),
+                CircularWidget(
+                    title: widget.conflictingChannels.length.toString(),
+                    description: 'Conflicting Channel(s)',
+                    borderColor: widget.conflictingChannels.isNotEmpty
+                        ? Colors.red
+                        : Colors.green),
+                CircularWidget(
+                    title:
+                        '${widget.widgetHandlers.length + widget.orphanHandlers.length + microAppHandlerCount}',
+                    description: 'Event Handler(s)'),
+                CircularWidget(
+                    title: '${widget.webviewControllers.length} ',
+                    description: 'Webview Controller(s)'),
               ],
             ),
-            TableRow(
-              children: [
-                TableCell(
-                  child: Text(
-                      '${widget.widgetHandlers.length + widget.orphanHandlers.length + microAppHandlerCount} Event Handler(s)'),
-                ),
-                TableCell(
-                  child: Text(
-                      '${widget.webviewControllers.length} Webview Controller(s)'),
-                ),
-                const TableCell(
-                  child: SizedBox(),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          )),
       body: Column(
         children: [
           Padding(

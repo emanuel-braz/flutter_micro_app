@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "GoRouter Routing",
+            "name": "GoRouter Routing (Android)",
             "request": "launch",
             "type": "dart",
             "program": "example/example_host/lib/main_go_router.dart",
@@ -10,6 +10,12 @@
                 "-d",
                 "emulator-5554"
             ]
+        },
+        {
+            "name": "GoRouter Routing",
+            "request": "launch",
+            "type": "dart",
+            "program": "example/example_host/lib/main_go_router.dart",
         },
         {
             "name": "Classic Routing",
