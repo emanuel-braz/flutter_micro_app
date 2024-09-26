@@ -66,10 +66,17 @@ class _CircularDashboardState extends State<CircularDashboard> {
 
     for (int i = 0; i < totalColors; i++) {
       double hue = (i * hueStep) % 360;
+
+      // Skip red hues (between 0° and 30° or between 330° and 360°)
+      if (hue < 30 || hue > 330) {
+        hue = (hue + 60) % 360; // Shift hue to avoid red
+      }
+
       Color color = HSVColor.fromAHSV(1.0, hue, 0.8, 0.9).toColor();
       colors.add(color);
     }
-    return colors;
+
+    return colors.length == 1 ? [Colors.green] : colors;
   }
 }
 
