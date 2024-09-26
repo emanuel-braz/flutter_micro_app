@@ -1,3 +1,8 @@
+## 2.0.0
+#### Features
+- Add circular widget
+- React to app changes
+
 ## 1.1.1
 ## 1.1.0
 #### Features
