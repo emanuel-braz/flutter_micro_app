@@ -22,10 +22,6 @@
             "request": "launch",
             "type": "dart",
             "program": "example/example_host/lib/main.dart",
-            "args": [
-                "-d",
-                "emulator-5554"
-            ]
         },
         {
             "name": "Web - Flutter Devtools",

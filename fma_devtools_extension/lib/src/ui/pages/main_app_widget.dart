@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:fma_devtools_extension/main.dart';
+import 'dart:async';
 
+import 'package:devtools_extensions/devtools_extensions.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/flutter_micro_app.dart';
+
+import '../../controllers/fma_controller.dart';
+import '../../helpers/excel_helper.dart';
 import 'event_dispatcher_page.dart';
 import 'micro_app_list_page.dart';
 import 'micro_board/micro_board_page.dart';
 
 class MainAppWidget extends StatefulWidget {
-  final MicroBoardData microBoardData;
-  final void Function()? updateView;
-
-  const MainAppWidget(
-      {super.key, required this.microBoardData, required this.updateView});
+  const MainAppWidget({super.key});
 
   @override
   State createState() => _MainAppWidgetState();
@@ -18,65 +19,112 @@ class MainAppWidget extends StatefulWidget {
 
 class _MainAppWidgetState extends State<MainAppWidget> {
   int _currentIndex = 0;
+  late List<Widget> _bars;
+  late final StreamSubscription _onDashboardDataChangedSubscription;
 
-  late final List<Widget> _bars;
+  @override
+  void dispose() {
+    super.dispose();
+    _onDashboardDataChangedSubscription.cancel();
+  }
 
   @override
   void initState() {
     _bars = [
-      MicroBoardPage(
-        apps: widget.microBoardData.microApps,
-        orphanHandlers: widget.microBoardData.orphanHandlers,
-        widgetHandlers: widget.microBoardData.widgetHandlers,
-        webviewControllers: widget.microBoardData.webviewControllers,
-        conflictingChannels: widget.microBoardData.conflictingChannels,
-      ),
-      MicroAppList(
-        microApps: widget.microBoardData.microApps,
-        updateView: widget.updateView,
-      ),
-      EventDispatcher(microBoardData: widget.microBoardData),
+      const MicroBoardPage(),
+      const MicroAppList(),
+      const EventDispatcher(),
     ];
 
-    // TODO: Not compatible with Flutter stable version yet
-    // TODO: Implement this - It receives events from the app to update micro board on app data changes
-    // registerExtension(
-    //     'ext.dev.emanuelbraz.fma.extensionToDevtoolsMicroBoardChanged',
-    //     (method, parameters) async {
-    //   ScaffoldMessenger.of(context).clearSnackBars();
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text('Micro Board Updated!'),
-    //   ));
-
-    //   return ServiceExtensionResponse.result('');
-    // });
+    _onDashboardDataChangedSubscription =
+        serviceManager.service!.onExtensionEvent.listen((event) {
+      if (event.extensionKind ==
+          Constants.extensionToDevtoolsMicroBoardChanged) {
+        _onDashboardDataChanged();
+      }
+    });
 
     super.initState();
+  }
+
+  void _onDashboardDataChanged() {
+    FmaController().updateView().then((value) => setState(() {}));
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Micro Board Updated!'),
+    ));
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _bars[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Micro Board',
+      appBar: AppBar(
+        title: const Text('Flutter Micro App'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              onPressed: () {
+                FmaController().updateView().then((value) => setState(() {}));
+              },
+              icon: const Icon(Icons.refresh),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.import_contacts),
-            label: 'Micro Pages',
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              onPressed: () {
+                ExcelHelper().create();
+              },
+              icon: const Icon(Icons.file_download_rounded),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Event Dispatcher',
+        ],
+      ),
+      body: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(top: 10),
+            width: 250,
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).dividerColor),
+              borderRadius: const BorderRadius.all(Radius.circular(6)),
+            ),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.dashboard),
+                  title: const Text('Micro Board'),
+                  onTap: () => _onItemTapped(0),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.import_contacts),
+                  title: const Text('Micro Pages'),
+                  onTap: () => _onItemTapped(1),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: const Text('Event Dispatcher'),
+                  onTap: () => _onItemTapped(2),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: _bars,
+            ),
           ),
         ],
       ),

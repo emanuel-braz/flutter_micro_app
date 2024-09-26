@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-import '../../../models/micro_board_webview.dart';
+import '../../../controllers/fma_controller.dart';
+import '../../widgets/circular_stroke.dart';
 import '../../widgets/circular_widget.dart';
 import 'micro_board_card_handler.dart';
 import 'micro_board_ma_widget.dart';
 
 class MicroBoardPage extends StatefulWidget {
-  final List<MicroBoardApp> apps;
-  final List<MicroBoardHandler> orphanHandlers;
-  final List<MicroBoardHandler> widgetHandlers;
-  final List<String> conflictingChannels;
-  final List<MicroBoardWebview> webviewControllers;
-  const MicroBoardPage(
-      {required this.apps,
-      required this.orphanHandlers,
-      required this.widgetHandlers,
-      required this.webviewControllers,
-      this.conflictingChannels = const <String>[],
-      super.key});
+  const MicroBoardPage({super.key});
 
   @override
   State<MicroBoardPage> createState() => _MicroBoardPageState();
@@ -26,114 +16,140 @@ class MicroBoardPage extends StatefulWidget {
 
 class _MicroBoardPageState extends State<MicroBoardPage> {
   final TextEditingController _filterInput = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    int routesCount = 0;
-    int microAppHandlerCount = 0;
+    return ValueListenableBuilder(
+      valueListenable: FmaController(),
+      builder: (context, value, child) {
+        int routesCount = 0;
+        int microAppHandlerCount = 0;
 
-    for (var app in widget.apps) {
-      final pages = app.pages;
-      final handlers = app.handlers;
+        for (var app in value.microBoardData.microApps) {
+          final pages = app.pages;
+          final handlers = app.handlers;
+          routesCount += pages.length;
+          microAppHandlerCount += handlers.length;
+        }
 
-      routesCount += pages.length;
-
-      microAppHandlerCount += handlers.length;
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-          elevation: 0,
-          forceMaterialTransparency: true,
-          backgroundColor: Theme.of(context).secondaryHeaderColor,
-          toolbarHeight: 120,
-          title: SizedBox(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CircularWidget(
-                    title: '${widget.apps.length}',
-                    description: 'Micro App(s)'),
-                CircularWidget(
-                    title: '$routesCount', description: 'Micro Route(s)'),
-                CircularWidget(
-                    title: widget.conflictingChannels.length.toString(),
-                    description: 'Conflicting Channel(s)',
-                    borderColor: widget.conflictingChannels.isNotEmpty
-                        ? Colors.red
-                        : Colors.green),
-                CircularWidget(
-                    title:
-                        '${widget.widgetHandlers.length + widget.orphanHandlers.length + microAppHandlerCount}',
-                    description: 'Event Handler(s)'),
-                CircularWidget(
-                    title: '${widget.webviewControllers.length} ',
-                    description: 'Webview Controller(s)'),
-              ],
-            ),
-          )),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: TextField(
-              controller: _filterInput,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Search for a route',
-                hintText: 'route path or description',
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(8),
-              children: [
-                ...(List<MicroBoardApp>.from(widget.apps)).where((e) {
-                  return e.pages.any((p) {
-                    return p.route
-                            .toLowerCase()
-                            .contains(_filterInput.text.toLowerCase()) ||
-                        p.description
-                            .toLowerCase()
-                            .contains(_filterInput.text.toLowerCase());
-                  });
-                }).map((e) {
-                  final filteredPages = List<MicroBoardRoute>.from(e.pages);
-
-                  filteredPages.removeWhere((p) =>
-                      !p.route
-                          .toLowerCase()
-                          .contains(_filterInput.text.toLowerCase()) &&
-                      !p.description
-                          .toLowerCase()
-                          .contains(_filterInput.text.toLowerCase()));
-
-                  return MicroBoardItemWidget(
-                    e.copyWith(pages: filteredPages),
-                    conflictingChannels: widget.conflictingChannels,
-                  );
-                }),
-                MicroBoardHandlerCard(
-                  widgetHandlers: widget.widgetHandlers,
-                  title: 'Widget Handlers',
-                  conflictingChannels: widget.conflictingChannels,
-                  titleColor: Colors.green,
+        return Scaffold(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Wrap(
+                  alignment: WrapAlignment.spaceEvenly,
+                  children: [
+                    CircularDashboard(
+                      elements: value.microBoardData.microApps.map((e) {
+                        return DashboardElement(
+                            label: e.name, value: e.pages.length);
+                      }).toList(),
+                    ),
+                    CircularWidget(
+                        title: '$routesCount', description: 'Micro Route(s)'),
+                    CircularWidget(
+                        title:
+                            '${value.microBoardData.widgetHandlers.length + value.microBoardData.orphanHandlers.length + microAppHandlerCount}',
+                        description: 'Event Handler(s)'),
+                    CircularWidget(
+                        title: value.microBoardData.orphanHandlers.length
+                            .toString(),
+                        description: 'Orphan Handler(s)',
+                        borderColor:
+                            value.microBoardData.conflictingChannels.isNotEmpty
+                                ? Colors.red
+                                : Colors.green),
+                    CircularWidget(
+                        title: value.microBoardData.conflictingChannels.length
+                            .toString(),
+                        description: 'Conflicting Channel(s)',
+                        borderColor:
+                            value.microBoardData.conflictingChannels.isNotEmpty
+                                ? Colors.red
+                                : Colors.green),
+                    CircularWidget(
+                        title:
+                            '${value.microBoardData.webviewControllers.length} ',
+                        description: 'Webview Controller(s)'),
+                  ]
+                      .map(
+                        (item) => Container(
+                          alignment: Alignment.bottomCenter,
+                          width: 160,
+                          height: 100,
+                          child: item,
+                        ),
+                      )
+                      .toList()),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: TextField(
+                  controller: _filterInput,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Search for a route',
+                    hintText: 'route path or description',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                 ),
-                MicroBoardHandlerCard(
-                    widgetHandlers: widget.orphanHandlers,
-                    title: 'Orphan Handlers',
-                    conflictingChannels: widget.conflictingChannels,
-                    titleColor: Colors.red),
-                const SizedBox(height: 54)
-              ],
-            ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(8),
+                  children: [
+                    ...(List<MicroBoardApp>.from(
+                            value.microBoardData.microApps))
+                        .where((e) {
+                      return e.pages.any((p) {
+                        return p.route
+                                .toLowerCase()
+                                .contains(_filterInput.text.toLowerCase()) ||
+                            p.description
+                                .toLowerCase()
+                                .contains(_filterInput.text.toLowerCase());
+                      });
+                    }).map((e) {
+                      final filteredPages = List<MicroBoardRoute>.from(e.pages);
+
+                      filteredPages.removeWhere((p) =>
+                          !p.route
+                              .toLowerCase()
+                              .contains(_filterInput.text.toLowerCase()) &&
+                          !p.description
+                              .toLowerCase()
+                              .contains(_filterInput.text.toLowerCase()));
+
+                      return MicroBoardItemWidget(
+                        e.copyWith(pages: filteredPages),
+                        conflictingChannels:
+                            value.microBoardData.conflictingChannels,
+                      );
+                    }),
+                    MicroBoardHandlerCard(
+                      widgetHandlers: value.microBoardData.widgetHandlers,
+                      title: 'Widget Handlers',
+                      conflictingChannels:
+                          value.microBoardData.conflictingChannels,
+                      titleColor: Colors.green,
+                    ),
+                    MicroBoardHandlerCard(
+                        widgetHandlers: value.microBoardData.orphanHandlers,
+                        title: 'Orphan Handlers',
+                        conflictingChannels:
+                            value.microBoardData.conflictingChannels,
+                        titleColor: Colors.red),
+                    const SizedBox(height: 54)
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
