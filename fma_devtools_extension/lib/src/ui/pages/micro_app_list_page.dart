@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
-class MicroAppList extends StatefulWidget {
-  final List<MicroBoardApp> microApps;
-  final void Function()? updateView;
+import '../../controllers/fma_controller.dart';
 
-  const MicroAppList(
-      {super.key, required this.microApps, required this.updateView});
+class MicroAppList extends StatefulWidget {
+  const MicroAppList({super.key});
 
   @override
   State<MicroAppList> createState() => _MicroAppListState();
@@ -52,20 +50,25 @@ class _MicroAppListState extends State<MicroAppList> {
           child: Row(
             children: [
               Expanded(
-                child: ListView.builder(
-                  itemCount: widget.microApps.length,
-                  itemBuilder: (context, index) {
-                    final microApp = widget.microApps[index];
-                    return ListTile(
-                      onTap: () {
-                        setState(() {
-                          pages = microApp.pages;
-                        });
-                      },
-                      title: Text(microApp.name),
-                    );
-                  },
-                ),
+                child: ValueListenableBuilder(
+                    valueListenable: FmaController(),
+                    builder: (context, value, child) {
+                      return ListView.builder(
+                        itemCount: value.microBoardData.microApps.length,
+                        itemBuilder: (context, index) {
+                          final microApp =
+                              value.microBoardData.microApps[index];
+                          return ListTile(
+                            onTap: () {
+                              setState(() {
+                                pages = microApp.pages;
+                              });
+                            },
+                            title: Text(microApp.name),
+                          );
+                        },
+                      );
+                    }),
               ),
               Expanded(
                 child: ListView.builder(

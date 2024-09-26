@@ -1,9 +1,8 @@
 import 'package:excel/excel.dart';
-
-import '../../main.dart';
+import 'package:fma_devtools_extension/src/controllers/fma_controller.dart';
 
 class ExcelHelper {
-  create(MicroBoardData data) {
+  create() {
     final excel = Excel.createExcel();
     Sheet sheetObject = excel['Routes'];
 
@@ -29,7 +28,7 @@ class ExcelHelper {
     sheetObject.setColumnWidth(3, 15);
     sheetObject.setColumnWidth(4, 30);
 
-    for (var app in data.microApps) {
+    for (var app in FmaController().value.microBoardData.microApps) {
       final pages = app.pages;
       for (var page in pages) {
         final microAppName = app.name;

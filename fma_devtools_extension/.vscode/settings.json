@@ -20,6 +20,6 @@
         "titleBar.inactiveForeground": "#15202b99"
     },
     "peacock.color": "#F5A0C5",
-    "dart.flutterSdkPath": "/Users/eb/.puro/envs/devtools/flutter",
-    "dart.sdkPath": "/Users/eb/.puro/envs/devtools/flutter/bin/cache/dart-sdk"
+    "dart.flutterSdkPath": "/Users/eb/.puro/envs/master/flutter",
+    "dart.sdkPath": "/Users/eb/.puro/envs/master/flutter/bin/cache/dart-sdk"
 }

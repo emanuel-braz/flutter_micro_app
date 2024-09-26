@@ -12,6 +12,7 @@ import 'package:flutter_micro_app/src/services/native_service.dart';
 
 import '../../infra/adapters/micro_app_event/micro_app_event_adapter.dart';
 import '../../infra/adapters/micro_app_event/micro_app_event_json_adapter.dart';
+import '../../utils/extensions/devtools_extension_utils.dart';
 import 'micro_app_event_delegate.dart';
 
 /// [MicroAppEventController]
@@ -90,42 +91,32 @@ class MicroAppEventController {
   }
 
   String getMicroBoardData() {
-    final microBoard = MicroBoard();
-
-    final microApps = microBoard.getMicroBoardApps;
-    final orphanHandlers = microBoard.getOrphanHandlers();
-    final widgetHandlers = microBoard.getWidgetsHandlers();
-    final webviewControllers = microBoard.getWebviewControllers();
-
-    final microAppsMap = microApps.map((e) => e.toMap()).toList();
-    final orphanHandlersMap = orphanHandlers.map((e) => e.toMap()).toList();
-    final widgetHandlersMap = widgetHandlers.map((e) => e.toMap()).toList();
-    final webviewControllersMap =
-        webviewControllers.map((e) => e.toMap()).toList();
-
-    final mapData = {
-      'micro_apps': microAppsMap,
-      'orphan_event_handlers': orphanHandlersMap,
-      'widget_event_handlers': widgetHandlersMap,
-      'webview_controllers': webviewControllersMap,
-    };
-
-    final jsonData = jsonEncode(mapData);
-    return jsonData;
-  }
-
-  notifyDevtoolsMicroBoardChanged() {
     try {
-      // TODO: Not compatible with flutter stable version yet
-      // serviceManager.callServiceExtensionOnMainIsolate(
-      //   Constants.extensionToDevtoolsMicroBoardChanged,
-      //   {
-      //     'data': getMicroBoardData(),
-      //   },
-      // );
+      final microBoard = MicroBoard();
+
+      final microApps = microBoard.getMicroBoardApps;
+      final orphanHandlers = microBoard.getOrphanHandlers();
+      final widgetHandlers = microBoard.getWidgetsHandlers();
+      final webviewControllers = microBoard.getWebviewControllers();
+
+      final microAppsMap = microApps.map((e) => e.toMap()).toList();
+      final orphanHandlersMap = orphanHandlers.map((e) => e.toMap()).toList();
+      final widgetHandlersMap = widgetHandlers.map((e) => e.toMap()).toList();
+      final webviewControllersMap =
+          webviewControllers.map((e) => e.toMap()).toList();
+
+      final mapData = {
+        'micro_apps': microAppsMap,
+        'orphan_event_handlers': orphanHandlersMap,
+        'widget_event_handlers': widgetHandlersMap,
+        'webview_controllers': webviewControllersMap,
+      };
+
+      final jsonData = jsonEncode(mapData);
+      return jsonData;
     } catch (e) {
-      logger.e('An error occurred while dispatching events to Devtools',
-          error: e);
+      logger.e('An error occurred while getting MicroBoardData', error: e);
+      return '{}';
     }
   }
 
@@ -181,7 +172,7 @@ class MicroAppEventController {
         _handlerRegisterDelegate.registerHandler(stream, handler);
     _handlers.putIfAbsent(handler, () => subscription);
 
-    notifyDevtoolsMicroBoardChanged();
+    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
     return subscription;
   }
 
@@ -196,7 +187,7 @@ class MicroAppEventController {
   /// unregisterAllHandlers
   Future<void> unregisterAllHandlers() async {
     await _handlerRegisterDelegate.unregisterAllSubscriptions(_handlers);
-    notifyDevtoolsMicroBoardChanged();
+    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
   }
 
   /// unregisterHandler
@@ -205,12 +196,14 @@ class MicroAppEventController {
       List<String>? channels,
       MicroAppEventHandler? handler}) async {
     if (handler != null) {
+      notifyDevtoolsMicroBoardChanged(getMicroBoardData());
       return _handlerRegisterDelegate.unregisterHandler(handler, _handlers);
     }
+
     await _handlerRegisterDelegate.unregisterSubscription(_handlers,
         id: id, channels: channels);
 
-    notifyDevtoolsMicroBoardChanged();
+    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
     return null;
   }
 
@@ -229,7 +222,7 @@ class MicroAppEventController {
   GenericMicroAppEventController registerWebviewController(
       {required String id,
       required GenericMicroAppEventController controller}) {
-    notifyDevtoolsMicroBoardChanged();
+    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
     return _webviewControllers[id] = controller;
   }
 
@@ -242,7 +235,7 @@ class MicroAppEventController {
       return controller;
     }
 
-    notifyDevtoolsMicroBoardChanged();
+    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
     return null;
   }
 }
