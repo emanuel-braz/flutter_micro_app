@@ -11,10 +11,12 @@ class DashboardElement {
 
 class CircularDashboard extends StatefulWidget {
   final List<DashboardElement> elements;
+  final Color? color;
 
   const CircularDashboard({
     Key? key,
     required this.elements,
+    this.color,
   }) : super(key: key);
 
   @override
@@ -37,8 +39,12 @@ class _CircularDashboardState extends State<CircularDashboard> {
             children: [
               CustomPaint(
                 size: const Size(62, 62),
-                painter: CircularDashboardPainter(widget.elements, totalValue,
-                    _getRandomColors(widget.elements.length)),
+                painter: CircularDashboardPainter(
+                    widget.elements,
+                    totalValue,
+                    widget.color != null
+                        ? [widget.color!]
+                        : _getRandomColors(widget.elements.length)),
               ),
               Positioned.fill(
                 child: Center(

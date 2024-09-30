@@ -6,12 +6,19 @@ import 'package:go_router/go_router.dart';
 void main() {
   MicroBoard().getMicroBoardApps;
 
+  MicroAppEventController().registerHandler(MicroAppEventHandler<Map>(
+    (event) {
+      debugPrint('[restart_app] Received event: ${event.payload}');
+    },
+    channels: const ['restart_app'],
+  ));
+
   runApp(MyApp());
 }
 
 final FmaGoRouter fmaGoRouter = FmaGoRouter(
-  name: 'GoRouter Example',
-  description: 'This is an example of GoRouter',
+  name: 'Micro Host',
+  description: 'This is an example of microapp using GoRouter',
   goRouter: GoRouter(
     navigatorKey: NavigatorInstance.navigatorKey,
     routes: <RouteBase>[
@@ -24,9 +31,19 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
         },
         routes: <RouteBase>[
           FmaGoRoute(
-            description: 'This page has path parameter',
+            description: 'This page has parameter',
             path: 'page_with_id/:id',
             parameters: ExamplePageA.new,
+            builder: (context, state) {
+              return ExamplePageA(
+                  'page with id = ' + (state.pathParameters['id'] ?? ''));
+            },
+          ),
+          FmaGoRoute(
+            description: 'This page has parameters with group\n'
+                'group/:groupId/item/:itemId',
+            path: 'group/:groupId/item/:itemId',
+            parameters: GroupParams.new,
             builder: (context, state) {
               return ExamplePageA(
                   'page with id = ' + (state.pathParameters['id'] ?? ''));
@@ -37,7 +54,8 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
             path: 'page1',
             parameters: ExamplePageC.new,
             builder: (context, state) {
-              return const ExamplePageC('page1');
+              final pageName = (state.extra as Map)['pageName'] as String;
+              return ExamplePageA(pageName);
             },
           ),
           FmaGoRoute(
@@ -160,14 +178,43 @@ final FmaGoRouter fmaGoRouter = FmaGoRouter(
 );
 
 // This is host application
-class MyApp extends MicroHostStatelessWidget {
-  MyApp({super.key});
+class MyApp extends MicroHostStatelessWidget with HandlerRegisterMixin {
+  MyApp({super.key}) {
+    registerEventHandler(
+      MicroAppEventHandler(
+        (event) {
+          final name = event.name;
+
+          if (name?.isNotEmpty == true) {
+            switch (name) {
+              case 'pop':
+                fmaGoRouter.goRouter.pop();
+                break;
+              case 'push':
+                final route = event.payload['route'];
+                final parameters = event.payload['parameters'];
+                fmaGoRouter.goRouter.go(route, extra: parameters);
+                break;
+            }
+          } else {
+            final route = event.payload['route'];
+            final parameters = event.payload['parameters'];
+            fmaGoRouter.goRouter.go(route, extra: parameters);
+          }
+        },
+        channels: const ['navigate'],
+        distinct: false,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      routerConfig: fmaGoRouter.goRouter,
+    return Material(
+      child: MaterialApp.router(
+        title: 'Flutter Demo',
+        routerConfig: fmaGoRouter.goRouter,
+      ),
     );
   }
 
@@ -184,7 +231,12 @@ class MyApp extends MicroHostStatelessWidget {
   String get description => fmaGoRouter.description ?? '';
 
   @override
-  List<MicroApp> get initialMicroApps => [];
+  List<MicroApp> get initialMicroApps => [
+        OnboardingMicroApp(),
+        UserMicroApp(),
+        AuthMicroApp(),
+        ChatbotMicroApp(),
+      ];
 }
 
 class BaseHomePage extends StatefulWidget {
@@ -194,11 +246,27 @@ class BaseHomePage extends StatefulWidget {
   State<BaseHomePage> createState() => _BaseHomePageState();
 }
 
-class _BaseHomePageState extends State<BaseHomePage> {
+class _BaseHomePageState extends State<BaseHomePage>
+    with HandlerRegisterStateMixin {
   @override
   void initState() {
     super.initState();
+
     MicroBoard.showButton();
+
+    registerEventHandler(
+      MicroAppEventHandler(
+        (event) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(event.payload.toString()),
+            ),
+          );
+        },
+        channels: const ['snackbar', 'auth'],
+      ),
+    );
   }
 
   @override
@@ -218,7 +286,7 @@ class _BaseHomePageState extends State<BaseHomePage> {
             ElevatedButton(
               child: const Text('Open Page 1'),
               onPressed: () {
-                context.go('/page1');
+                context.go('/page1', extra: {'pageName': 'Page 1'});
               },
             ),
             ElevatedButton(
@@ -238,6 +306,16 @@ class _BaseHomePageState extends State<BaseHomePage> {
       ),
     );
   }
+}
+
+class GroupParams {
+  final String groupId;
+  final String itemId;
+
+  GroupParams({
+    required this.groupId,
+    required this.itemId,
+  });
 }
 
 class ExamplePageA extends StatelessWidget {
@@ -304,4 +382,119 @@ class ExamplePageD extends StatelessWidget {
       ),
     );
   }
+}
+
+// Do not use Microapp with routes if you are using GoRouter, it's not fully supported. This is just an example to fill the dashboard
+class OnboardingMicroApp extends MicroApp {
+  @override
+  String get name => 'Onboarding MicroApp';
+
+  @override
+  String get description => 'This micro app is intended for onboarding users';
+
+  @override
+  List<MicroAppPage<Widget>> get pages => [];
+}
+
+// Do not use Microapp with routes if you are using GoRouter, it's not fully supported. This is just an example to fill the dashboard
+class UserMicroApp extends MicroApp with HandlerRegisterMixin {
+  UserMicroApp() {
+    registerEventHandler(
+      MicroAppEventHandler(
+        (event) {},
+        channels: const ['get_user', 'update_user', 'delete_user'],
+      ),
+    );
+  }
+
+  @override
+  String get name => 'User MicroApp';
+
+  @override
+  String get description => 'This micro app is intended for user management';
+
+  @override
+  List<MicroAppPage<Widget>> get pages => [
+        MicroAppPage(
+          name: 'User Profile',
+          description: 'This page displays user profile information',
+          route: '/user/profile',
+          parameters: ExamplePageA.new,
+          pageBuilder: PageBuilder(widgetBuilder: (context, settings) {
+            final json = settings.arguments as Map;
+            final String pageName = json['pageName'];
+            return ExamplePageA(pageName);
+          }),
+        ),
+        MicroAppPage(
+          name: 'User Settings',
+          description: 'This page displays user settings',
+          route: '/user/settings',
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) =>
+                const ExamplePageA('User Settings'),
+          ),
+        ),
+      ];
+}
+
+// Do not use Microapp with routes if you are using GoRouter, it's not fully supported. This is just an example to fill the dashboard
+class AuthMicroApp extends MicroApp with HandlerRegisterMixin {
+  AuthMicroApp() {
+    registerEventHandler(
+      MicroAppEventHandler(
+        (event) {},
+        channels: const ['auth'],
+      ),
+    );
+  }
+
+  @override
+  String get name => 'Auth MicroApp';
+
+  @override
+  String get description =>
+      'This micro app is intended for authentication purposes';
+
+  @override
+  List<MicroAppPage<Widget>> get pages => [
+        MicroAppPage(
+          name: 'Login',
+          description: 'This page is for user login',
+          route: '/auth/login',
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) => const ExamplePageA('Login'),
+          ),
+        ),
+        MicroAppPage(
+          name: 'Register',
+          description: 'This page is for user registration',
+          route: '/auth/register',
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) =>
+                const ExamplePageA('Register'),
+          ),
+        ),
+        MicroAppPage(
+          name: 'Forgot Password',
+          description: 'This page is for password recovery',
+          route: '/auth/forgot-password',
+          pageBuilder: PageBuilder(
+            widgetBuilder: (context, settings) =>
+                const ExamplePageA('Forgot Password'),
+          ),
+        ),
+      ];
+}
+
+// Do not use Microapp with routes if you are using GoRouter, it's not fully supported. This is just an example to fill the dashboard
+class ChatbotMicroApp extends MicroApp with HandlerRegisterMixin {
+  @override
+  String get name => 'Navigator MicroApp';
+
+  @override
+  String get description => 'This micro app is intended for navigation events';
+
+  @override
+  List<MicroAppPage<Widget>> get pages => [];
 }
