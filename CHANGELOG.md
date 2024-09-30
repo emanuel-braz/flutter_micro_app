@@ -1,3 +1,7 @@
+## 2.0.1
+#### Fixed
+- Fixing issue with orphaned handlers in dashboard
+
 ## 2.0.0
 #### Features
 - Add circular widget
