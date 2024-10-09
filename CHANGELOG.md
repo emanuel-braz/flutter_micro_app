@@ -1,3 +1,7 @@
+## 2.0.2
+#### Fixed
+- Fixing issue with --obfuscate flag when building the app
+
 ## 2.0.1
 #### Fixed
 - Fixing issue with orphaned handlers in dashboard
