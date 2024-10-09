@@ -8,7 +8,13 @@
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 <br>
 
-![Screen Shot 2022-02-03 at 00 32 35](https://user-images.githubusercontent.com/3827308/152278448-3c63a692-f390-4377-964b-6f2c447c0a70.png)
+![image](https://github.com/user-attachments/assets/60b3f22a-ffd2-4ea8-bcb4-5111366142b3)
+
+---
+
+### 💾 The Flutter Micro App package provides a Flutter DevTools Extension, so you can inspect the app event handlers, inspect the routes in Widget Tree through the Flutter Widget Inspector, dispatch events to control the app from outside, search for routes and export all routes to an Excel file (.xlsx)
+
+<img width="1674" alt="image" src="https://github.com/user-attachments/assets/7f9dcca9-1085-401c-9096-fc03e7ed5563">
 
 ---
 
@@ -41,35 +47,6 @@
       },
     )
   );
-```
-
-### 💾 Flutter DevTools: Inspect the app, search for routes and export all routes to an Excel file (.xlsx)
-- Use Flutter Devtools in order to inspect the whole application structure and export all routes to an excel file.
-
-<img width="1674" alt="image" src="https://github.com/user-attachments/assets/7f9dcca9-1085-401c-9096-fc03e7ed5563">
-
-
-```dart
-
-// In order to use GoRouter, you need to add package https://pub.dev/packages/fma_go_router  
- FmaGoRoute(
-  description: 'This is a example of GoRouter page',
-  path: 'page_with_id/:id',
-  parameters: ExamplePageA.new, // If using `.new`, the parameters will be passed automatically, but you can use a String if you want to pass manually
-  builder: (context, state) {
-    return ExamplePageA(state.pathParameters['id']);
-  },
-),
-
-or 
-
-MicroAppPage(
-  route: '/page2',
-  parameters: Page2.new,
-  pageBuilder: PageBuilder(
-      widgetBuilder: (_, settings) =>
-          Page2(title: settings.arguments as String?)),
-),
 ```
 
 ---
@@ -121,6 +98,31 @@ class MyApp extends MicroHostStatelessWidget { // Use MicroHostStatelessWidget o
   @override
   List<MicroApp> get initialMicroApps => [MicroApplication1(), MicroApplication2()];
 }
+```
+
+The example above shows how to use a classic routing strategy, but you can use GoRouter to leverage an advanced routing system.
+
+```dart
+// Register routes using classic routing or GoRouter
+// In order to use GoRouter, you need to add package https://pub.dev/packages/fma_go_router
+// IMPORTANT: See example code, in order to understand how GoRouter integration works
+ FmaGoRoute(
+  description: 'This is a example of GoRouter page',
+  path: 'page_with_id/:id',
+  parameters: ExamplePageA.new, // If using `.new`, the parameters will be passed automatically, but you can use a String if you want to pass manually
+  builder: (context, state) {
+    return ExamplePageA(state.pathParameters['id']);
+  },
+),
+
+// or use classic routing
+MicroAppPage(
+  route: '/page2',
+  parameters: Page2.new,
+  pageBuilder: PageBuilder(
+      widgetBuilder: (_, settings) =>
+          Page2(title: settings.arguments as String?)),
+),
 ```
 
 ### You can structure your application in many ways, this is one of the ways I usually use it in my projects.
