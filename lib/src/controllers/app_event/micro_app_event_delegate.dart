@@ -4,6 +4,7 @@ import '../../../dependencies.dart';
 import '../../entities/events/micro_app_event.dart';
 import '../../entities/events/micro_app_event_handler.dart';
 
+@pragma('vm:entry-point')
 class MicroAppEventDelegate {
   /// registerHandler
   StreamSubscription<MicroAppEvent> registerHandler(

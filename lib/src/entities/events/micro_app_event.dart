@@ -7,12 +7,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 
 /// Event channels
+@pragma('vm:entry-point')
 abstract class EventChannelsEquatable extends Equatable {
   final List<String> channels;
   const EventChannelsEquatable(this.channels);
 }
 
 /// [MicroAppEvent]
+@pragma('vm:entry-point')
 class MicroAppEvent<T> extends EventChannelsEquatable {
   final String? name;
   final T? payload;

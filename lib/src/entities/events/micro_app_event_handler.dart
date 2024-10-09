@@ -1,6 +1,7 @@
 import '../../../flutter_micro_app.dart';
 
 /// [MicroAppEventHandler]
+@pragma('vm:entry-point')
 class MicroAppEventHandler<T> extends EventChannelsEquatable {
   final String? id;
   final MicroAppEventOnEvent onEvent;
