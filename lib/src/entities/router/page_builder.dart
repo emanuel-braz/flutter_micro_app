@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../../utils/enums/micro_page_transition_type.dart';
 import '../../utils/typedefs.dart';
 
+@pragma('vm:entry-point')
 class PageBuilder<T extends Widget> {
   final WidgetPageBuilder<T>? builder;
   WidgetPageBuilder<T>? widgetBuilder;
