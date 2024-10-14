@@ -1,5 +1,6 @@
 import 'package:devtools_app_shared/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 
 import '../../controllers/fma_controller.dart';
@@ -14,22 +15,32 @@ class RemoteConfigPage extends StatefulWidget {
 class _RemoteConfigPageState extends State<RemoteConfigPage>
     with AutoDisposeMixin {
   bool _isEditMode = false;
+  final _focusNode = FocusNode();
+  bool _isMetaPressed = false;
 
   @override
   void initState() {
     super.initState();
 
     FmaController().syncRemoteConfigData();
-
+    _focusNode.requestFocus();
     // addAutoDisposeListener(FmaController().remoteConfig, () {
     //   setState(() {});
     // });
   }
 
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   void _confirmChanges() {
     FmaController().syncRemoteConfigData(
         parameters: {'data': FmaController().value.remoteConfig});
-
+    setState(() {
+      _isEditMode = false;
+    });
     l.d('Changes saved');
   }
 
@@ -39,35 +50,82 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
         valueListenable: FmaController(),
         builder: (context, value, child) {
           return Scaffold(
-              appBar: AppBar(
-                title: const Text('Remote Config'),
-                centerTitle: true,
-                actions: [
-                  IconButton(
-                    icon: Icon(_isEditMode ? Icons.check : Icons.edit),
-                    onPressed: () {
-                      if (_isEditMode) {
-                        _confirmChanges();
-                      }
-                      setState(() {
-                        _isEditMode = !_isEditMode;
-                      });
+            appBar: AppBar(
+              title: const Text('Remote Config'),
+              centerTitle: true,
+              actions: [
+                SizedBox(
+                  height: 32,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        if (_isEditMode) {
+                          _confirmChanges();
+                        } else {
+                          setState(() {
+                            _isEditMode = !_isEditMode;
+                          });
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            _isEditMode ? 'Save' : 'Edit',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(_isEditMode ? Icons.save : Icons.edit),
+                        ],
+                      )),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Switch(
+                    value: value.enabled,
+                    onChanged: (bool newValue) {
+                      // value.enabled = newValue;
+                      FmaController().syncRemoteConfigData(enabled: newValue);
                     },
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Switch(
-                      value: value.enabled,
-                      onChanged: (bool newValue) {
-                        // value.enabled = newValue;
-                        FmaController().syncRemoteConfigData(enabled: newValue);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              body: PayloadModifierScreen(_isEditMode));
+                ),
+              ],
+            ),
+            body: KeyboardListener(
+              focusNode: _focusNode,
+              onKeyEvent: _handleKeyEvent,
+              child: PayloadModifierScreen(_isEditMode),
+            ),
+          );
         });
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.metaLeft ||
+          event.logicalKey == LogicalKeyboardKey.metaRight) {
+        // Meta (Command) key is pressed
+        _isMetaPressed = true;
+      } else if (event.logicalKey == LogicalKeyboardKey.enter &&
+          _isMetaPressed) {
+        _isMetaPressed = false;
+        // Enter key is pressed while Meta is active
+        if (_isEditMode) {
+          _confirmChanges();
+        }
+      }
+    } else if (event is KeyUpEvent) {
+      // Reset Meta key state when released
+      if (event.logicalKey == LogicalKeyboardKey.metaLeft ||
+          event.logicalKey == LogicalKeyboardKey.metaRight) {
+        _isMetaPressed = false;
+      }
+    }
   }
 }
 
@@ -140,10 +198,12 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Text(key, style: Theme.of(context).textTheme.displaySmall)),
       subtitle: TextField(
+        minLines: 1,
+        maxLines: 50,
         controller: controller,
         keyboardType: (value is int || value is double)
             ? TextInputType.number
-            : TextInputType.text,
+            : TextInputType.multiline,
         enabled: widget.isEditMode,
         onChanged: widget.isEditMode
             ? (newValue) {
@@ -154,20 +214,6 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
                 } else {
                   state.remoteConfig[key] = newValue;
                 }
-              }
-            : null,
-        onSubmitted: widget.isEditMode
-            ? (newValue) {
-                setState(() {
-                  if (value is int) {
-                    state.remoteConfig[key] = int.tryParse(newValue) ?? value;
-                  } else if (value is double) {
-                    state.remoteConfig[key] =
-                        double.tryParse(newValue) ?? value;
-                  } else {
-                    state.remoteConfig[key] = newValue;
-                  }
-                });
               }
             : null,
         decoration: const InputDecoration(

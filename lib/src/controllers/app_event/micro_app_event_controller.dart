@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -40,11 +41,15 @@ class MicroAppEventController {
   Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> get handlers =>
       _handlers;
 
+  /// Remote config
+  bool _remoteConfigRegistered = false;
+
   /// Factory instance
   factory MicroAppEventController() => instance;
 
   /// MicroAppController instance
   static MicroAppEventController instance = MicroAppEventController._();
+
   MicroAppEventController._({bool isTest = false}) {
     _handlerRegisterDelegate = MicroAppEventDelegate();
 
@@ -64,76 +69,73 @@ class MicroAppEventController {
       }
     });
 
-    if (!isTest && !kReleaseMode) {
-      // Receive micro app events from devtools
-      registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
-          (method, parameters) async {
+    registerRemoteConfigChannels();
+  }
+
+  void registerRemoteConfigChannels() {
+    if (_remoteConfigRegistered || kReleaseMode) return;
+
+    _remoteConfigRegistered = true;
+
+    // Receive micro app events from devtools
+    registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
+        (method, parameters) async {
+      try {
+        _handleDevToolsEvent(method, parameters);
+        return ServiceExtensionResponse.result(jsonEncode({'success': true}));
+      } catch (e) {
+        l.e('An error occurred while dispatching events to webviews', error: e);
+
+        return ServiceExtensionResponse.result(
+            jsonEncode({'success': false, 'error': e}));
+      }
+    });
+
+    // It receives requests to return MicroBoardData to devtools
+    registerExtension(Constants.devtoolsToExtensionUpdate,
+        (method, parameters) async {
+      return ServiceExtensionResponse.result(getMicroBoardData());
+    });
+
+    // It receives requests to return remote config state to devtools
+    registerExtension(Constants.extensionToDevtoolsSyncRemoteConfigMap,
+        (method, parameters) async {
+      final isEmpty =
+          parameters['data'] == null && parameters['enabled'] == null;
+
+      if (isEmpty) {
         try {
-          _handleDevToolsEvent(method, parameters);
-          return ServiceExtensionResponse.result(jsonEncode({'success': true}));
+          return ServiceExtensionResponse.result(jsonEncode({
+            'success': true,
+            'data': FmaRemoteConfig.state.config,
+            'enabled': FmaRemoteConfig.state.enabled,
+          }));
         } catch (e) {
-          l.e('An error occurred while dispatching events to webviews',
-              error: e);
-
-          return ServiceExtensionResponse.result(
-              jsonEncode({'success': false, 'error': e}));
+          return ServiceExtensionResponse.error(exitCode, e.toString());
         }
-      });
+      } else {
+        try {
+          final data = parameters['data'];
+          final enabled = bool.tryParse(parameters['enabled'] ?? '');
 
-      // It receives requests to return MicroBoardData to devtools
-      registerExtension(Constants.devtoolsToExtensionUpdate,
-          (method, parameters) async {
-        return ServiceExtensionResponse.result(getMicroBoardData());
-      });
+          final Map<String, dynamic>? dataAsJson =
+              data == null ? null : jsonDecode(data);
 
-      // It receives requests to return remote config state to devtools
-      registerExtension(Constants.extensionToDevtoolsSyncRemoteConfigMap,
-          (method, parameters) async {
-        final isEmpty =
-            parameters['data'] == null && parameters['enabled'] == null;
+          FmaRemoteConfig.setState(FmaRemoteConfig.state.copyWith(
+            config: dataAsJson,
+            enabled: enabled,
+          ));
 
-        if (isEmpty) {
-          try {
-            return ServiceExtensionResponse.result(jsonEncode({
-              'success': true,
-              'data': FmaRemoteConfig.state.config,
-              'enabled': FmaRemoteConfig.state.enabled,
-            }));
-          } catch (e) {
-            return ServiceExtensionResponse.result(jsonEncode({
-              'success': false,
-              'message': e.toString(),
-            }));
-          }
-        } else {
-          try {
-            final data = parameters['data'];
-            final enabled = bool.tryParse(parameters['enabled'] ?? '');
-
-            final Map<String, dynamic>? dataAsJson =
-                data == null ? null : jsonDecode(data);
-
-            FmaRemoteConfig.setState(FmaRemoteConfig.state.copyWith(
-              config: dataAsJson,
-              enabled: enabled,
-            ));
-
-            return ServiceExtensionResponse.result(jsonEncode({
-              'success': true,
-              if (dataAsJson != null) 'data': dataAsJson,
-              if (enabled != null) 'enabled': enabled,
-            }));
-          } catch (e) {
-            return ServiceExtensionResponse.result(jsonEncode({
-              'success': false,
-              'data': FmaRemoteConfig.state.config,
-              'enabled': FmaRemoteConfig.state.enabled,
-              'message': e.toString(),
-            }));
-          }
+          return ServiceExtensionResponse.result(jsonEncode({
+            'success': true,
+            if (dataAsJson != null) 'data': dataAsJson,
+            if (enabled != null) 'enabled': enabled,
+          }));
+        } catch (e) {
+          return ServiceExtensionResponse.error(exitCode, e.toString());
         }
-      });
-    }
+      }
+    });
   }
 
   String getMicroBoardData() {
