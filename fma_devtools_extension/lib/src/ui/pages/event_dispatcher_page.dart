@@ -18,6 +18,14 @@ class _EventDispatcherState extends State<EventDispatcher> {
   final TextEditingController _txtPayload = TextEditingController();
 
   @override
+  void dispose() {
+    _txtChannels.dispose();
+    _txtEventName.dispose();
+    _txtPayload.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: FmaController(),

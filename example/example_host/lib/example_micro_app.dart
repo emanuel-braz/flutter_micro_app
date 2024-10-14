@@ -137,7 +137,7 @@ class MicroApplication1 extends MicroApp with HandlerRegisterMixin {
           }
         }
 
-        logger.d([
+        l.d([
           '(MicroAppExample - channel(colors) event received:',
           event.name,
           event.payload

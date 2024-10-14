@@ -1,6 +1,6 @@
-import 'package:dart_log/dart_log.dart';
 import 'package:flutter/material.dart';
 
+import '../../../dependencies.dart';
 import '../../controllers/navigators/navigator_controller.dart';
 import '../../entities/router/base_route.dart';
 
@@ -17,7 +17,7 @@ mixin RouterGenerator {
     Route<dynamic>? pageRoute = NavigatorInstance.getPageRoute(settings,
         routeNativeOnError: routeNativeOnError, baseRoute: baseRoute);
     if (pageRoute == null) {
-      logger.e('Error: [onGenerateRoute] Route is null',
+      l.e('Error: [onGenerateRoute] Route is null',
           error: 'Route "${settings.name}" not found!');
     }
 

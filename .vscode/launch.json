@@ -12,10 +12,14 @@
             ]
         },
         {
-            "name": "GoRouter Routing",
+            "name": "GoRouter Routing (iPhone)",
             "request": "launch",
             "type": "dart",
             "program": "example/example_host/lib/main_go_router.dart",
+            "args": [
+                "-d",
+                "F5D31FA9-B9E2-4E53-B137-FCEBC23EA86C"
+            ]
         },
         {
             "name": "Classic Routing",

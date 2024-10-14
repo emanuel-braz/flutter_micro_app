@@ -1,8 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
-import 'package:dart_log/dart_log.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../dependencies.dart';
 import '../../entities/micro_app_preferences.dart';
 import '../../entities/router/base_route.dart';
 import '../../entities/router/page_builder.dart';
@@ -305,8 +305,7 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
         MicroAppPreferences.config.onRouteNotRegistered;
 
     if (!hasRoute(route) && onRouteNotRegistered != null) {
-      logger
-          .w('Route not registered: $route, onRouteNotRegistered dispatched!');
+      l.w('Route not registered: $route, onRouteNotRegistered dispatched!');
       Future(() {
         onRouteNotRegistered(route,
             arguments: arguments, type: type, context: context);

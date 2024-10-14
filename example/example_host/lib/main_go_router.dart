@@ -3,8 +3,31 @@ import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:fma_go_router/fma_go_router.dart';
 import 'package:go_router/go_router.dart';
 
+late FirebaseRemoteConfigExample remoteConfigFirebase;
+
 void main() {
   MicroBoard().getMicroBoardApps;
+
+  remoteConfigFirebase = FirebaseRemoteConfigExample(FirebaseRemoteConfigStub())
+    ..updateConfig(
+      // I recommend always setting this to `false`(default) and toggling it using the DevTools extension switch.
+      // This way, you can test both the real and fake remote config without modifying the source code.
+
+      // default is FALSE - But if you set to true, it will fetch the remote
+      // config from Devtools instead of using the real provider.
+      // This is useful for development only, usually you don't want to
+      // enable this in production.
+      // Initial config json from your provider (usually from Firebase defaults config)
+      config: {
+        'black_friday_enabled': true,
+        'my_bool': true,
+        'my_int': 42,
+        'my_double': 3.14,
+        'my_string': 'Hello, Worlds!',
+        'my_map': {'key': 'value'},
+        'my_list': [1, 2, 3],
+      },
+    );
 
   MicroAppEventController().registerHandler(MicroAppEventHandler<Map>(
     (event) {
@@ -271,40 +294,121 @@ class _BaseHomePageState extends State<BaseHomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              child: const Text('Open Page with id 42'),
-              onPressed: () {
-                context.go('/page_with_id/42');
-              },
+    final theme = Theme.of(context);
+    final title = remoteConfigFirebase.getString('my_string');
+
+    return ValueListenableBuilder(
+        valueListenable: FmaRemoteConfig.stateNotifier,
+        builder: (context, _, __) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(title),
             ),
-            ElevatedButton(
-              child: const Text('Open Page 1'),
-              onPressed: () {
-                context.go('/page1', extra: {'pageName': 'Page 1'});
-              },
+            body: Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    child: const Text('Toogle Black Friday (FF/TF)'),
+                    onPressed: () {
+                      final newConfig = {
+                        ...FmaRemoteConfig.state.config,
+                        'black_friday_enabled': !FmaRemoteConfig
+                            .state.config['black_friday_enabled'],
+                      };
+                      remoteConfigFirebase.updateConfig(config: newConfig);
+                    },
+                  ),
+                  ProductPromotionCard(
+                    productName: 'Converse Chuck Taylor All Star ⭐️',
+                    imageUrl:
+                        'https://canfasd.ca/wp-content/uploads/2020/09/shoes-670620_1280-1-1.jpg',
+                    price: 29.99,
+                    isBlackFriday:
+                        remoteConfigFirebase.getBool('black_friday_enabled'),
+                  ),
+                  ElevatedButton(
+                    child: const Text('Show remote config parameters'),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text(
+                                'Mock Feature Flags locally, without messing with Firebase Remote Config or source code'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                    'You can control the feature flags from VSCode Flutter DevTools extension 🩵',
+                                    style: theme.textTheme.bodyLarge),
+                                const SizedBox(height: 16),
+                                ...FmaRemoteConfig.state.config.entries
+                                    .map((entry) {
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${entry.key}:',
+                                        style: theme.textTheme.bodyMedium,
+                                      ),
+                                      Text(
+                                        entry.value.toString(),
+                                        style: theme.textTheme.bodyMedium,
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  ElevatedButton(
+                    child: Text(
+                        'Open page ${remoteConfigFirebase.getString('my_int')}'),
+                    onPressed: () {
+                      context.go(
+                          '/page_with_id/${remoteConfigFirebase.getString('my_int').toString()}');
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Open Page 1'),
+                    onPressed: () {
+                      context.go('/page1', extra: {'pageName': 'Page 1'});
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Open Page 2'),
+                    onPressed: () {
+                      context.go('/page2');
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Open Page 3'),
+                    onPressed: () {
+                      context.go('/page2/page3');
+                    },
+                  ),
+                ],
+              ),
             ),
-            ElevatedButton(
-              child: const Text('Open Page 2'),
-              onPressed: () {
-                context.go('/page2');
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Open Page 3'),
-              onPressed: () {
-                context.go('/page2/page3');
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -497,4 +601,92 @@ class ChatbotMicroApp extends MicroApp with HandlerRegisterMixin {
 
   @override
   List<MicroAppPage<Widget>> get pages => [];
+}
+
+class ProductPromotionCard extends StatelessWidget {
+  final String productName;
+  final String imageUrl;
+  final double price;
+  final bool isBlackFriday;
+
+  const ProductPromotionCard({
+    Key? key,
+    required this.productName,
+    required this.imageUrl,
+    required this.price,
+    required this.isBlackFriday,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(15)),
+                child: Image.network(
+                  imageUrl,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  productName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  '\$${price.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+        if (isBlackFriday)
+          Positioned(
+            top: 4,
+            left: 4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
+              ),
+              child: const Text(
+                'Black Friday Promo 20% OFF',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }

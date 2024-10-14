@@ -1,6 +1,6 @@
-import 'package:dart_log/dart_log.dart';
 import 'package:flutter/services.dart';
 
+import '../../dependencies.dart';
 import '../entities/micro_app_preferences.dart';
 import '../utils/constants/constants.dart';
 import '../utils/typedefs.dart';
@@ -28,15 +28,15 @@ class MicroAppNativeService {
     try {
       return platform.invokeMethod(method, arguments);
     } on MissingPluginException catch (e) {
-      logger.e(
+      l.e(
           'Platform interaction failed to find a handling plugin.\n'
           'Please, change nativeEventsEnabled to false or implement a native method channel.\n\n'
           'MicroAppPreferences.update(MicroAppPreferences.config.copyWith(nativeEventsEnabled: false));',
           error: e.message);
     } on PlatformException catch (e) {
-      logger.e('Platform Exception:', error: e.message);
+      l.e('Platform Exception:', error: e.message);
     } on Exception catch (e) {
-      logger.e('Critical Error', error: e);
+      l.e('Critical Error', error: e);
     }
 
     return null;
