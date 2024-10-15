@@ -22,11 +22,16 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
   void initState() {
     super.initState();
 
+    addAutoDisposeListener(FmaController().requestRemoteConfigKey, () {
+      final key = FmaController().requestRemoteConfigKey.value;
+      if (key != null) {
+        FmaController().requestedKeys[key] =
+            '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+      }
+    });
+
     FmaController().syncRemoteConfigData();
     _focusNode.requestFocus();
-    // addAutoDisposeListener(FmaController().remoteConfig, () {
-    //   setState(() {});
-    // });
   }
 
   @override
@@ -168,57 +173,126 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
 
   // Widget for boolean values (Switch)
   Widget _buildSwitchTile(String key, bool value, FmaState state) {
-    return ListTile(
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(key, style: Theme.of(context).textTheme.displaySmall),
-          const SizedBox(height: 8),
-          Switch(
-            value: value,
-            onChanged: widget.isEditMode
-                ? (newValue) {
-                    setState(() {
-                      state.remoteConfig[key] = newValue;
-                    });
-                  }
-                : null,
-          ),
-        ],
-      ),
-    );
+    return ValueListenableBuilder(
+        valueListenable: FmaController().requestRemoteConfigKey,
+        builder: (context, requestKey, child) {
+          return ListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(key, style: Theme.of(context).textTheme.displaySmall),
+                    if (FmaController().requestedKeys[key] != null)
+                      CustomChip(
+                          time: FmaController().requestedKeys[key] as String),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Switch(
+                  value: value,
+                  onChanged: widget.isEditMode
+                      ? (newValue) {
+                          setState(() {
+                            state.remoteConfig[key] = newValue;
+                          });
+                        }
+                      : null,
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   // Widget for text, int, double, list, map (TextField)
   Widget _buildTextField(String key, dynamic value, FmaState state) {
     TextEditingController controller =
         TextEditingController(text: value.toString());
-    return ListTile(
-      title: Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(key, style: Theme.of(context).textTheme.displaySmall)),
-      subtitle: TextField(
-        minLines: 1,
-        maxLines: 50,
-        controller: controller,
-        keyboardType: (value is int || value is double)
-            ? TextInputType.number
-            : TextInputType.multiline,
-        enabled: widget.isEditMode,
-        onChanged: widget.isEditMode
-            ? (newValue) {
-                if (value is int) {
-                  state.remoteConfig[key] = int.tryParse(newValue) ?? value;
-                } else if (value is double) {
-                  state.remoteConfig[key] = double.tryParse(newValue) ?? value;
-                } else {
-                  state.remoteConfig[key] = newValue;
-                }
-              }
-            : null,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
+    return Builder(builder: (context) {
+      return ValueListenableBuilder(
+          valueListenable: FmaController().requestRemoteConfigKey,
+          builder: (context, requestKey, child) {
+            return ListTile(
+              title: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(key,
+                          style: Theme.of(context).textTheme.displaySmall),
+                      if (FmaController().requestedKeys[key] != null)
+                        CustomChip(
+                            time: FmaController().requestedKeys[key] as String),
+                    ],
+                  )),
+              subtitle: TextField(
+                minLines: 1,
+                maxLines: 50,
+                controller: controller,
+                keyboardType: (value is int || value is double)
+                    ? TextInputType.number
+                    : TextInputType.multiline,
+                enabled: widget.isEditMode,
+                onChanged: widget.isEditMode
+                    ? (newValue) {
+                        if (value is int) {
+                          state.remoteConfig[key] =
+                              int.tryParse(newValue) ?? value;
+                        } else if (value is double) {
+                          state.remoteConfig[key] =
+                              double.tryParse(newValue) ?? value;
+                        } else {
+                          state.remoteConfig[key] = newValue;
+                        }
+                      }
+                    : null,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                ),
+              ),
+            );
+          });
+    });
+  }
+}
+
+class CustomChip extends StatelessWidget {
+  final String time;
+  const CustomChip({super.key, required this.time});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).buttonTheme.colorScheme!.primary,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Fetched',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  height: 1,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimary),
+            ),
+            if (time.isNotEmpty)
+              Text(
+                time,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    height: 1.2,
+                    fontSize: 9,
+                    color: Theme.of(context).colorScheme.onPrimary),
+              ),
+          ],
         ),
       ),
     );

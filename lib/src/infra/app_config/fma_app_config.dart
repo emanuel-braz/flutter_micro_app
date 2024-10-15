@@ -113,6 +113,14 @@ abstract class FmaRemoteConfig {
 
     if (state.enabled && !kReleaseMode) {
       value = state.$config;
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: r'$all',
+          value: value,
+          type: value.runtimeType,
+        ),
+      );
     } else {
       value = getAllFunction?.call() ?? fallback ?? Defaults.mapType.value;
     }
@@ -127,6 +135,14 @@ abstract class FmaRemoteConfig {
     if (state.enabled && !kReleaseMode) {
       value = bool.tryParse((state.$config[key] ?? fallback).toString()) ??
           Defaults.boolType.value;
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: key,
+          value: value,
+          type: bool,
+        ),
+      );
     } else {
       value = getBoolFunction?.call(key) ?? fallback ?? Defaults.boolType.value;
     }
@@ -141,6 +157,14 @@ abstract class FmaRemoteConfig {
     if (state.enabled && !kReleaseMode) {
       value = int.tryParse((state.$config[key] ?? fallback).toString()) ??
           Defaults.intType.value;
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: key,
+          value: value,
+          type: int,
+        ),
+      );
     } else {
       value = getIntFunction?.call(key) ?? fallback ?? Defaults.intType.value;
     }
@@ -155,6 +179,14 @@ abstract class FmaRemoteConfig {
     if (state.enabled && !kReleaseMode) {
       value = double.tryParse((state.$config[key] ?? fallback).toString()) ??
           Defaults.doubleType.value;
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: key,
+          value: value,
+          type: double,
+        ),
+      );
     } else {
       value =
           getDoubleFunction?.call(key) ?? fallback ?? Defaults.doubleType.value;
@@ -170,6 +202,14 @@ abstract class FmaRemoteConfig {
     if (state.enabled && !kReleaseMode) {
       value = ((state.$config[key] ?? fallback) ?? Defaults.stringType.value)
           .toString();
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: key,
+          value: value,
+          type: String,
+        ),
+      );
     } else {
       value =
           getStringFunction?.call(key) ?? fallback ?? Defaults.stringType.value;
@@ -184,6 +224,14 @@ abstract class FmaRemoteConfig {
 
     if (state.enabled && !kReleaseMode) {
       value = state.$config[key] ?? fallback;
+
+      notifyRequestRemoteConfig(
+        RemoteConfigRequest(
+          key: key,
+          value: value,
+          type: value.runtimeType,
+        ),
+      );
     } else {
       value = getValueFunction?.call(key) ?? fallback;
     }

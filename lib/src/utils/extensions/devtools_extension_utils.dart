@@ -54,3 +54,19 @@ notifyAppRemoteConfigDataHasChanged() {
     l.e('An error occurred while notifying Devtools', error: e);
   }
 }
+
+notifyRequestRemoteConfig(RemoteConfigRequest remoteConfigRequest) {
+  try {
+    if (kReleaseMode) return;
+
+    postEvent(
+      Constants.notifyRequestRemoteConfig,
+      {
+        'success': true,
+        'data': remoteConfigRequest.toMap(),
+      },
+    );
+  } catch (e) {
+    l.e('An error occurred while notifying Devtools', error: e);
+  }
+}

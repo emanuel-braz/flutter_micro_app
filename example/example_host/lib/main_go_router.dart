@@ -331,6 +331,18 @@ class _BaseHomePageState extends State<BaseHomePage>
                         remoteConfigFirebase.getBool('black_friday_enabled'),
                   ),
                   ElevatedButton(
+                    child: const Text('Fetch black_friday_enabled'),
+                    onPressed: () {
+                      remoteConfigFirebase.getBool('black_friday_enabled');
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Fetch my_bool'),
+                    onPressed: () {
+                      remoteConfigFirebase.getBool('my_bool');
+                    },
+                  ),
+                  ElevatedButton(
                     child: const Text('Show remote config parameters'),
                     onPressed: () {
                       showDialog(
@@ -380,10 +392,10 @@ class _BaseHomePageState extends State<BaseHomePage>
                   ),
                   ElevatedButton(
                     child: Text(
-                        'Open page ${remoteConfigFirebase.getString('my_int')}'),
+                        'Open page ${remoteConfigFirebase.getInt('my_int')}'),
                     onPressed: () {
                       context.go(
-                          '/page_with_id/${remoteConfigFirebase.getString('my_int').toString()}');
+                          '/page_with_id/${remoteConfigFirebase.getInt('my_int').toString()}');
                     },
                   ),
                   ElevatedButton(

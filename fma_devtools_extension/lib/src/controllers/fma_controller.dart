@@ -3,9 +3,11 @@ import 'dart:developer';
 
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 import '../models/micro_board_data.dart';
+import '../notifiers/custom_value_notifier.dart';
 
 class FmaState {
   Map<String, dynamic>? _microBoardMap;
@@ -17,17 +19,27 @@ class FmaState {
 
 class FmaController extends ValueNotifier<FmaState> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final requestRemoteConfigKey = CustomValueNotifier<String?>(null);
+  final requestedKeys = <String, String>{};
+
+  void alertRequestRemoteConfigKeyFetched({
+    required String key,
+    required String type,
+    dynamic value,
+  }) {
+    requestRemoteConfigKey.notifyValue(key);
+  }
 
   Future<void> updateView() async {
     try {
       final response = await serviceManager.callServiceExtensionOnMainIsolate(
-          'ext.dev.emanuelbraz.fma.devtoolsToExtensionUpdate',
+          Constants.devtoolsToExtensionUpdate,
           args: {});
 
       value._microBoardMap = response.json;
       notifyListeners();
     } catch (e) {
-      log(e.toString());
+      l.e(e.toString());
     }
   }
 

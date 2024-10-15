@@ -24,14 +24,12 @@ class MainAppWidget extends StatefulWidget {
 class _MainAppWidgetState extends State<MainAppWidget> {
   int _currentIndex = 0;
   late List<Widget> _bars;
-  late final StreamSubscription _onDashboardDataChangedSubscription;
-  late final StreamSubscription _onInitRemoteConfigSubscription;
+  late final StreamSubscription _onPostEvent;
 
   @override
   void dispose() {
+    _onPostEvent.cancel();
     super.dispose();
-    _onDashboardDataChangedSubscription.cancel();
-    _onInitRemoteConfigSubscription.cancel();
   }
 
   @override
@@ -43,19 +41,15 @@ class _MainAppWidgetState extends State<MainAppWidget> {
       const RemoteConfigPage(),
     ];
 
-    _onDashboardDataChangedSubscription =
-        serviceManager.service!.onExtensionEvent.listen((event) {
+    _onPostEvent = serviceManager.service!.onExtensionEvent.listen((event) {
       if (event.extensionKind ==
           Constants.extensionToDevtoolsMicroBoardChanged) {
         _onDashboardDataChanged();
-      }
-    });
-
-    _onInitRemoteConfigSubscription =
-        serviceManager.service!.onExtensionEvent.listen((event) {
-      if (event.extensionKind ==
+      } else if (event.extensionKind ==
           Constants.notifyAppRemoteConfigDataHasChanged) {
         _onAppConfigHasChanged(event);
+      } else if (event.extensionKind == Constants.notifyRequestRemoteConfig) {
+        _onRequestRemoteConfig(event);
       }
     });
 
@@ -71,6 +65,21 @@ class _MainAppWidgetState extends State<MainAppWidget> {
     ));
 
     super.initState();
+  }
+
+  void _onRequestRemoteConfig(event) {
+    final extensionData = event.extensionData;
+    final dataMap = extensionData.data;
+    final data = dataMap['data'];
+
+    final key = data['key'];
+    final type = data['type'];
+    final value = data['value'];
+
+    FmaController()
+        .alertRequestRemoteConfigKeyFetched(key: key, type: type, value: value);
+
+    l.d('Resquest Remote Config: $key - $type');
   }
 
   void _onAppConfigHasChanged(event) {

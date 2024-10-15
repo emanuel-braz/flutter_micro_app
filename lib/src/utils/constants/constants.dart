@@ -28,6 +28,6 @@ class Constants {
       '$devtoolsExtensionChannel.notifyAppRemoteConfigDataHasChanged';
   static const String extensionToDevtoolsSyncRemoteConfigMap =
       '$devtoolsExtensionChannel.extensionToDevtoolsSyncRemoteConfigMap';
-  static const String requestRemoteConfigData =
-      '$devtoolsExtensionChannel.requestRemoteConfigData';
+  static const String notifyRequestRemoteConfig =
+      '$devtoolsExtensionChannel.notifyRequestRemoteConfig';
 }
