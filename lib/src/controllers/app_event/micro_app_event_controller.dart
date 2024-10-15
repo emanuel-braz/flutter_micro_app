@@ -69,7 +69,7 @@ class MicroAppEventController {
       }
     });
 
-    registerRemoteConfigChannels();
+    if (!isTest) registerRemoteConfigChannels();
   }
 
   void registerRemoteConfigChannels() {
