@@ -59,35 +59,38 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
               title: const Text('Remote Config'),
               centerTitle: true,
               actions: [
-                SizedBox(
-                  height: 32,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        if (_isEditMode) {
-                          _confirmChanges();
-                        } else {
-                          setState(() {
-                            _isEditMode = !_isEditMode;
-                          });
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            _isEditMode ? 'Save' : 'Edit',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(_isEditMode ? Icons.save : Icons.edit),
-                        ],
-                      )),
+                Tooltip(
+                  message: 'Command + Enter to save',
+                  child: SizedBox(
+                    height: 32,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          if (_isEditMode) {
+                            _confirmChanges();
+                          } else {
+                            setState(() {
+                              _isEditMode = !_isEditMode;
+                            });
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              _isEditMode ? 'Save' : 'Edit',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(_isEditMode ? Icons.save : Icons.edit),
+                          ],
+                        )),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
