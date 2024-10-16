@@ -98,7 +98,7 @@ packages:
     source: hosted
     version: "2.0.0"
   devtools_app_shared:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: devtools_app_shared
       sha256: "7c5ffac115f441d563b2f1ea2f0a14e2e0960aa8648fe151b0e372574e061111"
@@ -122,7 +122,7 @@ packages:
     source: hosted
     version: "10.0.2"
   dtd:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dtd
       sha256: "6e4e508c0d03e12e2c96f21faa0e5acc191f9431ecd02adb8daee64dbfae6b86"
@@ -188,7 +188,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.0.1"
+    version: "2.0.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter

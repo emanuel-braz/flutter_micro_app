@@ -1,14 +1,18 @@
 import 'dart:async';
 
+import 'package:devtools_extensions/api.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
 import '../../controllers/fma_controller.dart';
 import '../../helpers/excel_helper.dart';
+import '../widgets/custom_drawer.dart';
 import 'event_dispatcher_page.dart';
 import 'micro_app_list_page.dart';
 import 'micro_board/micro_board_page.dart';
+import 'remote_config_page.dart';
 
 class MainAppWidget extends StatefulWidget {
   const MainAppWidget({super.key});
@@ -20,12 +24,12 @@ class MainAppWidget extends StatefulWidget {
 class _MainAppWidgetState extends State<MainAppWidget> {
   int _currentIndex = 0;
   late List<Widget> _bars;
-  late final StreamSubscription _onDashboardDataChangedSubscription;
+  late final StreamSubscription _onPostEvent;
 
   @override
   void dispose() {
+    _onPostEvent.cancel();
     super.dispose();
-    _onDashboardDataChangedSubscription.cancel();
   }
 
   @override
@@ -34,17 +38,53 @@ class _MainAppWidgetState extends State<MainAppWidget> {
       const MicroBoardPage(),
       const MicroAppList(),
       const EventDispatcher(),
+      const RemoteConfigPage(),
     ];
 
-    _onDashboardDataChangedSubscription =
-        serviceManager.service!.onExtensionEvent.listen((event) {
+    _onPostEvent = serviceManager.service!.onExtensionEvent.listen((event) {
       if (event.extensionKind ==
           Constants.extensionToDevtoolsMicroBoardChanged) {
         _onDashboardDataChanged();
+      } else if (event.extensionKind ==
+          Constants.notifyAppRemoteConfigDataHasChanged) {
+        _onAppConfigHasChanged(event);
+      } else if (event.extensionKind == Constants.notifyRequestRemoteConfig) {
+        _onRequestRemoteConfig(event);
       }
     });
 
+    Logger.interceptors.clear();
+    Logger.interceptors.add(DefaultLogInterceptor(
+      (Object? data) {
+        extensionManager.postMessageToDevTools(
+          ShowNotificationExtensionEvent(
+            message: data.toString(),
+          ),
+        );
+      },
+    ));
+
     super.initState();
+  }
+
+  void _onRequestRemoteConfig(event) {
+    final extensionData = event.extensionData;
+    final dataMap = extensionData.data;
+    final data = dataMap['data'];
+
+    final key = data['key'];
+    final type = data['type'];
+    final value = data['value'];
+
+    FmaController()
+        .alertRequestRemoteConfigKeyFetched(key: key, type: type, value: value);
+
+    l.d('Resquest Remote Config: $key - $type');
+  }
+
+  void _onAppConfigHasChanged(event) {
+    l.d('Sync Remote Config');
+    FmaController().syncRemoteConfigData();
   }
 
   void _onDashboardDataChanged() {
@@ -67,9 +107,28 @@ class _MainAppWidgetState extends State<MainAppWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: FmaController().scaffoldKey,
       appBar: AppBar(
         title: const Text('Flutter Micro App'),
         actions: [
+          ListenableBuilder(
+              listenable: extensionManager.darkThemeEnabled,
+              builder: (context, child) {
+                final isDarkThemeEnabled =
+                    extensionManager.darkThemeEnabled.value;
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: () {
+                      extensionManager.darkThemeEnabled.value =
+                          !extensionManager.darkThemeEnabled.value;
+                    },
+                    icon: isDarkThemeEnabled
+                        ? const Icon(Icons.light_mode)
+                        : const Icon(Icons.dark_mode),
+                  ),
+                );
+              }),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
@@ -92,33 +151,31 @@ class _MainAppWidgetState extends State<MainAppWidget> {
       ),
       body: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.only(top: 10),
-            width: 250,
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
-              borderRadius: const BorderRadius.all(Radius.circular(6)),
-            ),
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.dashboard),
-                  title: const Text('Micro Board'),
-                  onTap: () => _onItemTapped(0),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.import_contacts),
-                  title: const Text('Micro Pages'),
-                  onTap: () => _onItemTapped(1),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.search),
-                  title: const Text('Event Dispatcher'),
-                  onTap: () => _onItemTapped(2),
-                ),
-              ],
-            ),
+          CustomDrawer(
+            onTap: (index) {
+              _onItemTapped(index);
+            },
+            settingsDivider: false,
+            widthSwitch: 700,
+            scrollPhysics: const NeverScrollableScrollPhysics(),
+            sidebarItems: [
+              CustomDrawerItem(
+                iconSelected: Icons.dashboard,
+                text: 'Micro Board',
+              ),
+              CustomDrawerItem(
+                iconSelected: Icons.import_contacts,
+                text: 'Micro Pages',
+              ),
+              CustomDrawerItem(
+                iconSelected: Icons.send_time_extension,
+                text: 'Event Dispatcher',
+              ),
+              CustomDrawerItem(
+                iconSelected: Icons.settings_remote,
+                text: 'Remote Config',
+              ),
+            ],
           ),
           Expanded(
             child: IndexedStack(

@@ -60,7 +60,7 @@ class MicroAppEventDelegate {
         return handler;
       }
     } catch (e) {
-      logger.e('Failed to unregister handler', error: e);
+      l.e('Failed to unregister handler', error: e);
     }
 
     return null;

@@ -31,12 +31,12 @@ void main() {
   // Listen to navigation events
   final internalNavigationSubs =
       NavigatorInstance.eventController.flutterLoggerStream.listen((event) {
-    logger.d('[flutter: navigation_log] -> $event');
+    l.d('[flutter: navigation_log] -> $event');
   });
 
   final nativeNavigationCommands =
       NavigatorInstance.eventController.nativeCommandStream.listen((event) {
-    logger.d('[navigation_command] -> $event');
+    l.d('[navigation_command] -> $event');
 
     //* You can open pages that native asked
     if (event.method == Constants.methodNavigationCommand) {
@@ -47,8 +47,7 @@ void main() {
 
       NavigatorInstance.pushNamed(routeThatNativeRequestToOpen,
           arguments: arguments, type: type);
-      logger.d(
-          'Native asked Flutter to open a Page -> $routeThatNativeRequestToOpen');
+      l.d('Native asked Flutter to open a Page -> $routeThatNativeRequestToOpen');
     }
   });
 

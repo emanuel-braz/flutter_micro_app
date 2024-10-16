@@ -58,7 +58,7 @@ class MicroAppEventJsonAdapter implements MicroAppEventAdapter {
           version: version,
           datetime: datetime);
     } catch (e) {
-      logger.e('MicroAppEventJsonAdapter', error: e);
+      l.e('MicroAppEventJsonAdapter', error: e);
       return MicroAppEvent(
         name: methodCall.method,
         payload: methodCall.arguments,

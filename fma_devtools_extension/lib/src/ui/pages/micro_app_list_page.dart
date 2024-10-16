@@ -1,3 +1,4 @@
+import 'package:devtools_app_shared/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 
@@ -47,9 +48,20 @@ class _MicroAppListState extends State<MicroAppList> {
           ],
         ),
         Expanded(
-          child: Row(
+          child: SplitPane(
+            axis: Axis.horizontal,
+            initialFractions: const [0.3, 0.7],
             children: [
-              Expanded(
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: isDark
+                          ? Colors.black87
+                          : Theme.of(context).secondaryHeaderColor,
+                    ),
+                  ),
+                ),
                 child: ValueListenableBuilder(
                     valueListenable: FmaController(),
                     builder: (context, value, child) {
@@ -70,7 +82,17 @@ class _MicroAppListState extends State<MicroAppList> {
                       );
                     }),
               ),
-              Expanded(
+              Container(
+                padding: const EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: isDark
+                          ? Colors.black87
+                          : Theme.of(context).secondaryHeaderColor,
+                    ),
+                  ),
+                ),
                 child: ListView.builder(
                   itemCount: pages.length,
                   itemBuilder: (context, index) {

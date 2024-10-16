@@ -11,7 +11,7 @@ class MicroApplication2 extends MicroAppWithBaseRoute
     with HandlerRegisterMixin {
   MicroApplication2() {
     registerEventHandler(MicroAppEventHandler((data) {
-      logger.d([
+      l.d([
         '(MicroAppExampleExternal - No channels) received here! :',
         data.name,
         data.payload
@@ -19,7 +19,7 @@ class MicroApplication2 extends MicroAppWithBaseRoute
     }, id: '123'));
 
     registerEventHandler(MicroAppEventHandler((data) {
-      logger.d('(MicroAppExampleExternal - Lorem Channel) received here!');
+      l.d('(MicroAppExampleExternal - Lorem Channel) received here!');
     }, channels: const ['my_channel_with_conflict']));
   }
 

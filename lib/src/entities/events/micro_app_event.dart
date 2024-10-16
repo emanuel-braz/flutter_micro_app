@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dart_log/dart_log.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
+
+import '../../../dependencies.dart';
 
 /// Event channels
 @pragma('vm:entry-point')
@@ -156,7 +156,7 @@ class MicroAppEvent<T> extends EventChannelsEquatable {
     try {
       return MicroAppEvent<T>.fromMap(json.decode(source));
     } catch (e) {
-      logger.e('[MicroAppEvent]: error parsing json', error: e);
+      l.e('[MicroAppEvent]: error parsing json', error: e);
       return null;
     }
   }
