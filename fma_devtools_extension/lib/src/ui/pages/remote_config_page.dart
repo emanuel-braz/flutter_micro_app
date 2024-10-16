@@ -25,8 +25,9 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
     addAutoDisposeListener(FmaController().requestRemoteConfigKey, () {
       final key = FmaController().requestRemoteConfigKey.value;
       if (key != null) {
+        final now = DateTime.now();
         FmaController().requestedKeys[key] =
-            '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+            '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
       }
     });
 
