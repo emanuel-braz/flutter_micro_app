@@ -22,15 +22,7 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
   void initState() {
     super.initState();
 
-    addAutoDisposeListener(FmaController().requestRemoteConfigKey, () {
-      final key = FmaController().requestRemoteConfigKey.value;
-      if (key != null) {
-        final now = DateTime.now();
-        FmaController().requestedKeys[key] =
-            '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
-      }
-    });
-
+    FmaController().requestedKeys.clear();
     FmaController().syncRemoteConfigData();
     _focusNode.requestFocus();
   }
@@ -98,7 +90,6 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
                   child: Switch(
                     value: value.enabled,
                     onChanged: (bool newValue) {
-                      // value.enabled = newValue;
                       FmaController().syncRemoteConfigData(enabled: newValue);
                     },
                   ),
@@ -189,8 +180,7 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
                   children: [
                     Text(key, style: Theme.of(context).textTheme.displaySmall),
                     if (FmaController().requestedKeys[key] != null)
-                      CustomChip(
-                          time: FmaController().requestedKeys[key] as String),
+                      CustomChip(FmaController().requestedKeys[key]!),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -227,8 +217,7 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
                       Text(key,
                           style: Theme.of(context).textTheme.displaySmall),
                       if (FmaController().requestedKeys[key] != null)
-                        CustomChip(
-                            time: FmaController().requestedKeys[key] as String),
+                        CustomChip(FmaController().requestedKeys[key]!),
                     ],
                   )),
               subtitle: TextField(
@@ -264,41 +253,97 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
 }
 
 class CustomChip extends StatelessWidget {
-  final String time;
-  const CustomChip({super.key, required this.time});
+  final ItemFetched item;
+  const CustomChip(this.item, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).buttonTheme.colorScheme!.primary,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Fetched',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  height: 1,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimary),
-            ),
-            if (time.isNotEmpty)
-              Text(
-                time,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    height: 1.2,
-                    fontSize: 9,
-                    color: Theme.of(context).colorScheme.onPrimary),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Remove Chip'),
+                  content:
+                      const Text('Do you want to remove and clear the count?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        FmaController().removeItem(item);
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Remove'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).buttonTheme.colorScheme!.primary,
+                borderRadius: BorderRadius.circular(100),
               ),
-          ],
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Fetched',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          height: 1,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
+                    if (item.time.isNotEmpty)
+                      Text(
+                        item.time,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            height: 1.2,
+                            fontSize: 9,
+                            color: Theme.of(context).colorScheme.onPrimary),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
+        Positioned(
+          right: -6,
+          top: -6,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.error,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Text(
+                item.count.toString().padLeft(2, '0'),
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    height: 1,
+                    fontSize: 9,
+                    color: Theme.of(context).colorScheme.onError),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

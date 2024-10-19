@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:devtools_extensions/api.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
@@ -20,14 +21,30 @@ class FmaState {
 class FmaController extends ValueNotifier<FmaState> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final requestRemoteConfigKey = CustomValueNotifier<String?>(null);
-  final requestedKeys = <String, String>{};
+  final requestedKeys = <String, ItemFetched>{};
 
   void alertRequestRemoteConfigKeyFetched({
     required String key,
     required String type,
     dynamic value,
   }) {
+    final now = DateTime.now();
+    final timeToDisplay =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+
+    if (FmaController().requestedKeys[key] != null) {
+      FmaController().requestedKeys[key]!.count++;
+    } else {
+      FmaController().requestedKeys[key] =
+          ItemFetched(time: timeToDisplay, count: 1, key: key);
+    }
+
     requestRemoteConfigKey.notifyValue(key);
+  }
+
+  void removeItem(ItemFetched item) {
+    requestedKeys.remove(item.key);
+    notifyListeners();
   }
 
   Future<void> updateView() async {
@@ -78,12 +95,7 @@ class FmaController extends ValueNotifier<FmaState> {
 
         if (isSuccess) {
           serviceManager.performHotReload();
-
-          // this request updated data from the app, and update the view in devtools
-          //
-          // This way I ensure that always devtools is in sync with the app
-          // instead of controlling updates in two different places (SSOT)
-          if (enabled != null) syncRemoteConfigData();
+          notifyListeners();
         } else {
           showMessage(json['message'] ?? 'Failed to sync remote config');
         }
@@ -109,4 +121,22 @@ class FmaController extends ValueNotifier<FmaState> {
       SnackBar(content: Text(message), duration: const Duration(seconds: 4)),
     );
   }
+
+  void showNotification(String message) {
+    extensionManager.postMessageToDevTools(
+      ShowNotificationExtensionEvent(message: message),
+    );
+  }
+}
+
+class ItemFetched {
+  String key;
+  String time;
+  int count;
+
+  ItemFetched({
+    required this.time,
+    required this.count,
+    required this.key,
+  });
 }

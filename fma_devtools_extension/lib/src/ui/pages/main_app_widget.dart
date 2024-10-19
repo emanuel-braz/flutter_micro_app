@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:devtools_extensions/api.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_micro_app/dependencies.dart';
@@ -52,17 +51,6 @@ class _MainAppWidgetState extends State<MainAppWidget> {
         _onRequestRemoteConfig(event);
       }
     });
-
-    Logger.interceptors.clear();
-    Logger.interceptors.add(DefaultLogInterceptor(
-      (Object? data) {
-        extensionManager.postMessageToDevTools(
-          ShowNotificationExtensionEvent(
-            message: data.toString(),
-          ),
-        );
-      },
-    ));
 
     super.initState();
   }

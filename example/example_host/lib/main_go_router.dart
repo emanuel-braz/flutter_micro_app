@@ -12,12 +12,7 @@ void main() {
     ..updateConfig(
       // I recommend always setting this to `false`(default) and toggling it using the DevTools extension switch.
       // This way, you can test both the real and fake remote config without modifying the source code.
-
-      // default is FALSE - But if you set to true, it will fetch the remote
-      // config from Devtools instead of using the real provider.
-      // This is useful for development only, usually you don't want to
-      // enable this in production.
-      // Initial config json from your provider (usually from Firebase defaults config)
+      enabled: false, // Default is false
       config: {
         'black_friday_enabled': true,
         'my_bool': true,
@@ -295,7 +290,10 @@ class _BaseHomePageState extends State<BaseHomePage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final title = remoteConfigFirebase.getString('my_string');
+    final isBlackFriday = remoteConfigFirebase.getBool('black_friday_enabled');
+    final pageNumber = remoteConfigFirebase.getInt('my_int');
 
     return ValueListenableBuilder(
         valueListenable: FmaRemoteConfig.stateNotifier,
@@ -327,8 +325,7 @@ class _BaseHomePageState extends State<BaseHomePage>
                     imageUrl:
                         'https://canfasd.ca/wp-content/uploads/2020/09/shoes-670620_1280-1-1.jpg',
                     price: 29.99,
-                    isBlackFriday:
-                        remoteConfigFirebase.getBool('black_friday_enabled'),
+                    isBlackFriday: isBlackFriday,
                   ),
                   ElevatedButton(
                     child: const Text('Fetch black_friday_enabled'),
@@ -340,6 +337,12 @@ class _BaseHomePageState extends State<BaseHomePage>
                     child: const Text('Fetch my_bool'),
                     onPressed: () {
                       remoteConfigFirebase.getBool('my_bool');
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Fetch my_string'),
+                    onPressed: () {
+                      remoteConfigFirebase.getBool('my_string');
                     },
                   ),
                   ElevatedButton(
@@ -391,8 +394,7 @@ class _BaseHomePageState extends State<BaseHomePage>
                     },
                   ),
                   ElevatedButton(
-                    child: Text(
-                        'Open page ${remoteConfigFirebase.getInt('my_int')}'),
+                    child: Text('Open page $pageNumber'),
                     onPressed: () {
                       context.go(
                           '/page_with_id/${remoteConfigFirebase.getInt('my_int').toString()}');
