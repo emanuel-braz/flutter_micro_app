@@ -94,7 +94,7 @@ abstract class FmaRemoteConfig {
         getValueFunction = getValue;
 
   /// Update Remote Config with the given parameters.
-  void updateConfig({Map<String, dynamic>? config, bool? enabled}) {
+  static void updateConfig({Map<String, dynamic>? config, bool? enabled}) {
     // Avoid try updating Remote Config in release mode.
     if (kReleaseMode) return;
 

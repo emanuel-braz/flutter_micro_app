@@ -18,6 +18,7 @@ export 'src/entities/micro_board/micro_board_handler.dart';
 export 'src/entities/micro_board/micro_board_route.dart';
 export 'src/entities/router/base_route.dart';
 export 'src/entities/router/page_builder.dart';
+export 'src/infra/app_config/fma_app_config.dart';
 export 'src/infra/app_config/index.dart';
 export 'src/presentation/widgets/micro_navigator_widget.dart';
 export 'src/presentation/widgets/micro_widget_builder.dart';

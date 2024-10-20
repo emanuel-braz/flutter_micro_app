@@ -58,7 +58,7 @@ void main() {
         getValue: (key) => 'dynamicvalue1',
       );
 
-      testRemoteConfig.updateConfig(
+      FmaRemoteConfig.updateConfig(
         config: {
           'bool': true,
           'int': 2,
@@ -70,7 +70,7 @@ void main() {
     });
 
     test('updateConfig should update the config', () {
-      testRemoteConfig.updateConfig(
+      FmaRemoteConfig.updateConfig(
         config: {
           'bool': false,
           'int': 0,
@@ -91,7 +91,7 @@ void main() {
 
     group('extension disabled', () {
       setUp(() {
-        testRemoteConfig.updateConfig(enabled: false);
+        FmaRemoteConfig.updateConfig(enabled: false);
       });
 
       test('getBool should return the correct value', () {
@@ -122,7 +122,7 @@ void main() {
 
     group('extension enabled', () {
       setUp(() {
-        testRemoteConfig.updateConfig(enabled: true);
+        FmaRemoteConfig.updateConfig(enabled: true);
       });
 
       test('getBool should return the correct value', () {
