@@ -12,10 +12,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
-  devtools_extensions: ^0.2.2
-  excel: ^4.0.6
   flutter_micro_app: '>=1.1.0 <2.0.0'
+
+  devtools_extensions: ^0.2.2
+  devtools_app_shared: ^0.2.2
+  dtd: ^2.2.0
+  
+  cupertino_icons: ^1.0.2
+  excel: ^4.0.6
 
 dev_dependencies:
   flutter_test:

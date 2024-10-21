@@ -22,4 +22,12 @@ class Constants {
       '$devtoolsExtensionChannel.devtoolsToExtensionMicroAppEvent';
   static const String extensionToDevtoolsMicroBoardChanged =
       '$devtoolsExtensionChannel.extensionToDevtoolsMicroBoardChanged';
+
+  // Remote Config
+  static const String notifyAppRemoteConfigDataHasChanged =
+      '$devtoolsExtensionChannel.notifyAppRemoteConfigDataHasChanged';
+  static const String extensionToDevtoolsSyncRemoteConfigMap =
+      '$devtoolsExtensionChannel.extensionToDevtoolsSyncRemoteConfigMap';
+  static const String notifyRequestRemoteConfig =
+      '$devtoolsExtensionChannel.notifyRequestRemoteConfig';
 }

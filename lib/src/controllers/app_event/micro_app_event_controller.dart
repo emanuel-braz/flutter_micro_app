@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_micro_app/src/services/native_service.dart';
 
 import '../../infra/adapters/micro_app_event/micro_app_event_adapter.dart';
 import '../../infra/adapters/micro_app_event/micro_app_event_json_adapter.dart';
-import '../../utils/extensions/devtools_extension_utils.dart';
 import 'micro_app_event_delegate.dart';
 
 /// [MicroAppEventController]
@@ -41,11 +41,15 @@ class MicroAppEventController {
   Map<MicroAppEventHandler, StreamSubscription<MicroAppEvent>> get handlers =>
       _handlers;
 
+  /// Remote config
+  bool _remoteConfigRegistered = false;
+
   /// Factory instance
   factory MicroAppEventController() => instance;
 
   /// MicroAppController instance
   static MicroAppEventController instance = MicroAppEventController._();
+
   MicroAppEventController._({bool isTest = false}) {
     _handlerRegisterDelegate = MicroAppEventDelegate();
 
@@ -61,33 +65,77 @@ class MicroAppEventController {
           webviewController.emit(event);
         }
       } catch (e) {
-        logger.e('An error occurred while dispatching events to webviews',
-            error: e);
+        l.e('An error occurred while dispatching events to webviews', error: e);
       }
     });
 
-    if (!isTest) {
-      // Receive micro app events from devtools
-      registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
-          (method, parameters) async {
+    if (!isTest) registerRemoteConfigChannels();
+  }
+
+  void registerRemoteConfigChannels() {
+    if (_remoteConfigRegistered || kReleaseMode) return;
+
+    _remoteConfigRegistered = true;
+
+    // Receive micro app events from devtools
+    registerExtension(Constants.devtoolsToExtensionMicroAppEvent,
+        (method, parameters) async {
+      try {
+        _handleDevToolsEvent(method, parameters);
+        return ServiceExtensionResponse.result(jsonEncode({'success': true}));
+      } catch (e) {
+        l.e('An error occurred while dispatching events to webviews', error: e);
+
+        return ServiceExtensionResponse.result(
+            jsonEncode({'success': false, 'error': e}));
+      }
+    });
+
+    // It receives requests to return MicroBoardData to devtools
+    registerExtension(Constants.devtoolsToExtensionUpdate,
+        (method, parameters) async {
+      return ServiceExtensionResponse.result(getMicroBoardData());
+    });
+
+    // It receives requests to return remote config state to devtools
+    registerExtension(Constants.extensionToDevtoolsSyncRemoteConfigMap,
+        (method, parameters) async {
+      final isEmpty =
+          parameters['data'] == null && parameters['enabled'] == null;
+
+      if (isEmpty) {
         try {
-          _handleDevToolsEvent(method, parameters);
-          return ServiceExtensionResponse.result(jsonEncode({'success': true}));
+          return ServiceExtensionResponse.result(jsonEncode({
+            'success': true,
+            'data': FmaRemoteConfig.state.config,
+            'enabled': FmaRemoteConfig.state.enabled,
+          }));
         } catch (e) {
-          logger.e('An error occurred while dispatching events to webviews',
-              error: e);
-
-          return ServiceExtensionResponse.result(
-              jsonEncode({'success': false, 'error': e}));
+          return ServiceExtensionResponse.error(exitCode, e.toString());
         }
-      });
+      } else {
+        try {
+          final data = parameters['data'];
+          final enabled = bool.tryParse(parameters['enabled'] ?? '');
 
-      // It receives requests to return MicroBoardData to devtools
-      registerExtension(Constants.devtoolsToExtensionUpdate,
-          (method, parameters) async {
-        return ServiceExtensionResponse.result(getMicroBoardData());
-      });
-    }
+          final Map<String, dynamic>? dataAsJson =
+              data == null ? null : jsonDecode(data);
+
+          FmaRemoteConfig.setState(FmaRemoteConfig.state.copyWith(
+            config: dataAsJson,
+            enabled: enabled,
+          ));
+
+          return ServiceExtensionResponse.result(jsonEncode({
+            'success': true,
+            if (dataAsJson != null) 'data': dataAsJson,
+            if (enabled != null) 'enabled': enabled,
+          }));
+        } catch (e) {
+          return ServiceExtensionResponse.error(exitCode, e.toString());
+        }
+      }
+    });
   }
 
   String getMicroBoardData() {
@@ -115,7 +163,7 @@ class MicroAppEventController {
       final jsonData = jsonEncode(mapData);
       return jsonData;
     } catch (e) {
-      logger.e('An error occurred while getting MicroBoardData', error: e);
+      l.e('An error occurred while getting MicroBoardData', error: e);
       return '{}';
     }
   }
@@ -172,7 +220,7 @@ class MicroAppEventController {
         _handlerRegisterDelegate.registerHandler(stream, handler);
     _handlers.putIfAbsent(handler, () => subscription);
 
-    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+    notifyMicroAppHasChanged(getMicroBoardData());
     return subscription;
   }
 
@@ -187,7 +235,7 @@ class MicroAppEventController {
   /// unregisterAllHandlers
   Future<void> unregisterAllHandlers() async {
     await _handlerRegisterDelegate.unregisterAllSubscriptions(_handlers);
-    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+    notifyMicroAppHasChanged(getMicroBoardData());
   }
 
   /// unregisterHandler
@@ -196,14 +244,14 @@ class MicroAppEventController {
       List<String>? channels,
       MicroAppEventHandler? handler}) async {
     if (handler != null) {
-      notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+      notifyMicroAppHasChanged(getMicroBoardData());
       return _handlerRegisterDelegate.unregisterHandler(handler, _handlers);
     }
 
     await _handlerRegisterDelegate.unregisterSubscription(_handlers,
         id: id, channels: channels);
 
-    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+    notifyMicroAppHasChanged(getMicroBoardData());
     return null;
   }
 
@@ -222,7 +270,7 @@ class MicroAppEventController {
   GenericMicroAppEventController registerWebviewController(
       {required String id,
       required GenericMicroAppEventController controller}) {
-    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+    notifyMicroAppHasChanged(getMicroBoardData());
     return _webviewControllers[id] = controller;
   }
 
@@ -235,7 +283,7 @@ class MicroAppEventController {
       return controller;
     }
 
-    notifyDevtoolsMicroBoardChanged(getMicroBoardData());
+    notifyMicroAppHasChanged(getMicroBoardData());
     return null;
   }
 }

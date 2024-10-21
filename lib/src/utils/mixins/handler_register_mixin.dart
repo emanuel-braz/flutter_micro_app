@@ -15,8 +15,7 @@ mixin HandlerRegisterStateMixin<T extends StatefulWidget> on State<T> {
       );
       eventHandlersRegistered.add(eventHandlerCopied);
     } catch (e) {
-      logger.e(
-          '[HandlerRegisterStateMixin] An error occurred while trying to register the event handler',
+      l.e('[HandlerRegisterStateMixin] An error occurred while trying to register the event handler',
           error: e);
     }
   }
@@ -43,8 +42,7 @@ mixin HandlerRegisterMixin on MicroApp {
       MicroAppEventController().registerHandler(eventHandlerCopied);
       return eventHandlerCopied;
     } catch (e) {
-      logger.e(
-          '[HandlerRegisterMixin] An error occurred while trying to register the event handler',
+      l.e('[HandlerRegisterMixin] An error occurred while trying to register the event handler',
           error: e);
       return null;
     }

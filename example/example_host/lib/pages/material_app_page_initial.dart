@@ -67,18 +67,15 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                   futures
                       .getFirstResult()
                       .then((value) => {
-                            logger.d(
-                                '** { You can capture data asyncronously later (value = $value) } **')
+                            l.d('** { You can capture data asyncronously later (value = $value) } **')
                           })
                       .catchError((error) async {
-                    logger.e(
-                        '** { But you can capture errors asyncronously later } **',
+                    l.e('** { But you can capture errors asyncronously later } **',
                         error: error);
                     return <dynamic>{};
                   });
 
-                  logger.d(
-                      '** { You do not need to wait for a TimeoutException } **');
+                  l.d('** { You do not need to wait for a TimeoutException } **');
                 },
               ),
               ElevatedButton(
@@ -91,7 +88,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                       ))
                       .getFirstResult();
 
-                  logger.d(result);
+                  l.d(result);
                 },
               ),
               const _CustomButton(),
@@ -135,8 +132,7 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                   final isValidEmail = await context.maNav
                       .pushNamedNative<bool>('emailValidator',
                           arguments: 'validateEmail:lorem@ipsum.com');
-                  logger.d(
-                      'Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
+                  l.d('Native says email lorem@ipsum.com is a ${isValidEmail ?? false ? 'valid' : 'invalid'} email');
                 },
               ),
               ElevatedButton(
@@ -171,17 +167,15 @@ class _MaterialAppPageInitialState extends State<MaterialAppPageInitial>
                             ),
                             timeout: const Duration(seconds: 2))
                         .getFirstResult();
-                    logger.d('Result is: $result');
+                    l.d('Result is: $result');
                   } on TimeoutException catch (e) {
-                    logger.e(
-                        'The native platform did not respond to the request',
+                    l.e('The native platform did not respond to the request',
                         error: e);
                   } on PlatformException catch (e) {
-                    logger.e(
-                        'The native platform respond to the request with some error',
+                    l.e('The native platform respond to the request with some error',
                         error: e);
                   } on Exception {
-                    logger.e('Generic Error');
+                    l.e('Generic Error');
                   }
                 },
               ),
