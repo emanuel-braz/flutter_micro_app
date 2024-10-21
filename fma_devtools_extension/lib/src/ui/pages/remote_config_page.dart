@@ -5,6 +5,8 @@ import 'package:flutter_micro_app/dependencies.dart';
 
 import '../../controllers/fma_controller.dart';
 
+enum SortType { notFetched, name, lastTimeFetched, defaultSort }
+
 class RemoteConfigPage extends StatefulWidget {
   const RemoteConfigPage({super.key});
 
@@ -85,13 +87,18 @@ class _RemoteConfigPageState extends State<RemoteConfigPage>
                         )),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Switch(
-                    value: value.enabled,
-                    onChanged: (bool newValue) {
-                      FmaController().syncRemoteConfigData(enabled: newValue);
-                    },
+                Tooltip(
+                  message: value.enabled
+                      ? 'Turn off Remote Config Mocking'
+                      : 'Enable Remote Config Mocking',
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Switch(
+                      value: value.enabled,
+                      onChanged: (bool newValue) {
+                        FmaController().syncRemoteConfigData(enabled: newValue);
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -138,36 +145,149 @@ class PayloadModifierScreen extends StatefulWidget {
 }
 
 class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
+  final TextEditingController _filterInput = TextEditingController();
+  Map<String, dynamic> _filteredRemoteConfig = {};
+  SortType _sortType = SortType.defaultSort;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _filteredRemoteConfig = FmaController().value.remoteConfig;
+    _filterInput.addListener(_setState);
+    FmaController().addListener(_onConfigChange);
+  }
+
+  @override
+  void dispose() {
+    _filterInput.removeListener(_setState);
+    _filterInput.dispose();
+    FmaController().removeListener(_onConfigChange);
+    super.dispose();
+  }
+
+  void _setState() => setState(() {});
+
+  _onConfigChange() {
+    setState(() {
+      _filteredRemoteConfig = FmaController().value.remoteConfig;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ValueListenableBuilder(
-          valueListenable: FmaController(),
-          builder: (context, value, child) {
-            return ListView.separated(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: value.remoteConfig.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                final item = value.remoteConfig.entries.elementAt(index);
-                return _buildItem(item.key, item.value, value);
-              },
-            );
-          }),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _filterInput,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: 'Search',
+                      prefixIcon: const Icon(Icons.search),
+                      suffix: IconButton(
+                          onPressed: () {
+                            _filterInput.clear();
+                          },
+                          icon: const Icon(Icons.clear)),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Sort by'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('Name'),
+                              onTap: () {
+                                setState(() {
+                                  _sortType = SortType.name;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('Fetched'),
+                              onTap: () {
+                                setState(() {
+                                  _sortType = SortType.lastTimeFetched;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('Not Fetched'),
+                              onTap: () {
+                                setState(() {
+                                  _sortType = SortType.notFetched;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(Icons.sort,
+                        color: _sortType != SortType.defaultSort
+                            ? Colors.blue
+                            : null),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ValueListenableBuilder(
+                valueListenable: FmaController(),
+                builder: (context, value, child) {
+                  _filter();
+                  _sort();
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: _filteredRemoteConfig.length,
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final item =
+                          _filteredRemoteConfig.entries.elementAt(index);
+                      return _buildItem(item.key, item.value, value);
+                    },
+                  );
+                }),
+          ),
+        ],
+      ),
     );
   }
 
   // Widget to build the corresponding input for each type
   Widget _buildItem(String key, dynamic value, FmaState state) {
     if (value is bool) {
-      return _buildSwitchTile(key, value, state);
+      return _buildSwitchTile(key, state);
     } else {
-      return _buildTextField(key, value, state);
+      return _buildTextField(key, state);
     }
   }
 
   // Widget for boolean values (Switch)
-  Widget _buildSwitchTile(String key, bool value, FmaState state) {
+  Widget _buildSwitchTile(String key, FmaState state) {
     return ValueListenableBuilder(
         valueListenable: FmaController().requestRemoteConfigKey,
         builder: (context, requestKey, child) {
@@ -178,14 +298,26 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(key, style: Theme.of(context).textTheme.displaySmall),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: key));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Copied to clipboard')),
+                            );
+                          },
+                          child: Text(key,
+                              style: Theme.of(context).textTheme.displaySmall)),
+                    ),
                     if (FmaController().requestedKeys[key] != null)
                       CustomChip(FmaController().requestedKeys[key]!),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Switch(
-                  value: value,
+                  value: state.remoteConfig[key],
                   onChanged: widget.isEditMode
                       ? (newValue) {
                           setState(() {
@@ -201,7 +333,8 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
   }
 
   // Widget for text, int, double, list, map (TextField)
-  Widget _buildTextField(String key, dynamic value, FmaState state) {
+  Widget _buildTextField(String key, FmaState state) {
+    final value = state.remoteConfig[key];
     TextEditingController controller =
         TextEditingController(text: value.toString());
     return Builder(builder: (context) {
@@ -214,8 +347,20 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(key,
-                          style: Theme.of(context).textTheme.displaySmall),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: key));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Copied to clipboard')),
+                            );
+                          },
+                          child: Text(key,
+                              style: Theme.of(context).textTheme.displaySmall),
+                        ),
+                      ),
                       if (FmaController().requestedKeys[key] != null)
                         CustomChip(FmaController().requestedKeys[key]!),
                     ],
@@ -249,6 +394,65 @@ class _PayloadModifierScreenState extends State<PayloadModifierScreen> {
             );
           });
     });
+  }
+
+  void _filter() {
+    _filteredRemoteConfig = Map.fromEntries(FmaController()
+        .value
+        .remoteConfig
+        .entries
+        .where((element) => element.key
+            .toLowerCase()
+            .contains(_filterInput.text.toLowerCase())));
+  }
+
+  _sort() {
+    switch (_sortType) {
+      case SortType.notFetched:
+        final sortedKeys = _filteredRemoteConfig.keys.toList()
+          ..sort((a, b) {
+            final aRequested = FmaController().requestedKeys[a]?.time != null;
+            final bRequested = FmaController().requestedKeys[b]?.time != null;
+            if (aRequested && !bRequested) {
+              return 1;
+            } else if (!aRequested && bRequested) {
+              return -1;
+            } else {
+              return a.compareTo(b);
+            }
+          });
+        final sortedMap = Map.fromEntries(sortedKeys.map((key) =>
+            MapEntry<String, dynamic>(key, _filteredRemoteConfig[key])));
+        _filteredRemoteConfig = sortedMap;
+        break;
+
+      case SortType.lastTimeFetched:
+        final sortedKeys = _filteredRemoteConfig.keys.toList()
+          ..sort((a, b) {
+            final aRequested = FmaController().requestedKeys[a]?.time;
+            final bRequested = FmaController().requestedKeys[b]?.time;
+            if (aRequested != null && bRequested != null) {
+              return aRequested.compareTo(bRequested);
+            } else if (aRequested != null) {
+              return -1;
+            } else if (bRequested != null) {
+              return 1;
+            } else {
+              return a.compareTo(b);
+            }
+          });
+        final sortedMap = Map.fromEntries(sortedKeys.map((key) =>
+            MapEntry<String, dynamic>(key, _filteredRemoteConfig[key])));
+        _filteredRemoteConfig = sortedMap;
+        break;
+      // SortType.name:
+      default:
+        final sortedKeys = _filteredRemoteConfig.keys.toList()..sort();
+        final sortedMap = Map.fromEntries(sortedKeys.map((key) =>
+            MapEntry<String, dynamic>(key, _filteredRemoteConfig[key])));
+        _filteredRemoteConfig = sortedMap;
+        break;
+    }
   }
 }
 

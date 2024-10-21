@@ -82,7 +82,7 @@ class _MainAppWidgetState extends State<MainAppWidget> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Micro Board Updated!'),
+      content: Text('Dashboard Updated!'),
     ));
   }
 
@@ -94,6 +94,7 @@ class _MainAppWidgetState extends State<MainAppWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final remoteConfigCount = FmaController().value.remoteConfig.length;
     return Scaffold(
       key: FmaController().scaffoldKey,
       appBar: AppBar(
@@ -104,35 +105,47 @@ class _MainAppWidgetState extends State<MainAppWidget> {
               builder: (context, child) {
                 final isDarkThemeEnabled =
                     extensionManager.darkThemeEnabled.value;
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
-                    onPressed: () {
-                      extensionManager.darkThemeEnabled.value =
-                          !extensionManager.darkThemeEnabled.value;
-                    },
-                    icon: isDarkThemeEnabled
-                        ? const Icon(Icons.light_mode)
-                        : const Icon(Icons.dark_mode),
+                return Tooltip(
+                  message: isDarkThemeEnabled
+                      ? 'Switch to Light Theme'
+                      : 'Switch to Dark Theme',
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IconButton(
+                      onPressed: () {
+                        extensionManager.darkThemeEnabled.value =
+                            !extensionManager.darkThemeEnabled.value;
+                      },
+                      icon: isDarkThemeEnabled
+                          ? const Icon(Icons.light_mode)
+                          : const Icon(Icons.dark_mode),
+                    ),
                   ),
                 );
               }),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () {
-                FmaController().updateView().then((value) => setState(() {}));
-              },
-              icon: const Icon(Icons.refresh),
+          Tooltip(
+            message: 'Refresh',
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                onPressed: () {
+                  FmaController().updateView().then((value) => setState(() {}));
+                  FmaController().syncRemoteConfigData();
+                },
+                icon: const Icon(Icons.refresh),
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () {
-                ExcelHelper().create();
-              },
-              icon: const Icon(Icons.file_download_rounded),
+          Tooltip(
+            message: 'Download routes as Excel',
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                onPressed: () {
+                  ExcelHelper().create();
+                },
+                icon: const Icon(Icons.file_download_rounded),
+              ),
             ),
           ),
         ],
@@ -149,7 +162,7 @@ class _MainAppWidgetState extends State<MainAppWidget> {
             sidebarItems: [
               CustomDrawerItem(
                 iconSelected: Icons.dashboard,
-                text: 'Micro Board',
+                text: 'Dashboard',
               ),
               CustomDrawerItem(
                 iconSelected: Icons.import_contacts,
@@ -161,7 +174,8 @@ class _MainAppWidgetState extends State<MainAppWidget> {
               ),
               CustomDrawerItem(
                 iconSelected: Icons.settings_remote,
-                text: 'Remote Config',
+                text:
+                    'Remote Config${remoteConfigCount > 0 ? ' ($remoteConfigCount)' : ''}',
               ),
             ],
           ),

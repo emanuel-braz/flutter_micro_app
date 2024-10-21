@@ -8,21 +8,22 @@ late FirebaseRemoteConfigExample remoteConfigFirebase;
 void main() {
   MicroBoard().getMicroBoardApps;
 
-  remoteConfigFirebase = FirebaseRemoteConfigExample(FirebaseRemoteConfigStub())
-    ..updateConfig(
-      // I recommend always setting this to `false`(default) and toggling it using the DevTools extension switch.
-      // This way, you can test both the real and fake remote config without modifying the source code.
-      enabled: false, // Default is false
-      config: {
-        'black_friday_enabled': true,
-        'my_bool': true,
-        'my_int': 42,
-        'my_double': 3.14,
-        'my_string': 'Hello, Worlds!',
-        'my_map': {'key': 'value'},
-        'my_list': [1, 2, 3],
-      },
-    );
+  remoteConfigFirebase =
+      FirebaseRemoteConfigExample(FirebaseRemoteConfigStub());
+  FmaRemoteConfig.updateConfig(
+    // I recommend always setting this to `false`(default) and toggling it using the DevTools extension switch.
+    // This way, you can test both the real and fake remote config without modifying the source code.
+    enabled: false, // Default is false
+    config: {
+      'black_friday_enabled': true,
+      'my_bool': true,
+      'my_int': 42,
+      'my_double': 3.14,
+      'my_string': 'Hello, Worlds!',
+      'my_map': {'key': 'value'},
+      'my_list': [1, 2, 3],
+    },
+  );
 
   MicroAppEventController().registerHandler(MicroAppEventHandler<Map>(
     (event) {
@@ -317,7 +318,7 @@ class _BaseHomePageState extends State<BaseHomePage>
                         'black_friday_enabled': !FmaRemoteConfig
                             .state.config['black_friday_enabled'],
                       };
-                      remoteConfigFirebase.updateConfig(config: newConfig);
+                      FmaRemoteConfig.updateConfig(config: newConfig);
                     },
                   ),
                   ProductPromotionCard(

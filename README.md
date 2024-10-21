@@ -1,6 +1,6 @@
 
-### A package to speed up the creation of micro apps structure in Flutter applications
-> Monolithic distribution with independent multiplatform development, inspired in frameworks such as Single SPA, using Event Driven Architecture.
+### This package is designed to streamline the organization and maintain consistency when implementing a micro-app architecture in Flutter applications, ensuring a standardized and efficient development process.
+> Monolithic distribution with independent multilanguage development, using Event Driven Architecture.
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
 ![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)
@@ -12,10 +12,40 @@
 
 ---
 
-### 💾 The Flutter Micro App package provides a Flutter DevTools Extension, so you can inspect the app event handlers, inspect the routes in Widget Tree through the Flutter Widget Inspector, dispatch events to control the app from outside, search for routes and export all routes to an Excel file (.xlsx)
+### 💾 The Flutter Micro App package provides a Flutter DevTools Extension, so you can inspect the app event handlers, inspect the routes in Widget Tree through the Flutter Widget Inspector, dispatch events to control the app from outside, search for routes and export all routes to an Excel file (.xlsx), and stubbing feature flags.
+
+Video: https://youtu.be/XSvhcquhI5E?si=L34yFMXL_lgrO6eh
 
 <img width="1674" alt="image" src="https://github.com/user-attachments/assets/7f9dcca9-1085-401c-9096-fc03e7ed5563">
 
+### Stubbing Remote Config
+
+In order to stub Remote Config, you need to load initial data as a json/Map, and then you will be able to use it, and switch between the real and mock data easily through Devtools.
+
+```dart
+// If you are using Firebase Remote Config, you can do this way:
+FmaRemoteConfig.updateConfig(
+  config: FirebaseRemoteConfig.instance.getAll()
+  .map((key, value) => MapEntry(key, value.asString()))
+  .cast<String, String>()
+);
+
+
+// If you are using a json file from assets(You also can download this file from Firebase Remote Config Defaults):
+final jsonData = await json.decode(await rootBundle.loadString('assets/default_remote_config.json'));
+FmaRemoteConfig.updateConfig(config: jsonData);
+
+
+// If you are using a Map(or want customize it dynamically), you can do this way:
+FmaRemoteConfig.updateConfig(
+  config: {
+    'key1': true, // Boolean values will be shown as a switch automatically
+    'key2': 1.2,
+    'key3': 3,
+    'key4': 'value',
+  }
+);
+```
 ---
 
 ### ⚙️ Define micro app configurations and contracts
