@@ -1,6 +1,6 @@
 
 ### This package is designed to streamline the organization and maintain consistency when implementing a micro-app architecture in Flutter applications, ensuring a standardized and efficient development process.
-> Monolithic distribution with independent multilanguage development, using Event Driven Architecture.
+
 
 [![Pub Version](https://img.shields.io/pub/v/flutter_micro_app?color=%2302569B&label=pub&logo=flutter)](https://pub.dev/packages/flutter_micro_app) 
 ![CI](https://github.com/emanuel-braz/flutter_micro_app/actions/workflows/analyze.yml/badge.svg)

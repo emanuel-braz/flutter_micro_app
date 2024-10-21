@@ -1,3 +1,7 @@
+## 2.1.0-rc.1
+#### Features
+- Add remote config panel - [Feature Flag Stubbing] 
+
 ## 2.0.2
 #### Fixed
 - Fixing issue with --obfuscate flag when building the app
