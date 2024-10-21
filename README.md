@@ -46,6 +46,27 @@ FmaRemoteConfig.updateConfig(
   }
 );
 ```
+
+```dart
+// Example of a custom implementation of a remote config
+class RemoteConfigExample extends FmaRemoteConfig {
+  final FirebaseRemoteConfig firebaseRemoteConfig;
+
+  RemoteConfigExample(this.firebaseRemoteConfig)
+      : super(
+            getAll: firebaseRemoteConfig.getAll, // Optional
+            getInt: firebaseRemoteConfig.getInt, // Optional
+            getDouble: firebaseRemoteConfig.getDouble, // Optional
+            getString: firebaseRemoteConfig.getString, // Optional
+            getBool: firebaseRemoteConfig.getBool, // Optional
+            getValue: firebaseRemoteConfig.getValue // Optional
+            );
+}
+
+// later
+final remoteConfig = RemoteConfigExample(FirebaseRemoteConfig.instance);
+final myFlag = remoteConfig.getBool('my_flag');
+```
 ---
 
 ### ⚙️ Define micro app configurations and contracts
