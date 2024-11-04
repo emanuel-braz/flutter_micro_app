@@ -8,7 +8,7 @@
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 <br>
 
-![image](https://github.com/user-attachments/assets/60b3f22a-ffd2-4ea8-bcb4-5111366142b3)
+![image](https://github.com/user-attachments/assets/1e074585-464f-4483-abe7-307d5a038c02)
 
 ---
 
