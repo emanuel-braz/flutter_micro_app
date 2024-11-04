@@ -30,7 +30,16 @@ FmaRemoteConfig.updateConfig(
   .cast<String, String>()
 );
 
+// or convert boolen values to switch in DevTools
+FmaRemoteConfig.updateConfig(
+  config: FirebaseRemoteConfig.instance.getAll().map((key, value) {
+    final stringValue = value.asString();
+    return MapEntry(key, stringValue == 'true' ? true : stringValue == 'false' ? false : stringValue);
+  });
+);
+```
 
+```dart
 // If you are using a json file from assets(You also can download this file from Firebase Remote Config Defaults):
 final jsonData = await json.decode(await rootBundle.loadString('assets/default_remote_config.json'));
 FmaRemoteConfig.updateConfig(config: jsonData);
