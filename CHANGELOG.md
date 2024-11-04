@@ -1,3 +1,5 @@
+## 2.2.0
+
 ## 2.1.0-rc.1
 #### Features
 - Add remote config panel - [Feature Flag Stubbing] 
