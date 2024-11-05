@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_micro_app: '>=1.1.0 <2.0.0'
+  flutter_micro_app: '>=1.1.0 <3.0.0'
 
   devtools_extensions: ^0.2.2
   devtools_app_shared: ^0.2.2
