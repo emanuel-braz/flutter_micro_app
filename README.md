@@ -76,7 +76,23 @@ class RemoteConfigExample extends FmaRemoteConfig {
 final remoteConfig = RemoteConfigExample(FirebaseRemoteConfig.instance);
 final myFlag = remoteConfig.getBool('my_flag');
 ```
+
+[![Remote Config Example]](https://github.com/user-attachments/assets/0a044f5d-3ba1-4842-97ca-f0ee571bfac1)
+
 ---
+
+### Exporting routes to file.xlsx
+
+[![Export Routes]](https://github.com/user-attachments/assets/505b155b-3534-43e9-8d15-f493ae61df19)
+
+---
+
+### Controlling the app through micro events
+
+[![Event Controller]](https://github.com/user-attachments/assets/20463baf-f085-4bd7-91b7-c719ca8bb884)
+
+---
+
 
 ### ⚙️ Define micro app configurations and contracts
 
