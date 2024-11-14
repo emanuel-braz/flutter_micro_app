@@ -40,6 +40,16 @@ class FileUtil {
         }
         imports.add(_getFileName(importPath));
       }
+
+      final exportMatch = RegExp(r"export\s+'([^']+)';").firstMatch(line);
+      if (exportMatch != null) {
+        final exportPath = exportMatch.group(1)!;
+        if (exportPath.startsWith('package:') ||
+            exportPath.startsWith('dart:')) {
+          continue;
+        }
+        imports.add(_getFileName(exportPath));
+      }
     }
 
     return imports;
