@@ -142,7 +142,11 @@ class MicroAppEventController {
     registerExtension(Constants.syncNetworkGraphData,
         (method, parameters) async {
       final filePaths = await FileUtil.getAllFiles(parameters['folder']!);
-      return ServiceExtensionResponse.result(jsonEncode(filePaths));
+      final rules = FileUtil.getRules(parameters['folder']!);
+      return ServiceExtensionResponse.result(jsonEncode({
+        'files': filePaths,
+        'rules': rules,
+      }));
     });
   }
 

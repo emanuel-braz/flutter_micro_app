@@ -1,0 +1,23 @@
+{
+    "rules": [
+        {
+            "source": "src/usecase/**/*.ts",
+            "cannot_import": [
+                "src/data_source/**/*.ts"
+            ]
+        },
+        {
+            "source": "src/repository/**/*.ts",
+            "cannot_import": [
+                "src/usecase/**/*.ts"
+            ]
+        },
+        {
+            "source": "src/controller/**/*.ts",
+            "cannot_import": [
+                "src/data_source/**/*.ts",
+                "src/usecase/**/*.ts"
+            ]
+        }
+    ]
+}
