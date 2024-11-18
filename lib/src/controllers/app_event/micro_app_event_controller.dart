@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_micro_app/dependencies.dart';
 import 'package:flutter_micro_app/flutter_micro_app.dart';
 import 'package:flutter_micro_app/src/services/native_service.dart';
+import 'package:flutter_micro_app/src/utils/file/file_util.dart';
 
 import '../../infra/adapters/micro_app_event/micro_app_event_adapter.dart';
 import '../../infra/adapters/micro_app_event/micro_app_event_json_adapter.dart';
@@ -135,6 +136,17 @@ class MicroAppEventController {
           return ServiceExtensionResponse.error(exitCode, e.toString());
         }
       }
+    });
+
+    // It receives requests to return NetworkGraphData to devtools
+    registerExtension(Constants.syncNetworkGraphData,
+        (method, parameters) async {
+      final filePaths = await FileUtil.getAllFiles(parameters['folder']!);
+      final rules = FileUtil.getRules(parameters['folder']!);
+      return ServiceExtensionResponse.result(jsonEncode({
+        'files': filePaths,
+        'rules': rules,
+      }));
     });
   }
 

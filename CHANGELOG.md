@@ -1,3 +1,8 @@
+## 2.3.0
+- Added Connections tab to DevTools Extension
+    - Shows all connections between Dart files in a network graph
+    - Configure all CRVs(Connection Rule Violation) for Dart files
+
 ## 2.2.0
 
 ## 2.1.0-rc.1

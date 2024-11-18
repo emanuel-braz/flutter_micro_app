@@ -34,7 +34,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "1254696112";
+    const serviceWorkerVersion = "907259749";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
@@ -42,6 +42,13 @@
 <body>
   <script>
     window.addEventListener('load', function(ev) {
+      // window.jsToggleDarkMode = (data) => {
+    //   const isDarkMode = JSON.parse(data)["isDarkMode"];
+    //   console.log("isDarkMode:", isDarkMode);
+    //   const backgroundColor = JSON.parse(data)["backgroundColor"];
+    //   console.log("backgroundColor:", backgroundColor);
+    // };
+
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {

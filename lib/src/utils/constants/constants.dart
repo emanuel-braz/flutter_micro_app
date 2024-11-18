@@ -30,4 +30,8 @@ class Constants {
       '$devtoolsExtensionChannel.extensionToDevtoolsSyncRemoteConfigMap';
   static const String notifyRequestRemoteConfig =
       '$devtoolsExtensionChannel.notifyRequestRemoteConfig';
+
+  // Network Graph
+  static const String syncNetworkGraphData =
+      '$devtoolsExtensionChannel.syncNetworkGraphData';
 }

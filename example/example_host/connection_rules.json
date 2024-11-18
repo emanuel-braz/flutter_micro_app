@@ -1,0 +1,44 @@
+[
+    {
+        "description": "All .dart files should have a maximum of 50 dependencies",
+        "source": "**/*.dart",
+        "maxDependencies": 50
+    },
+    {
+        "description": "Usecases should not depend on datasources or screens",
+        "source": "**/usecases/*.dart",
+        "cannotDependOn": [
+            "**/datasources/*.dart",
+            "**/*_screen.dart"
+        ]
+    },
+    {
+        "description": "Presentation files should not depend on datasources",
+        "source": "**/presentation/**/*.dart",
+        "cannotDependOn": [
+            "**/datasources/*.dart"
+        ]
+    },
+    {
+        "description": "Cubit files should not depend on datasources",
+        "source": "**/*_cubit.dart",
+        "cannotDependOn": [
+            "**/datasources/*.dart"
+        ]
+    },
+    {
+        "description": "Bloc files should not depend on datasources",
+        "source": "**/*_bloc.dart",
+        "cannotDependOn": [
+            "**/datasources/*.dart"
+        ]
+    },
+    {
+        "description": "Screen files should not depend on datasources or repositories",
+        "source": "**/*_screen.dart",
+        "cannotDependOn": [
+            "**/datasources/*.dart",
+            "**/repositories/*.dart"
+        ]
+    }
+]
