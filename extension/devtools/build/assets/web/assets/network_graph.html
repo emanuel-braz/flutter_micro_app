@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Graph</title>
+  </head>
+  <body id="network-graph">
+    <style>
+      html,
+      body,
+      #sigma-container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      #search {
+        position: absolute;
+        right: 1em;
+        top: 0.4em;
+      }
+      #search input {
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 0.5em;
+        font-size: 1em;
+        width: 20em;
+      }
+
+      #suggestions {
+        display: none;
+        position: absolute;
+        top: 2em;
+        right: 1em;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 0.5em;
+        padding: 0.5em;
+        max-height: 10em;
+        overflow-y: auto;
+      }
+
+      #suggestions option {
+        padding: 0.5em;
+        cursor: pointer;
+      }
+
+      #suggestions option:hover {
+        background-color: #ccc;
+      }
+
+      .button {
+        padding: 0.5em 1em;
+        background-color: #adc6ff;
+        color: #002e69;
+        border: 0;
+        border-radius: 2em;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 1em;
+      }
+
+      .buttons {
+        position: absolute;
+        left: 1em;
+        top: 1em;
+        display: flex;
+        align-items: center;
+      }
+
+      .toggle-buttons {
+        position: absolute;
+        right: 1em;
+        bottom: 1em;
+        display: flex;
+      }
+
+      .toggle-button {
+        padding: 0.5em 1em;
+        background-color: #adc6ff;
+        color: #002e69;
+        border: 0;
+        border-radius: 2em;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 1em;
+      }
+      
+      #toast.show {
+        display: block;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      #toast.hide {
+        opacity: 0;
+        display: none;
+        transition: opacity 0.3s ease;
+      }
+
+      #close-toast {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      #lock {
+        font-size: 1.5em;
+        cursor: pointer;
+        margin-right: 0.5em;
+      }
+
+      #toast-focus {
+        font-size: 1.2em;
+        margin-bottom: 0.5em;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .expandable-panel {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 500px;
+        max-height: 80%;
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        transition: height 0.3s ease;
+        overflow: hidden;
+        border-radius: 10px 10px 0 0;
+    }
+    .expandable-panel-header {
+      background-color: #adc6ff;
+      color: #002e69;
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .expandable-panel-content {
+      padding: 0;
+      display: none;
+      overflow-wrap: break-word;
+      font-size: small;
+      max-height: 500px;
+      overflow-y: auto;  /* Enable vertical scrolling */
+    }
+
+    #crvIndicator {
+      float: right;
+      margin-top: -3px;
+    }
+
+    </style>
+    <div id="sigma-container"></div>
+
+    <div id="search">
+      <input type="search" id="search-input" list="suggestions" placeholder="Search file" />
+      <datalist id="suggestions"></datalist>
+    </div>
+    <div class="buttons">
+      <div id="lock" title="(a) Toggle animation">🔓</div>
+      <button class="button" id="scoped">Scoped</button>
+      <button class="button" id="general">General</button>
+    </div>
+
+    <div class="toggle-buttons">
+      <button id="drag-node" class="toggle-button" style="background-color: #fff;" title="(d) Drag a node position">Drag nodes: OFF</button>
+      <button id="hover-node" class="toggle-button" title="(h) Hide others nodes when hovering">Hide others: OFF</button>
+      <button id="full-screen" class="toggle-button" title="(f) Toggle fullscreen"><strong>⎚</strong></button>
+    </div>
+    
+    <div id="toast" class="hide" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 10px 20px 15px 20px; background: #333; color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 100;">
+      <p id="toast-focus" style="color: #1e90ff;"></p>
+
+      <pre id="toast-text"></pre>
+      
+      <a id="toast-link" href="#" target="_blank" style="color: #1e90ff; text-decoration: none; margin-left: 0;">Open in VSCode</a>
+
+      <button id="close-toast" title="(Esc / Enter) to close" style="position: absolute; top: 5px; right: 5px; background: none; border: none; color: #fff; font-size: 20px; cursor: pointer;">&times;</button>
+    </div>
+
+    <div class="expandable-panel" id="panel" title="(p) Toggle panel">
+      <div class="expandable-panel-header" id="togglePanelButton">
+        <svg id="crvIndicator" height="24" width="24">
+          <circle cx="12" cy="12" r="12" fill="green" />
+          <text id="total-violations" x="12" y="16" text-anchor="middle" fill="white" font-size="9" font-family="Arial" font-weight="bold"></text>
+        </svg>
+        <span id="toggleText">Connection Rules Violations</span>
+      </div>
+      <div class="expandable-panel-content" id="panelContent">
+        <!-- Dynamic content will load here -->
+      </div>
+    </div>
+    
+    <script src="network_graph.js"></script>
+  </body>
+</html>
