@@ -93,6 +93,35 @@ final myFlag = remoteConfig.getBool('my_flag');
 
 ---
 
+### In order to see all connections between dart files, you can use the **Connections** tab.
+Create a file called `connection_rules.json` in root project folder, and add all rules desired using `glob patterns`. see example:
+
+```json
+[
+  {
+      "description": "All .dart files should have a maximum of 50 dependencies",
+      "source": "**/*.dart",
+      "maxDependencies": 50
+  },
+  {
+      "description": "Usecases should not depend on datasources or screens",
+      "source": "**/usecases/*.dart",
+      "cannotDependOn": [
+          "**/datasources/*.dart",
+          "**/*_screen.dart"
+      ]
+  },
+  {
+      "description": "Presentation files should not depend on datasources",
+      "source": "**/presentation/**/*.dart",
+      "cannotDependOn": [
+          "**/datasources/*.dart"
+      ]
+  }
+]
+```
+
+---
 
 ### ⚙️ Define micro app configurations and contracts
 
