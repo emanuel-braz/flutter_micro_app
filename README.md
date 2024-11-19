@@ -94,6 +94,10 @@ final myFlag = remoteConfig.getBool('my_flag');
 ---
 
 ### In order to see all connections between dart files, you can use the **Connections** tab.
+
+![fma_graph](https://github.com/user-attachments/assets/cb64a5b5-967c-4220-9826-b0866c2ddf61)
+
+
 Create a file called `connection_rules.json` in root project folder, and add all rules desired using `glob patterns`. see example:
 
 ```json
