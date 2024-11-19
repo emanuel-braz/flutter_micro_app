@@ -125,6 +125,8 @@ Create a file called `connection_rules.json` in root project folder, and add all
   }
 ]
 ```
+### Connections that violate rules are highlighted with a red line. Use the Connection Rules Violations panel to view all violations and fix them.
+<img width="1254" alt="Screenshot 2024-11-18 at 22 06 43" src="https://github.com/user-attachments/assets/7e25180e-8cc8-4558-a58b-513c6b7c66b1">
 
 ---
 
