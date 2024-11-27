@@ -14,7 +14,7 @@ typedef WidgetRouteBuilder = PageRouteBuilder Function(Widget page);
 typedef ModalBuilder = Route Function(RouteSettings settings);
 
 typedef MethodCallHandler = Future<dynamic> Function(MethodCall);
-typedef MicroAppEventOnEvent = void Function(MicroAppEvent);
+typedef MicroAppEventOnEvent<T> = void Function(MicroAppEvent<T> event);
 typedef MicroAppEventOnDone = void Function();
 typedef MicroAppEventOnError = Function;
 typedef MicroAppEventSubscription = StreamSubscription<MicroAppEvent> Function(
