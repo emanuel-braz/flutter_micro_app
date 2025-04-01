@@ -234,11 +234,13 @@ class MicroAppNavigatorController extends RouteObserver<PageRoute<dynamic>> {
         } else {
           if (isIOS) {
             return CupertinoPageRoute(
+              settings: RouteSettings(arguments: routeArguments, name: routeName),
               builder: (context) => pageBuilder.widgetBuilder!(context,
                   RouteSettings(arguments: routeArguments, name: routeName)),
             );
           } else {
             return MaterialPageRoute(
+              settings: RouteSettings(arguments: routeArguments, name: routeName),
               builder: (context) => pageBuilder.widgetBuilder!(context,
                   RouteSettings(arguments: routeArguments, name: routeName)),
             );
